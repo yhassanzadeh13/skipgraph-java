@@ -193,6 +193,12 @@ public class SK_Node
            
      }   
      
+     
+     /**
+      * Inserts the current node to the network. In other words,
+      * updates the lookup tables of the current node and of its neighbors.
+      */
+     
      public static void Insert()
      {
         try 
@@ -297,11 +303,13 @@ public class SK_Node
          
     }
      /**
-      * Searches the graph for a given name ID.
+      * Searches the graph for the input name ID.
       * 
       * @param name name ID of the node to be searched in the graph
       * 
-      * @return if found, returns the name of the node. else, returns the string "nothing found"
+      * @return if found, returns the (port of the) node. 
+      * Else, randomly returns a node in the level that the search has ended i.e. returns a node having maximum number of common bits with the search target, starting with the most significant (leftmost) digit.
+      * If only one node exists in the graph (e.g. the node did not inserted itself into the network), current node will be returned.
       */
      public static String SearchByNameID(String name)
      {
@@ -367,11 +375,13 @@ public class SK_Node
          
     }     
      /**
-      * Searches the graph for a given number ID.
+      * Searches the graph for the input number ID.
       * 
       * @param num number ID of the node to be searched in the graph
       * 
-      * @return if found, returns the node. else, returns null
+      * @return if found, returns the (port of the) node. 
+      * Else, returns the node with number ID which is the greatest number that is less than the search target.
+      * If only one node exists in the graph (e.g. the node did not inserted itself into the network), current node will be returned.
       */
      public static String SearchByNumID(String num)
      {
