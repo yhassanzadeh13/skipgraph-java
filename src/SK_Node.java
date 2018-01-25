@@ -16,7 +16,8 @@ public class SK_Node
     //Parameters of Node
     public static String Name_ID = null;
     public static String Num_ID = null; //Number ID is assumed to be greater than 0 
-    public static String lookup[][] = new String[4][2]; 
+    //public static String lookup[][] = new String[4][2]; 
+    public static LookupTable lookup = new LookupTable(4,2);
     public static int myPort = 0;
     public static Scanner input = new Scanner(System.in);
     public static String response;
@@ -26,7 +27,7 @@ public class SK_Node
     {
           ServerConnection SS = new ServerConnection();
           
-          LookupInit();
+          //LookupInit();
           setName();
           SS.start();
           
@@ -81,28 +82,7 @@ public class SK_Node
                  + "1-Insert\n2-Search By Name ID\n3-Search By Number ID\n4-Print the Lookup Table\n"); 
      }
      
-     /**
-      * Initializes the lookup table for the current node.
-      */
-     public static void LookupInit()
-     {
-         for(int i = 0 ; i < 4 ; i++)
-             for(int j = 0 ; j < 2 ; j++)
-                 lookup[i][j] = null;
-     }
-     /**
-      * Prints the lookup table for the current node.
-      */
-     public static void PrintLookup()
-     {
-         System.out.println("\n");
-         for(int i = 3 ; i >= 0 ; i--)
-         {
-             for(int j = 0 ; j<2 ; j++)
-                 System.out.print(lookup[i][j]+"\t");
-             System.out.println("\n");
-         }
-     }
+     
      
      /**
       * Sends a message to a node.
@@ -223,10 +203,12 @@ public class SK_Node
             Left = yourPort;
             Right = sendTo("lookup_0_R", yourPort, "localhost");
             
-            lookup[0][0] = yourPort;
+            //lookup[0][0] = yourPort;
+            lookup.LookupUpdate(0,0,yourPort);
             sendTo("set_0_R_"+myPort, yourPort, "localhost");
             
-            lookup[0][1] = Right;
+            //lookup[0][1] = Right;
+            lookup.LookupUpdate(0,1,Right);
             if(Right != null)
                 sendTo("set_0_L_"+myPort, Right, "localhost");
             
@@ -262,8 +244,10 @@ public class SK_Node
                         if(RightNeighbor != null)
                             sendTo("set_"+(level+1)+"_L_"+myPort, RightNeighbor, "localhost");
                         
-                        lookup[level+1][0] = Left;
-                        lookup[level+1][1] = RightNeighbor;
+                       // lookup[level+1][0] = Left;
+                        lookup.LookupUpdate((level+1), 0, Left);
+                       // lookup[level+1][1] = RightNeighbor;
+                        lookup.LookupUpdate((level+1), 1, RightNeighbor);
                         Right = RightNeighbor;
                     }
                 }
@@ -279,8 +263,10 @@ public class SK_Node
                         if(LeftNeighbor != null)
                             sendTo("set_"+(level+1)+"_R_"+myPort, LeftNeighbor, "localhost");
                         
-                        lookup[level+1][0] = LeftNeighbor;
-                        lookup[level+1][1] = Right;
+                        //lookup[level+1][0] = LeftNeighbor;
+                        lookup.LookupUpdate((level+1), 0, LeftNeighbor);
+                        //lookup[level+1][1] = Right;
+                        lookup.LookupUpdate((level+1), 1, Right);
                         Left = LeftNeighbor;
                     }
                 }
@@ -321,14 +307,18 @@ public class SK_Node
             int level = 0;
 
                       
-            Left  = lookup[0][0];
-            Right = lookup[0][1];
+            //Left  = lookup[0][0];
+            Left = lookup.getLookupEntry(0, 0);
+            //Right = lookup[0][1];
+            Right = lookup.getLookupEntry(0, 1);
             
             if(commonBits(Name_ID,name) > level)
             {
                  level = commonBits(Name_ID , name); 
-                 Left  = lookup[level][0];
-                 Right = lookup[level][1]; 
+                 //Left  = lookup[level][0];
+                 Left = lookup.getLookupEntry(level, 0);
+                 //Right = lookup[level][1]; 
+                 Right = lookup.getLookupEntry(level, 1);
             }
             
                while(true)
@@ -371,7 +361,8 @@ public class SK_Node
             Logger.getLogger(SK_Node.class.getName()).log(Level.SEVERE, null, ex);
         }
          
-        return "nothing found"; 
+        //return "nothing found"; 
+        return Name_ID;
          
     }     
      /**
@@ -387,7 +378,8 @@ public class SK_Node
      {
         int level = 3; 
          
-        if(lookup[0][0] == null && lookup[0][1] == null) // if only the introducer exists
+        //if(lookup[0][0] == null && lookup[0][1] == null) // if only the introducer exists
+        if(lookup.getLookupEntry(0, 0) == null && lookup.getLookupEntry(0, 1) == null)
         {
             return Integer.toString(myPort);
         }
@@ -399,11 +391,13 @@ public class SK_Node
          
          
          String next = null;
-         while(level > 0 && lookup[level][1] == null)
+         //while(level > 0 && lookup[level][1] == null)
+         while(level > 0 && lookup.getLookupEntry(level, 1) == null)
              level = level - 1;
          if(level >= 0)
          {
-             next = lookup[level][1];
+             //next = lookup[level][1];
+        	 next = lookup.getLookupEntry(level, 1);
              while(level>=0)
              {
                  try
@@ -440,11 +434,13 @@ public class SK_Node
         {
          
          String next = null;
-         while(level > 0 && lookup[level][0] == null)
+         //while(level > 0 && lookup[level][0] == null)
+         while(level > 0 && lookup.getLookupEntry(level, 0) == null)
              level = level - 1;
          if(level >= 0)
          {
-             next = lookup[level][0];
+             //next = lookup[level][0];
+        	 next = lookup.getLookupEntry(level, 0);
              while(level>=0)
              {
                  try
@@ -510,7 +506,7 @@ public class SK_Node
                  System.out.println("The Result of Search by number ID for "+num+" is: "+result2);
                  break;
              case"4":
-                 PrintLookup();
+                 lookup.PrintLookup();
                  break;
          }
          

@@ -41,9 +41,11 @@ public class SKThread extends Thread
                 case"lookup": //lookup_level_direction
                     level = Integer.parseInt(split[1].toString());
                     if(split[2].contains("R"))
-                        os.println(SK_Node.lookup[level][1]);
+                        //os.println(SK_Node.lookup[level][1]);
+                    	os.println(SK_Node.lookup.getLookupEntry(level, 1));
                     else
-                        os.println(SK_Node.lookup[level][0]);
+                        //os.println(SK_Node.lookup[level][0]);
+                    	os.println(SK_Node.lookup.getLookupEntry(level, 0));
                     os.flush();
                     break;
                     
@@ -57,11 +59,13 @@ public class SKThread extends Thread
                 case "set": //set_level_direction_address
                      level = Integer.parseInt(split[1].toString());
                     if(split[2].contains("R"))
-                        SK_Node.lookup[level][1] = split[3];
+                        //SK_Node.lookup[level][1] = split[3];
+                    	SK_Node.lookup.LookupUpdate(level, 1, split[3]);
                     else
-                        SK_Node.lookup[level][0] = split[3];
+                        //SK_Node.lookup[level][0] = split[3];
+                    	SK_Node.lookup.LookupUpdate(level, 0, split[3]);
                     System.out.println("Lookup table has been updated successfully");
-                    SK_Node.PrintLookup();
+                    SK_Node.lookup.PrintLookup();
                     os.println("Split[2] is:-"+split[2]+"-");
                     os.flush();
                     break;
