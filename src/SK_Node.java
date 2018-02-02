@@ -18,11 +18,13 @@ public class SK_Node
     public static String Num_ID = null; //Number ID is assumed to be greater than 0 
     //public static String lookup[][] = new String[4][2]; 
     public static LookupTable lookup = new LookupTable(4,2);
-    public static int myPort = 0;
+    public static String myAddress = "";
     public static Scanner input = new Scanner(System.in);
     public static String response;
     public static int size = 4;
-    public static String introducer = "2224";
+    public static String introducer = "1850";
+    public static int myPort; 
+    public static String myIP;
     public static void main(String args[]) throws IOException
     {
           ServerConnection SS = new ServerConnection();
@@ -189,28 +191,33 @@ public class SK_Node
             
 //            System.out.println("Who is before?");
 //            String yourPort = get();
-              String yourPort = sendTo("search_"+Num_ID, introducer , "localhost");
+              String yourAddress = sendTo("search_"+Num_ID, introducer , "192.168.2.162");
+              System.out.println(yourAddress);
+              String[] address = yourAddress.split(":");
+              String yourPort = address[1];
+              String yourIP = address[0];
               System.out.println("my before is " + yourPort);
 //            Scanner input3 = new Scanner(System.in);
 //            yourPort = input3.nextLine();
 //           input3.close();
             
-//            sendTo("set_0_R_"+myPort, yourPort, "localhost");
-//            sendTo("set_0_L_221", yourPort, "localhost");
-//            sendTo("lookup_0_R_", yourPort, "localhost");
-//            sendTo("lookup_0_L_", yourPort, "localhost");
+//            sendTo("set_0_R_"+myPort, yourPort, "192.168.2.162");
+//            sendTo("set_0_L_221", yourPort, "192.168.2.162");
+//            sendTo("lookup_0_R_", yourPort, "192.168.2.162");
+//            sendTo("lookup_0_L_", yourPort, "192.168.2.162");
             
-            Left = yourPort;
-            Right = sendTo("lookup_0_R", yourPort, "localhost");
+            //Left = yourPort;
+              Left = yourAddress;
+            Right = sendTo("lookup_0_R", yourPort, yourIP);
             
             //lookup[0][0] = yourPort;
-            lookup.LookupUpdate(0,0,yourPort);
-            sendTo("set_0_R_"+myPort, yourPort, "localhost");
+            lookup.LookupUpdate(0,0,yourAddress);
+            sendTo("set_0_R_"+myAddress, yourPort, yourIP);
             
             //lookup[0][1] = Right;
             lookup.LookupUpdate(0,1,Right);
             if(Right != null)
-                sendTo("set_0_L_"+myPort, Right, "localhost");
+                sendTo("set_0_L_"+myAddress, Right.split(":")[1] , Right.split(":")[0]);
             
             int level = 0;
             while(true)
@@ -219,14 +226,14 @@ public class SK_Node
                while(true)
                 {
                     if(Left != null)
-                        if(commonBits(sendTo("name", Left, "localhost")) <= level)
-                            Left  = sendTo("lookup_"+level+"_L", Left, "localhost");
+                        if(commonBits(sendTo("name", Left.split(":")[1], Left.split(":")[0])) <= level)
+                            Left  = sendTo("lookup_"+level+"_L", Left.split(":")[1], Left.split(":")[0]);
                         else 
                             break;
                             
                     if(Right != null)
-                        if(commonBits(sendTo("name", Right, "localhost")) <=level)
-                         Right = sendTo("lookup_"+level+"_R", Right, "localhost");
+                        if(commonBits(sendTo("name", Right.split(":")[1], Right.split(":")[0])) <=level)
+                         Right = sendTo("lookup_"+level+"_R", Right.split(":")[1], Right.split(":")[0]);
                         else 
                             break;
                     if(Right == null && Left == null)
@@ -235,14 +242,14 @@ public class SK_Node
                 
                 if(Left!= null)
                 {
-                    if(commonBits(sendTo("name", Left, "localhost")) > level )
+                    if(commonBits(sendTo("name", Left.split(":")[1], Left.split(":")[0])) > level )
                     {
                         String RightNeighbor = null;
-                        RightNeighbor = sendTo("lookup_"+(level+1)+"_R", Left, "localhost");
+                        RightNeighbor = sendTo("lookup_"+(level+1)+"_R", Left.split(":")[1], Left.split(":")[0]);
                         
-                        sendTo("set_"+(level+1)+"_R_"+myPort, Left, "localhost");
+                        sendTo("set_"+(level+1)+"_R_"+myAddress, Left.split(":")[1], Left.split(":")[0]);
                         if(RightNeighbor != null)
-                            sendTo("set_"+(level+1)+"_L_"+myPort, RightNeighbor, "localhost");
+                            sendTo("set_"+(level+1)+"_L_"+myAddress, RightNeighbor.split(":")[1], RightNeighbor.split(":")[0]);
                         
                        // lookup[level+1][0] = Left;
                         lookup.LookupUpdate((level+1), 0, Left);
@@ -254,14 +261,14 @@ public class SK_Node
                 
                 else if(Right != null)
                 {
-                    if(commonBits(sendTo("name", Right, "localhost")) > level)
+                    if(commonBits(sendTo("name", Right.split(":")[1], Right.split(":")[0])) > level)
                     {
                         String LeftNeighbor = null;
-                        LeftNeighbor = sendTo("lookup_"+(level+1)+"_L", Right, "localhost");
+                        LeftNeighbor = sendTo("lookup_"+(level+1)+"_L", Right.split(":")[1], Right.split(":")[0]);
                         
-                        sendTo("set_"+(level+1)+"_L_"+myPort, Right, "localhost");
+                        sendTo("set_"+(level+1)+"_L_"+myAddress, Right.split(":")[1], Right.split(":")[0]);
                         if(LeftNeighbor != null)
-                            sendTo("set_"+(level+1)+"_R_"+myPort, LeftNeighbor, "localhost");
+                            sendTo("set_"+(level+1)+"_R_"+myAddress, LeftNeighbor.split(":")[1], LeftNeighbor.split(":")[0]);
                         
                         //lookup[level+1][0] = LeftNeighbor;
                         lookup.LookupUpdate((level+1), 0, LeftNeighbor);
@@ -325,29 +332,29 @@ public class SK_Node
                 {
                     if(Left != null)
                     {
-                        if(sendTo("name", Left, "localhost").contains(name))
+                        if(sendTo("name", Left.split(":")[1], Left.split(":")[0]).contains(name))
                             return Left;
-                        else if(commonBits(sendTo("name", Left, "localhost"),name) <= level)
-                            Left  = sendTo("lookup_"+level+"_L", Left, "localhost");
-                        else if(commonBits(sendTo("name", Left, "localhost"),name) > level)
+                        else if(commonBits(sendTo("name", Left.split(":")[1], Left.split(":")[0]),name) <= level)
+                            Left  = sendTo("lookup_"+level+"_L", Left.split(":")[1], Left.split(":")[0]);
+                        else if(commonBits(sendTo("name", Left.split(":")[1], Left.split(":")[0]),name) > level)
                         {
-                            level = commonBits(sendTo("name", Left, "localhost"),name);
-                            Right = sendTo("lookup_"+level+"_R", Left, "localhost");
-                            Left  = sendTo("lookup_"+level+"_L", Left, "localhost");
+                            level = commonBits(sendTo("name", Left.split(":")[1], Left.split(":")[0]),name);
+                            Right = sendTo("lookup_"+level+"_R", Left.split(":")[1], Left.split(":")[0]);
+                            Left  = sendTo("lookup_"+level+"_L", Left.split(":")[1], Left.split(":")[0]);
                             continue;
                         }
                     }        
                     else if(Right != null)
                     {
-                        if(sendTo("name", Right, "localhost").contains(name))
+                        if(sendTo("name", Right.split(":")[1], Right.split(":")[0]).contains(name))
                             return Right;
-                        else if(commonBits(sendTo("name", Right, "localhost"),name) <=level)
-                         Right = sendTo("lookup_"+level+"_R", Right, "localhost");
-                        else if(commonBits(sendTo("name", Right, "localhost"),name) > level)
+                        else if(commonBits(sendTo("name", Right.split(":")[1], Right.split(":")[0]),name) <=level)
+                         Right = sendTo("lookup_"+level+"_R", Right.split(":")[1], Right.split(":")[0]);
+                        else if(commonBits(sendTo("name", Right.split(":")[1], Right.split(":")[0]),name) > level)
                         {
-                            level = commonBits(sendTo("name", Right, "localhost"),name);
-                            Right = sendTo("lookup_"+level+"_R", Right, "localhost");
-                            Left  = sendTo("lookup_"+level+"_L", Right, "localhost");  
+                            level = commonBits(sendTo("name", Right.split(":")[1], Right.split(":")[0]),name);
+                            Right = sendTo("lookup_"+level+"_R", Right.split(":")[1], Right.split(":")[0]);
+                            Left  = sendTo("lookup_"+level+"_L", Right.split(":")[1], Right.split(":")[0]);  
                             continue;
                         }
                     }
@@ -381,7 +388,8 @@ public class SK_Node
         //if(lookup[0][0] == null && lookup[0][1] == null) // if only the introducer exists
         if(lookup.getLookupEntry(0, 0) == null && lookup.getLookupEntry(0, 1) == null)
         {
-            return Integer.toString(myPort);
+            //return Integer.toString(myPort);
+        	return myAddress;
         }
          
         
@@ -403,12 +411,12 @@ public class SK_Node
                  try
                  {
         
-                     if(sendTo("lookup_"+level+"_R", next, "localhost") != null) 
+                     if(sendTo("lookup_"+level+"_R", next.split(":")[1], next.split(":")[0]) != null) 
                      {
-                         if(Integer.parseInt(sendTo("num", sendTo("lookup_"+level+"_R", next, "localhost"), "localhost")) <= Integer.parseInt(num))
+                         if(Integer.parseInt(sendTo("num", sendTo("lookup_"+level+"_R", next.split(":")[1], next.split(":")[0]).split(":")[1], sendTo("lookup_"+level+"_R", next.split(":")[1], next.split(":")[0]).split(":")[0])) <= Integer.parseInt(num))
                          {
-                             next = sendTo("lookup_"+level+"_R", next, "localhost");
-                             if(Integer.parseInt(sendTo("num", next, "localhost")) == Integer.parseInt(num))
+                             next = sendTo("lookup_"+level+"_R", next.split(":")[1], next.split(":")[0]);
+                             if(Integer.parseInt(sendTo("num", next.split(":")[1], next.split(":")[0])) == Integer.parseInt(num))
                                                                                                 return next;
                          }
                          else
@@ -446,12 +454,12 @@ public class SK_Node
                  try
                  {
         
-                     if(sendTo("lookup_"+level+"_L", next, "localhost") != null) 
+                     if(sendTo("lookup_"+level+"_L", next.split(":")[1], next.split(":")[0]) != null) 
                      {
-                         if(Integer.parseInt(sendTo("num", sendTo("lookup_"+level+"_L", next, "localhost"), "localhost")) >= Integer.parseInt(num))
+                         if(Integer.parseInt(sendTo("num", sendTo("lookup_"+level+"_L", next.split(":")[1], next.split(":")[0]).split(":")[1], sendTo("lookup_"+level+"_L", next.split(":")[1], next.split(":")[0]).split(":")[0])) >= Integer.parseInt(num))
                          {
-                             next = sendTo("lookup_"+level+"_L", next, "localhost");
-                             if(Integer.parseInt(sendTo("num", next, "localhost")) == Integer.parseInt(num))
+                             next = sendTo("lookup_"+level+"_L", next.split(":")[1], next.split(":")[0]);
+                             if(Integer.parseInt(sendTo("num", next.split(":")[1], next.split(":")[0])) == Integer.parseInt(num))
                                                                                                 return next;
                          }
                          else

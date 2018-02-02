@@ -108,7 +108,7 @@ public class SKThread extends Thread
             System.out.println("Client "+line+" Closed");
         }
 
-    finally
+      finally
         {    
             try
             {
@@ -135,6 +135,6 @@ public class SKThread extends Thread
             {
                 System.out.println("Socket Close Error");
             }
-        }//end finally
+        }//end finally 
     }//end of run
 }//end of SKThread

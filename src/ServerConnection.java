@@ -11,7 +11,12 @@ public class ServerConnection extends Thread
         System.out.println("What is my address?");
         //Scanner input2 = new Scanner(System.in);
         //SK_Node.myPort = input2.nextInt();
-        SK_Node.myPort = Integer.parseInt(SK_Node.get());
+        //SK_Node.myPort = Integer.parseInt(SK_Node.get());
+        SK_Node.myAddress = SK_Node.get();
+        String[] address = SK_Node.myAddress.split(":");
+        SK_Node.myIP = address[0];
+        SK_Node.myPort = Integer.parseInt(address[1]);
+        
         try
         {
             ss2 = new ServerSocket(SK_Node.myPort); // can also use static final PORT_NUM , when defined
