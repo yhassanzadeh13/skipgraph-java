@@ -1,66 +1,66 @@
 package underlay;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import underlay.packets.GenericRequest;
 import underlay.packets.RequestType;
 
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-
 /**
  * This test creates two underlays on the machine at different ports and checks the
- * connectivity between them. Uses the Java RMI adapter for now.
+ * connectivity between them. Uses the default adapter.
  */
-class UnderlayTest {
+public class UnderlayTest {
 
-    private static final int LOCAL_PORT = 9090;
-    private static final int REMOTE_PORT = 9091;
+    protected static final int LOCAL_PORT = 9090;
+    protected static final int REMOTE_PORT = 9091;
 
-    private static Underlay localUnderlay;
-    private static Underlay remoteUnderlay;
+    protected static Underlay localUnderlay;
+    protected static Underlay remoteUnderlay;
 
-    private static String localIP;
-
-    // Create two underlays at different ports.
+    // Initializes the underlays.
     @BeforeAll
     static void setUp() {
-        // Construct the underlays.
-        localUnderlay = new Underlay(LOCAL_PORT);
-        remoteUnderlay = new Underlay(REMOTE_PORT);
+        localUnderlay = Underlay.newDefaultUnderlay();
+        remoteUnderlay = Underlay.newDefaultUnderlay();
 
-        try {
-            localIP = Inet4Address.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT));
+        Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT));
     }
 
     // Checks the message delivery for every request type between underlays.
     @Test
     void sendMessage() {
         // The address of the remote underlay.
-        String remoteAddress = localIP + ":" + REMOTE_PORT;
+        String remoteAddress = remoteUnderlay.getAddress();
+        int remotePort = remoteUnderlay.getPort();
 
         // Check search by name ID request.
         GenericRequest r = new GenericRequest();
         r.addParameter("targetNameID", "");
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, RequestType.SearchByNameID, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.SearchByNameID, r));
         // Check search by numerical ID request.
         r = new GenericRequest();
         r.addParameter("targetNumID", 0);
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, RequestType.SearchByNumID, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.SearchByNumID, r));
         // Check level-based search by name ID request.
         r = new GenericRequest();
         r.addParameter("level", 0);
         r.addParameter("targetNameID", "");
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, RequestType.NameIDLevelSearch, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.NameIDLevelSearch, r));
         // Check left/right update requests.
         r = new GenericRequest();
         r.addParameter("level", 0);
         r.addParameter("newValue", "");
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, RequestType.UpdateLeftNode, r));
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, RequestType.UpdateRightNode, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateLeftNode, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateRightNode, r));
+    }
+
+    // Terminates the underlays.
+    @AfterAll
+    static void tearDown() {
+        Assertions.assertTrue(localUnderlay.terminate());
+        Assertions.assertTrue(remoteUnderlay.terminate());
     }
 }
