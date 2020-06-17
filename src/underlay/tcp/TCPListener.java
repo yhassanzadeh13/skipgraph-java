@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 /**
- * Implements a `Runnable` that continuously listens a local TCP port and delegates the handling
+ * Implements a routine that continuously listens a local TCP port and delegates the handling
  * of each received request to a `TCPHandler` thread.
  */
 public class TCPListener implements Runnable {

@@ -1,6 +1,7 @@
 package underlay.tcp;
 
 import underlay.Underlay;
+import underlay.packets.RequestPacket;
 import underlay.packets.RequestParameters;
 import underlay.packets.RequestType;
 import underlay.packets.ResponseParameters;
@@ -22,7 +23,7 @@ public class TCPUnderlay extends Underlay {
     private ServerSocket serverSocket;
 
     /**
-     *
+     * Creates a TCP socket at the given port and starts listening it.
      * @param port the port that the underlay should be bound to.
      * @return true iff initialization is successful.
      */
@@ -67,7 +68,7 @@ public class TCPUnderlay extends Underlay {
         // Send the request.
         try {
             requestStream = new ObjectOutputStream(remote.getOutputStream());
-            TCPRequest request = new TCPRequest(t, p);
+            RequestPacket request = new RequestPacket(t, p);
             requestStream.writeObject(request);
         } catch(IOException e) {
             System.err.println("[TCPUnderlay] Could not send the request.");
@@ -75,11 +76,10 @@ public class TCPUnderlay extends Underlay {
             return null;
         }
         // Receive the response.
-        ResponseParameters responseParameters;
+        ResponseParameters response;
         try {
             responseStream = new ObjectInputStream(remote.getInputStream());
-            TCPResponse response = (TCPResponse) responseStream.readObject();
-            responseParameters = response.parameters;
+            response = (ResponseParameters) responseStream.readObject();
         } catch(IOException | ClassNotFoundException e) {
             System.err.println("[TCPUnderlay] Could not receive the response.");
             e.printStackTrace();
@@ -94,11 +94,12 @@ public class TCPUnderlay extends Underlay {
             System.err.println("[TCPUnderlay] Could not close the outgoing connection.");
             e.printStackTrace();
         }
-        return responseParameters;
+        return response;
     }
 
     /**
      * Terminates the underlay by unbinding the listener from the port.
+     * @return whether the termination was successful.
      */
     @Override
     public boolean terminate() {
