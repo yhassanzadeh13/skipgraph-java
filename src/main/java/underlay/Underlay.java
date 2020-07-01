@@ -1,5 +1,6 @@
 package underlay;
 
+import middlelayer.MiddleLayer;
 import underlay.javarmi.JavaRMIUnderlay;
 import underlay.packets.RequestParameters;
 import underlay.packets.RequestType;
@@ -11,11 +12,17 @@ import java.net.UnknownHostException;
 /**
  * Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication.
  */
-public abstract class Underlay extends RequestHandler {
+public abstract class Underlay {
+
+    private MiddleLayer middleLayer;
 
     private int port;
     private String address;
     private String fullAddress;
+
+    public void setMiddleLayer(MiddleLayer middleLayer) {
+        this.middleLayer = middleLayer;
+    }
 
     public int getPort() {
         return port;
@@ -27,6 +34,16 @@ public abstract class Underlay extends RequestHandler {
 
     public String getFullAddress() {
         return fullAddress;
+    }
+
+    /**
+     * Dispatches a request to the middle layer method and returns the response.
+     * @param t type of the request.
+     * @param p request parameters.
+     * @return emitted response.
+     */
+    public ResponseParameters dispatchRequest(RequestType t, RequestParameters p) {
+        return middleLayer.receive(t, p);
     }
 
     /**
@@ -72,7 +89,7 @@ public abstract class Underlay extends RequestHandler {
     public abstract boolean terminate();
 
     /**
-     * Constructs a new default underlay. Must be initialized.
+     * Constructs a new default underlay. Must be initialized and connected to the middle layer.
      * @return a new default underlay.
      */
     public static Underlay newDefaultUnderlay() {

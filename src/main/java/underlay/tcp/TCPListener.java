@@ -1,7 +1,5 @@
 package underlay.tcp;
 
-import underlay.RequestHandler;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,11 +14,11 @@ public class TCPListener implements Runnable {
     // Owned resource by the `TCPUnderlay`.
     private final ServerSocket serverSocket;
     // Owned resource by the `TCPUnderlay`.
-    private final RequestHandler requestHandler;
+    private final TCPUnderlay underlay;
 
-    public TCPListener(ServerSocket serverSocket, RequestHandler requestHandler) {
+    public TCPListener(ServerSocket serverSocket, TCPUnderlay underlay) {
         this.serverSocket = serverSocket;
-        this.requestHandler = requestHandler;
+        this.underlay = underlay;
     }
 
     @Override
@@ -31,7 +29,7 @@ public class TCPListener implements Runnable {
                 Socket incomingConnection = serverSocket.accept();
                 // Handle the connection in a new thread.
                 // TODO: manage the termination of the handler threads.
-                new Thread(new TCPHandler(incomingConnection, requestHandler)).start();
+                new Thread(new TCPHandler(incomingConnection, underlay)).start();
             } catch(SocketException e) {
                 // Once the listener socket is closed by an outside thread, this point will be reached and
                 // we will stop listening.

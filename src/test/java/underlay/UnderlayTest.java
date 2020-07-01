@@ -1,15 +1,17 @@
 package underlay;
 
+import middlelayer.MiddleLayer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import overlay.Overlay;
 import underlay.packets.GenericRequest;
 import underlay.packets.RequestType;
 
 /**
  * This test creates two underlays on the machine at different ports and checks the
- * connectivity between them. Uses the default adapter.
+ * connectivity between them. Uses the default underlay implementation.
  */
 public class UnderlayTest {
 
@@ -19,11 +21,26 @@ public class UnderlayTest {
     protected static Underlay localUnderlay;
     protected static Underlay remoteUnderlay;
 
+    /**
+     * Builds the middle layer and overlay on top of the given underlay so that it can
+     * be used.
+     * @param underlay underlay to be built.
+     */
+    protected static void buildLayers(Underlay underlay) {
+        Overlay overlay = new Overlay();
+        MiddleLayer middleLayer = new MiddleLayer(underlay, overlay);
+        underlay.setMiddleLayer(middleLayer);
+        overlay.setMiddleLayer(middleLayer);
+    }
+
     // Initializes the underlays.
     @BeforeAll
     static void setUp() {
         localUnderlay = Underlay.newDefaultUnderlay();
         remoteUnderlay = Underlay.newDefaultUnderlay();
+
+        buildLayers(localUnderlay);
+        buildLayers(remoteUnderlay);
 
         Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT));
         Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT));

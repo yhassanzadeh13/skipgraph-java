@@ -1,6 +1,5 @@
 package underlay.udp;
 
-import underlay.RequestHandler;
 import underlay.packets.RequestPacket;
 import underlay.packets.ResponseParameters;
 
@@ -23,21 +22,21 @@ public class UDPHandler implements Runnable {
     // The port of the client that the request was sent from.
     private final int clientPort;
     // The handler which will be handling this request.
-    private final RequestHandler requestHandler;
+    private final UDPUnderlay underlay;
 
     public UDPHandler(DatagramSocket udpSocket, RequestPacket request, InetAddress clientAddress, int clientPort,
-                      RequestHandler requestHandler) {
+                      UDPUnderlay underlay) {
         this.udpSocket = udpSocket;
         this.request = request;
         this.clientAddress = clientAddress;
         this.clientPort = clientPort;
-        this.requestHandler = requestHandler;
+        this.underlay = underlay;
     }
 
     // TODO send back an error response when necessary.
     @Override
     public void run() {
-        ResponseParameters response = requestHandler.dispatchRequest(request.type, request.parameters);
+        ResponseParameters response = underlay.dispatchRequest(request.type, request.parameters);
         // Serialize the response.
         byte[] responseBytes = UDPUtils.serialize(response);
         if(responseBytes == null) {

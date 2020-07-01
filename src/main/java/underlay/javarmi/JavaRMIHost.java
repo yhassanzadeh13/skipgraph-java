@@ -1,6 +1,5 @@
 package underlay.javarmi;
 
-import underlay.RequestHandler;
 import underlay.packets.RequestParameters;
 import underlay.packets.RequestType;
 import underlay.packets.ResponseParameters;
@@ -13,14 +12,14 @@ import java.rmi.server.UnicastRemoteObject;
  */
 public class JavaRMIHost extends UnicastRemoteObject implements JavaRMIService {
 
-    private final RequestHandler requestHandler;
+    private final JavaRMIUnderlay underlay;
 
-    public JavaRMIHost(RequestHandler requestHandler) throws RemoteException {
-        this.requestHandler = requestHandler;
+    public JavaRMIHost(JavaRMIUnderlay underlay) throws RemoteException {
+        this.underlay = underlay;
     }
 
     @Override
     public ResponseParameters handleRequest(RequestType type, RequestParameters parameters) {
-        return requestHandler.dispatchRequest(type, parameters);
+        return underlay.dispatchRequest(type, parameters);
     }
 }

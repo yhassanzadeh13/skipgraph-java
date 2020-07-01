@@ -83,7 +83,7 @@ public class JavaRMIUnderlay extends Underlay {
             return remote.handleRequest(t, p);
         } catch (Exception e) {
             System.err.println("[JavaRMIUnderlay] Could not send the message.");
-            System.err.println();
+            e.printStackTrace();
             return null;
         }
     }
