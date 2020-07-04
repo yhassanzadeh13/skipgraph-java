@@ -1,10 +1,8 @@
 package middlelayer;
-
-import overlay.Overlay;
+import skipnode.SkipNodeIdentity;
+import skipnode.SkipNodeInterface;
 import underlay.Underlay;
-import underlay.packets.RequestParameters;
-import underlay.packets.RequestType;
-import underlay.packets.ResponseParameters;
+import underlay.packets.*;
 
 /**
  * Represents a mediator between the overlay and the underlay. The requests coming from the underlay are directed
@@ -15,9 +13,9 @@ import underlay.packets.ResponseParameters;
 public class MiddleLayer {
 
     private final Underlay underlay;
-    private final Overlay overlay;
+    private final SkipNodeInterface overlay;
 
-    public MiddleLayer(Underlay underlay, Overlay overlay) {
+    public MiddleLayer(Underlay underlay, SkipNodeInterface overlay) {
         this.underlay = underlay;
         this.overlay = overlay;
     }
@@ -41,22 +39,95 @@ public class MiddleLayer {
      * @return response emitted by the overlay.
      */
     public ResponseParameters receive(RequestType t, RequestParameters p) {
+        // TODO: Create responses for each request type
+        GenericResponse resp = new GenericResponse();
         switch (t) {
             case SearchByNameID:
-                return overlay.searchByNameID((String) p.getRequestValue("targetNameID"));
+                SkipNodeIdentity result = overlay.searchByNameID((String) p.getRequestValue("targetNameID"));
+                resp.addParameter("searchResult", result);
+                return resp;
             case SearchByNumID:
-                return overlay.searchByNumID((Integer) p.getRequestValue("targetNumID"));
+                resp.addParameter("searchResult", overlay.searchByNumID((Integer) p.getRequestValue("targetNumID")));
+                return resp;
             case NameIDLevelSearch:
-                return overlay.nameIDLevelSearch((Integer) p.getRequestValue("level"),
-                        (String) p.getRequestValue("targetNameID"));
+                resp.addParameter("searchResult", overlay.nameIDLevelSearch((Integer) p.getRequestValue("level"),
+                                                                            (String) p.getRequestValue("targetNameID")));
+                return resp;
             case UpdateLeftNode:
-                return overlay.updateLeftNode((Integer) p.getRequestValue("level"),
-                        (String) p.getRequestValue("newValue"));
+                resp.addParameter("successful", overlay.updateLeftNode((SkipNodeIdentity) p.getRequestValue("newValue"),
+                                                                         (Integer) p.getRequestValue("level")));
+                return resp;
             case UpdateRightNode:
-                return overlay.updateRightNode((Integer) p.getRequestValue("level"),
-                        (String) p.getRequestValue("newValue"));
+                resp.addParameter("successful", overlay.updateRightNode((SkipNodeIdentity) p.getRequestValue("newValue"),
+                                                                         (Integer) p.getRequestValue("level")));
+                return resp;
             default:
                 return null;
         }
+    }
+
+    /*
+    Implemented methods.
+    These are the methods that the Overlay will use to send messages using the middle layer
+    TODO: Think about whether we should implement a wrapper class to handle this similarly to how RMI returns a callable object
+    Possible usage then: dial(address) would return an object that handles all the communication to the middle layer
+    and can abstract away all the details, allowing for it to be used as if it was simply available locally.
+     */
+
+    public SkipNodeIdentity searchByNameID(String destinationAddress, int port, String nameID){
+        // Create the request
+        GenericRequest req = new GenericRequest();
+        // Add the parameters
+        req.addParameter("targetNameID", nameID);
+
+        // Send the request through the underlay
+        ResponseParameters response = this.send(destinationAddress, port, RequestType.SearchByNameID, req);
+
+        return (SkipNodeIdentity) response.getResponseValue("searchResult");
+    }
+
+    public SkipNodeIdentity searchByNumID(String destinationAddress, int port, int numID){
+        // Create the request
+        GenericRequest req = new GenericRequest();
+        // Add the parameters
+        req.addParameter("targetNumID", numID);
+
+        // Send the request through the underlay
+        ResponseParameters response = this.send(destinationAddress, port, RequestType.SearchByNumID, req);
+
+        return (SkipNodeIdentity) response.getResponseValue("searchResult");
+    }
+
+    public SkipNodeIdentity nameIDLevelSearch(String destinationAddress, int port, int level, String nameID){
+        // Create the request
+        GenericRequest req = new GenericRequest();
+        // Add the parameters
+        req.addParameter("level", level);
+        req.addParameter("targetNameID", nameID);
+
+        // Send the request through the underlay
+        ResponseParameters response = this.send(destinationAddress, port, RequestType.NameIDLevelSearch, req);
+
+        return (SkipNodeIdentity) response.getResponseValue("searchResult");
+    }
+
+    public SkipNodeIdentity updateRightNode(String destinationAddress, int port,SkipNodeIdentity snId, int level){
+        // Create the request
+        UpdateRequest req = new UpdateRequest(level, snId);
+
+        // Send the request through the underlay
+        ResponseParameters response = this.send(destinationAddress, port, RequestType.UpdateRightNode, req);
+
+        return (SkipNodeIdentity) response.getResponseValue("searchResult");
+    }
+
+    public SkipNodeIdentity updateLeftNode(String destinationAddress, int port,SkipNodeIdentity snId, int level){
+        // Create the request
+        UpdateRequest req = new UpdateRequest(level, snId);
+
+        // Send the request through the underlay
+        ResponseParameters response = this.send(destinationAddress, port, RequestType.UpdateLeftNode, req);
+
+        return (SkipNodeIdentity) response.getResponseValue("searchResult");
     }
 }
