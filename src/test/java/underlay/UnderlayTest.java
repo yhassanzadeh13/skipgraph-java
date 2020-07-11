@@ -1,15 +1,21 @@
 package underlay;
 
+import lookup.LookupTable;
+import lookup.LookupTableFactory;
+import middlelayer.MiddleLayer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import skipnode.SkipNode;
+import skipnode.SkipNodeInterface;
 import underlay.packets.GenericRequest;
 import underlay.packets.RequestType;
+import underlay.packets.UpdateRequest;
 
 /**
  * This test creates two underlays on the machine at different ports and checks the
- * connectivity between them. Uses the default adapter.
+ * connectivity between them. Uses the default underlay implementation.
  */
 public class UnderlayTest {
 
@@ -19,11 +25,26 @@ public class UnderlayTest {
     protected static Underlay localUnderlay;
     protected static Underlay remoteUnderlay;
 
+    /**
+     * Builds the middle layer and overlay on top of the given underlay so that it can
+     * be used.
+     * @param underlay underlay to be built.
+     */
+    protected static void buildLayers(Underlay underlay) {
+        SkipNodeInterface overlay = new SkipNode(LookupTable.EMPTY_NODE, LookupTableFactory.createDefaultLookupTable());
+        MiddleLayer middleLayer = new MiddleLayer(underlay, overlay);
+        underlay.setMiddleLayer(middleLayer);
+        overlay.setMiddleLayer(middleLayer);
+    }
+
     // Initializes the underlays.
     @BeforeAll
     static void setUp() {
         localUnderlay = Underlay.newDefaultUnderlay();
         remoteUnderlay = Underlay.newDefaultUnderlay();
+
+        buildLayers(localUnderlay);
+        buildLayers(remoteUnderlay);
 
         Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT));
         Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT));
@@ -50,11 +71,9 @@ public class UnderlayTest {
         r.addParameter("targetNameID", "");
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.NameIDLevelSearch, r));
         // Check left/right update requests.
-        r = new GenericRequest();
-        r.addParameter("level", 0);
-        r.addParameter("newValue", "");
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateLeftNode, r));
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateRightNode, r));
+        UpdateRequest u = new UpdateRequest(0, LookupTable.EMPTY_NODE);
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateLeftNode, u));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateRightNode, u));
     }
 
     // Terminates the underlays.

@@ -1,6 +1,5 @@
 package underlay.udp;
 
-import underlay.RequestHandler;
 import underlay.packets.RequestPacket;
 import underlay.packets.ResponseParameters;
 
@@ -17,14 +16,14 @@ public class UDPListener implements Runnable {
     // Owned resource by the `UDPUnderlay`.
     private final DatagramSocket listenSocket;
     // Owned resource by the `UDPUnderlay`.
-    private final RequestHandler requestHandler;
+    private final UDPUnderlay underlay;
     // Owned resource by the `UDPUnderlay`. Used to dispatch the received
     // responses to the main thread.
     private final UDPResponseLock responseLock;
 
-    public UDPListener(DatagramSocket listenSocket, RequestHandler requestHandler, UDPResponseLock responseLock) {
+    public UDPListener(DatagramSocket listenSocket, UDPUnderlay underlay, UDPResponseLock responseLock) {
         this.listenSocket = listenSocket;
-        this.requestHandler = requestHandler;
+        this.underlay = underlay;
         this.responseLock = responseLock;
     }
 
@@ -42,7 +41,7 @@ public class UDPListener implements Runnable {
                 // If the packet is a request, handle it in a new `UDPHandler` thread.
                 if(packetObject instanceof RequestPacket) {
                     RequestPacket request = (RequestPacket) packetObject;
-                    new Thread(new UDPHandler(listenSocket, request, packet.getAddress(), packet.getPort(), requestHandler)).start();
+                    new Thread(new UDPHandler(listenSocket, request, packet.getAddress(), packet.getPort(), underlay)).start();
                 } else if(packetObject instanceof ResponseParameters) {
                     // If the packet is a response, dispatch the response to the main thread.
                     responseLock.dispatch((ResponseParameters) packetObject);

@@ -17,6 +17,9 @@ class JavaRMIUnderlayTest extends UnderlayTest {
         localUnderlay = new JavaRMIUnderlay();
         remoteUnderlay = new JavaRMIUnderlay();
 
+        buildLayers(localUnderlay);
+        buildLayers(remoteUnderlay);
+
         Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT + 2));
         Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT + 2));
     }

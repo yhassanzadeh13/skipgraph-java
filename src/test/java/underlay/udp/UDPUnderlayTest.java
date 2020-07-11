@@ -16,6 +16,9 @@ class UDPUnderlayTest extends UnderlayTest {
         localUnderlay = new UDPUnderlay();
         remoteUnderlay = new UDPUnderlay();
 
+        buildLayers(localUnderlay);
+        buildLayers(remoteUnderlay);
+
         Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT + 4));
         Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT + 4));
     }

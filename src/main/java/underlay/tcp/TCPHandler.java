@@ -1,6 +1,5 @@
 package underlay.tcp;
 
-import underlay.RequestHandler;
 import underlay.packets.RequestPacket;
 import underlay.packets.ResponseParameters;
 
@@ -16,12 +15,12 @@ public class TCPHandler implements Runnable {
 
     // TCP stream. We use this two-way stream to read the request and send back the response.
     private final Socket incomingConnection;
-    // Request handler.
-    private final RequestHandler requestHandler;
+    // TCP underlay.
+    private final TCPUnderlay underlay;
 
-    public TCPHandler(Socket incomingConnection, RequestHandler requestHandler) {
+    public TCPHandler(Socket incomingConnection, TCPUnderlay underlay) {
         this.incomingConnection = incomingConnection;
-        this.requestHandler = requestHandler;
+        this.underlay = underlay;
     }
 
     // TODO send back an error response when necessary.
@@ -48,7 +47,7 @@ public class TCPHandler implements Runnable {
             return;
         }
         // Acquire the response.
-        ResponseParameters responseParameters = requestHandler.dispatchRequest(request.type, request.parameters);
+        ResponseParameters responseParameters = underlay.dispatchRequest(request.type, request.parameters);
         // Write the response to the connection.
         try {
             responseStream.writeObject(responseParameters);
