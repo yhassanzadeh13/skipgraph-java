@@ -1,6 +1,6 @@
 package underlay.udp;
 
-import underlay.packets.ResponseParameters;
+import underlay.packets.Response;
 
 /**
  * Used to synchronize the sender thread with the receiver thread at the host. The sender thread (i.e. UDPUnderlay) will
@@ -9,14 +9,14 @@ import underlay.packets.ResponseParameters;
  */
 public class UDPResponseLock {
 
-    private ResponseParameters response;
+    private Response response;
 
     /**
      * Called by the sender thread to wait for the listener thread to receive a response. Return the response once
      * the listener thread invokes the `dispatch` method on the lock.
      * @return the response received from the listener thread.
      */
-    public synchronized ResponseParameters waitForResponse() {
+    public synchronized Response waitForResponse() {
         try {
             wait();
         } catch (InterruptedException e) {
@@ -24,7 +24,7 @@ public class UDPResponseLock {
             e.printStackTrace();
             return null;
         }
-        ResponseParameters r = response;
+        Response r = response;
         response = null;
         return r;
     }
@@ -34,7 +34,7 @@ public class UDPResponseLock {
      * to stop waiting and receive the dispatched response.
      * @param response the response to dispatch to the sender thread.
      */
-    public synchronized void dispatch(ResponseParameters response) {
+    public synchronized void dispatch(Response response) {
         this.response = response;
         notify();
     }

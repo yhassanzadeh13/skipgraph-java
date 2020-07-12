@@ -9,9 +9,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
-import underlay.packets.GenericRequest;
 import underlay.packets.RequestType;
-import underlay.packets.UpdateRequest;
+import underlay.packets.requests.*;
 
 /**
  * This test creates two underlays on the machine at different ports and checks the
@@ -58,22 +57,14 @@ public class UnderlayTest {
         int remotePort = remoteUnderlay.getPort();
 
         // Check search by name ID request.
-        GenericRequest r = new GenericRequest();
-        r.addParameter("targetNameID", "");
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.SearchByNameID, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIDRequest("")));
         // Check search by numerical ID request.
-        r = new GenericRequest();
-        r.addParameter("targetNumID", 0);
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.SearchByNumID, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNumIDRequest(0)));
         // Check level-based search by name ID request.
-        r = new GenericRequest();
-        r.addParameter("level", 0);
-        r.addParameter("targetNameID", "");
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.NameIDLevelSearch, r));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new NameIDLevelSearchRequest(0, 0, "")));
         // Check left/right update requests.
-        UpdateRequest u = new UpdateRequest(0, LookupTable.EMPTY_NODE);
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateLeftNode, u));
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, RequestType.UpdateRightNode, u));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));
+        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateRightNodeRequest(0, LookupTable.EMPTY_NODE)));
     }
 
     // Terminates the underlays.

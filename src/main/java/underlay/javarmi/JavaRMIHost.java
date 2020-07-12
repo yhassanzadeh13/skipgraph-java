@@ -1,8 +1,8 @@
 package underlay.javarmi;
 
-import underlay.packets.RequestParameters;
+import underlay.packets.Request;
 import underlay.packets.RequestType;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Response;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -19,7 +19,7 @@ public class JavaRMIHost extends UnicastRemoteObject implements JavaRMIService {
     }
 
     @Override
-    public ResponseParameters handleRequest(RequestType type, RequestParameters parameters) {
-        return underlay.dispatchRequest(type, parameters);
+    public Response handleRequest(Request request) {
+        return underlay.dispatchRequest(request);
     }
 }

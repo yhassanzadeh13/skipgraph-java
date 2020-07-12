@@ -1,14 +1,11 @@
 package underlay.javarmi;
 
 import underlay.Underlay;
-import underlay.packets.RequestParameters;
+import underlay.packets.Request;
 import underlay.packets.RequestType;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Response;
 
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
 /**
@@ -62,12 +59,11 @@ public class JavaRMIUnderlay extends Underlay {
      * Invokes the appropriate RMI method on the server with the given address.
      * @param address address of the remote server.
      * @param port port of the remote server.
-     * @param t type of the request.
-     * @param p parameters of the request.
+     * @param request request to send.
      * @return response received from the server.
      */
     @Override
-    public ResponseParameters sendMessage(String address, int port, RequestType t, RequestParameters p) {
+    public Response sendMessage(String address, int port, Request request) {
         if(host == null) {
             System.err.println("[JavaRMIUnderlay] Host does not exist.");
             return null;
@@ -80,7 +76,7 @@ public class JavaRMIUnderlay extends Underlay {
         }
         // Use the remote handler to dispatch the request.
         try {
-            return remote.handleRequest(t, p);
+            return remote.handleRequest(request);
         } catch (Exception e) {
             System.err.println("[JavaRMIUnderlay] Could not send the message.");
             e.printStackTrace();

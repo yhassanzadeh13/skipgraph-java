@@ -1,8 +1,8 @@
 package underlay.javarmi;
 
-import underlay.packets.RequestParameters;
+import underlay.packets.Request;
 import underlay.packets.RequestType;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Response;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -12,5 +12,5 @@ import java.rmi.RemoteException;
  * to the local `RequestHandler` instance.
  */
 public interface JavaRMIService extends Remote {
-    ResponseParameters handleRequest(RequestType type, RequestParameters parameters) throws RemoteException;
+    Response handleRequest(Request request) throws RemoteException;
 }

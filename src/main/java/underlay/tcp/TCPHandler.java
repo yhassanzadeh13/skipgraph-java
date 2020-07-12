@@ -1,7 +1,7 @@
 package underlay.tcp;
 
-import underlay.packets.RequestPacket;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Request;
+import underlay.packets.Response;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -38,16 +38,16 @@ public class TCPHandler implements Runnable {
             return;
         }
         // Read the request from the connection.
-        RequestPacket request;
+        Request request;
         try {
-            request = (RequestPacket) requestStream.readObject();
+            request = (Request) requestStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("[TCPHandler] Could not read the request.");
             e.printStackTrace();
             return;
         }
         // Acquire the response.
-        ResponseParameters responseParameters = underlay.dispatchRequest(request.type, request.parameters);
+        Response responseParameters = underlay.dispatchRequest(request);
         // Write the response to the connection.
         try {
             responseStream.writeObject(responseParameters);

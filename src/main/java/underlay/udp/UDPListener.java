@@ -1,7 +1,7 @@
 package underlay.udp;
 
-import underlay.packets.RequestPacket;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Request;
+import underlay.packets.Response;
 
 import java.io.IOException;
 import java.net.*;
@@ -39,12 +39,12 @@ public class UDPListener implements Runnable {
                 // Deserialize the packet.
                 Object packetObject = UDPUtils.deserialize(packet.getData(), packet.getLength());
                 // If the packet is a request, handle it in a new `UDPHandler` thread.
-                if(packetObject instanceof RequestPacket) {
-                    RequestPacket request = (RequestPacket) packetObject;
+                if(packetObject instanceof Request) {
+                    Request request = (Request) packetObject;
                     new Thread(new UDPHandler(listenSocket, request, packet.getAddress(), packet.getPort(), underlay)).start();
-                } else if(packetObject instanceof ResponseParameters) {
+                } else if(packetObject instanceof Response) {
                     // If the packet is a response, dispatch the response to the main thread.
-                    responseLock.dispatch((ResponseParameters) packetObject);
+                    responseLock.dispatch((Response) packetObject);
                 } else {
                     System.err.println("[UDPListener] Could not parse the received packet.");
                 }

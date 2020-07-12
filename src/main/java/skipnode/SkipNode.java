@@ -4,7 +4,7 @@ import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import underlay.Underlay;
 
-public class SkipNode implements SkipNodeInterface{
+public class SkipNode implements SkipNodeInterface {
     /**
      * Attributes
      */
@@ -54,7 +54,7 @@ public class SkipNode implements SkipNodeInterface{
     }
 
     @Override
-    public SkipNodeIdentity nameIDLevelSearch(int level, String nameID) {
+    public SkipNodeIdentity nameIDLevelSearch(int level, int direction, String nameID) {
         //TODO Implement
         return LookupTable.EMPTY_NODE;
     }

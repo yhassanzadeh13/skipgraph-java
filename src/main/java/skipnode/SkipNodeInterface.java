@@ -46,7 +46,7 @@ public interface SkipNodeInterface {
      * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist, returns the SkipNodeIdentity of the SnipNode which shares the longest
      * prefix among the nodes in the SkipGraph
      */
-    SkipNodeIdentity nameIDLevelSearch(int level, String nameID);
+    SkipNodeIdentity nameIDLevelSearch(int level, int direction, String nameID);
     /**
      * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity
      * @param snId The new SkipNodeIdentity to be placed in the given level

@@ -2,9 +2,9 @@ package underlay;
 
 import middlelayer.MiddleLayer;
 import underlay.javarmi.JavaRMIUnderlay;
-import underlay.packets.RequestParameters;
+import underlay.packets.Request;
 import underlay.packets.RequestType;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Response;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
@@ -37,13 +37,12 @@ public abstract class Underlay {
     }
 
     /**
-     * Dispatches a request to the middle layer method and returns the response.
-     * @param t type of the request.
-     * @param p request parameters.
+     * Dispatches a request to the middle layer and returns the response.
+     * @param request the request.
      * @return emitted response.
      */
-    public ResponseParameters dispatchRequest(RequestType t, RequestParameters p) {
-        return middleLayer.receive(t, p);
+    public Response dispatchRequest(Request request) {
+        return middleLayer.receive(request);
     }
 
     /**
@@ -75,11 +74,10 @@ public abstract class Underlay {
      * Can be used to send a request to a remote server that runs the same underlay architecture.
      * @param address address of the remote server.
      * @param port port of the remote server.
-     * @param t type of the request.
-     * @param p parameters of the request.
+     * @param request the request.
      * @return response emitted by the remote server.
      */
-    public abstract ResponseParameters sendMessage(String address, int port, RequestType t, RequestParameters p);
+    public abstract Response sendMessage(String address, int port, Request request);
 
 
     /**

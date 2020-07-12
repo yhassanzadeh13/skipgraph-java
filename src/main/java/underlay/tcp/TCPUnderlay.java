@@ -1,10 +1,9 @@
 package underlay.tcp;
 
 import underlay.Underlay;
-import underlay.packets.RequestPacket;
-import underlay.packets.RequestParameters;
+import underlay.packets.Request;
 import underlay.packets.RequestType;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Response;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -48,12 +47,11 @@ public class TCPUnderlay extends Underlay {
      *
      * @param address address of the remote server.
      * @param port port of the remote serve.r
-     * @param t type of the request.
-     * @param p parameters of the request.
+     * @param request the request to send.
      * @return the response emitted by the remote server.
      */
     @Override
-    public ResponseParameters sendMessage(String address, int port, RequestType t, RequestParameters p) {
+    public Response sendMessage(String address, int port, Request request) {
         Socket remote;
         ObjectOutputStream requestStream;
         ObjectInputStream responseStream;
@@ -68,7 +66,6 @@ public class TCPUnderlay extends Underlay {
         // Send the request.
         try {
             requestStream = new ObjectOutputStream(remote.getOutputStream());
-            RequestPacket request = new RequestPacket(t, p);
             requestStream.writeObject(request);
         } catch(IOException e) {
             System.err.println("[TCPUnderlay] Could not send the request.");
@@ -76,10 +73,10 @@ public class TCPUnderlay extends Underlay {
             return null;
         }
         // Receive the response.
-        ResponseParameters response;
+        Response response;
         try {
             responseStream = new ObjectInputStream(remote.getInputStream());
-            response = (ResponseParameters) responseStream.readObject();
+            response = (Response) responseStream.readObject();
         } catch(IOException | ClassNotFoundException e) {
             System.err.println("[TCPUnderlay] Could not receive the response.");
             e.printStackTrace();

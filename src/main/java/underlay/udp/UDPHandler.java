@@ -1,7 +1,7 @@
 package underlay.udp;
 
-import underlay.packets.RequestPacket;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Request;
+import underlay.packets.Response;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -16,7 +16,7 @@ public class UDPHandler implements Runnable {
     // The UDP socket that the response will be sent through.
     private final DatagramSocket udpSocket;
     // The received request to handle.
-    private final RequestPacket request;
+    private final Request request;
     // The address of the client that the request was sent from.
     private final InetAddress clientAddress;
     // The port of the client that the request was sent from.
@@ -24,7 +24,7 @@ public class UDPHandler implements Runnable {
     // The handler which will be handling this request.
     private final UDPUnderlay underlay;
 
-    public UDPHandler(DatagramSocket udpSocket, RequestPacket request, InetAddress clientAddress, int clientPort,
+    public UDPHandler(DatagramSocket udpSocket, Request request, InetAddress clientAddress, int clientPort,
                       UDPUnderlay underlay) {
         this.udpSocket = udpSocket;
         this.request = request;
@@ -36,7 +36,7 @@ public class UDPHandler implements Runnable {
     // TODO send back an error response when necessary.
     @Override
     public void run() {
-        ResponseParameters response = underlay.dispatchRequest(request.type, request.parameters);
+        Response response = underlay.dispatchRequest(request);
         // Serialize the response.
         byte[] responseBytes = UDPUtils.serialize(response);
         if(responseBytes == null) {

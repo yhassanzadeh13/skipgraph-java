@@ -1,10 +1,9 @@
 package underlay.udp;
 
 import underlay.Underlay;
-import underlay.packets.RequestPacket;
-import underlay.packets.RequestParameters;
+import underlay.packets.Request;
 import underlay.packets.RequestType;
-import underlay.packets.ResponseParameters;
+import underlay.packets.Response;
 
 import java.io.IOException;
 import java.net.*;
@@ -55,12 +54,11 @@ public class UDPUnderlay extends Underlay {
      * defined in `UDPUtils.MAX_PACKET_SIZE`.
      * @param address address of the remote server.
      * @param port port of the remote server.
-     * @param t type of the request.
-     * @param p parameters of the request.
+     * @param request request to send.
      * @return the response emitted by the server.
      */
     @Override
-    public ResponseParameters sendMessage(String address, int port, RequestType t, RequestParameters p) {
+    public Response sendMessage(String address, int port, Request request) {
         // Convert a string address to an actual address to be used for UDP.
         InetAddress destAddress;
         try {
@@ -70,8 +68,7 @@ public class UDPUnderlay extends Underlay {
             e.printStackTrace();
             return null;
         }
-        // Construct the request.
-        RequestPacket request = new RequestPacket(t, p);
+        // Serialize the request.
         byte[] requestBytes = UDPUtils.serialize(request);
         if(requestBytes == null) {
             System.err.println("[UDPUnderlay] Invalid request.");
@@ -87,7 +84,7 @@ public class UDPUnderlay extends Underlay {
             return null;
         }
         // Now, wait for the response.
-        ResponseParameters response = responseLock.waitForResponse();
+        Response response = responseLock.waitForResponse();
         if(response == null) {
             System.err.println("[UDPUnderlay] Could not get the response.");
             return null;
