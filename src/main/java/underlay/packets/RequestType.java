@@ -8,5 +8,7 @@ public enum RequestType {
     SearchByNumID,
     NameIDLevelSearch,
     UpdateLeftNode,
-    UpdateRightNode
+    UpdateRightNode,
+    GetLeftNode,
+    GetRightNode
 }

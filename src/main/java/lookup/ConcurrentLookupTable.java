@@ -57,6 +57,7 @@ public class ConcurrentLookupTable implements LookupTable {
         lock.readLock().lock();
         int idx = getIndex(direction.RIGHT, level);
         SkipNodeIdentity node = nodes.get(idx);
+        if(node == null) node = LookupTable.EMPTY_NODE;
         lock.readLock().unlock();
         return node;
     }
@@ -66,6 +67,7 @@ public class ConcurrentLookupTable implements LookupTable {
         lock.readLock().lock();
         int idx = getIndex(direction.LEFT, level);
         SkipNodeIdentity node = nodes.get(idx);
+        if(node == null) node = LookupTable.EMPTY_NODE;
         lock.readLock().unlock();
         return node;
     }

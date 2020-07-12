@@ -34,7 +34,7 @@ public interface SkipNodeInterface {
     /**
      * Search for the given nameID
      * @param nameID The nameID to search for
-     * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist, returns the SkipNodeIdentity of the SnipNode which shares the longest
+     * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist, returns the SkipNodeIdentity of the SkipNode which shares the longest
      * prefix among the nodes in the SkipGraph
      */
     SkipNodeIdentity searchByNameID(String nameID);
@@ -43,8 +43,7 @@ public interface SkipNodeInterface {
      * Search for the given nameID on the given level. Helper method for searchByNameID
      * @param level The level to start the search from
      * @param nameID The nameID to search for
-     * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist, returns the SkipNodeIdentity of the SnipNode which shares the longest
-     * prefix among the nodes in the SkipGraph
+     * @return Returns the SkipNodeIdentity of the closest SkipNode which has the common prefix length larger than `level`.
      */
     SkipNodeIdentity nameIDLevelSearch(int level, int direction, String nameID);
     /**
@@ -62,4 +61,18 @@ public interface SkipNodeInterface {
      * @return The SkipNodeIdentity that was replaced (Could be an EMPTY_NODE)
      */
     SkipNodeIdentity updateRightNode(SkipNodeIdentity snId, int level);
+
+    /**
+     * Returns the right neighbor of the node at the given level.
+     * @param level the level of the right neighbor.
+     * @return the right neighbor at the given level.
+     */
+    SkipNodeIdentity getRightNode(int level);
+
+    /**
+     * Returns the left neighbor of the node at the given level.
+     * @param level the level of the left neighbor.
+     * @return the left neighbor at the given level.
+     */
+    SkipNodeIdentity getLeftNode(int level);
 }

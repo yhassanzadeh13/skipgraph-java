@@ -46,7 +46,7 @@ public class JavaRMIUnderlay extends Underlay {
         try {
             host = new JavaRMIHost(this);
             // Bind this RMI adapter to the given port.
-            LocateRegistry.createRegistry(port).bind("node", host);
+            LocateRegistry.createRegistry(port).rebind("node", host);
         } catch (Exception e) {
             System.err.println("[JavaRMIUnderlay] Error while initializing at port " + port);
             e.printStackTrace();
