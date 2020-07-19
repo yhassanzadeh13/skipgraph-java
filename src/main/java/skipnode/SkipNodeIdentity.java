@@ -57,4 +57,9 @@ public class SkipNodeIdentity implements Serializable {
     public int hashCode() {
         return Objects.hash(getNameID(), getNumID(), getAddress(), getPort());
     }
+
+    @Override
+    public String toString() {
+        return "Name ID: "+nameID+"\tNum ID: "+numID+"\tAddress: "+address+"\tPort: "+port;
+    }
 }

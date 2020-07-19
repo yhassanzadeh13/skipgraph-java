@@ -59,8 +59,56 @@ public class SkipNode implements SkipNodeInterface {
 
     @Override
     public SkipNodeIdentity searchByNumID(int numID) {
-        // TODO Implement
-        return LookupTable.EMPTY_NODE;
+        // If this is the node the search request is looking for, return its identity
+        if (numID == this.numID) {
+            return getIdentity();
+        }
+
+        // Initialize the level to begin looking at
+        int level = lookupTable.getNumLevels();
+
+        // If the target is greater than this node's numID, the search should continue to the right
+        if (this.numID < numID){
+            // Start from the top, while there is no right neighbor, or the right neighbor's num ID is greater than what we are searching for
+            // keep going down
+            while(level>=0){
+                if (lookupTable.GetRight(level)==LookupTable.EMPTY_NODE ||
+                        lookupTable.GetRight(level).getNumID() > numID){
+                    level--;
+                }else{
+                    break;
+                }
+            }
+
+            // If the level is less than zero, then this node is the closest node to the numID being searched for from the right. Return.
+            if (level < 0) {
+                return getIdentity();
+            }
+
+            // Else, delegate the search to that node on the right
+            SkipNodeIdentity delegateNode = lookupTable.GetRight(level);
+            return middleLayer.searchByNumID(delegateNode.getAddress(), delegateNode.getPort(), numID);
+        }else{
+            // Start from the top, while there is no right neighbor, or the right neighbor's num ID is greater than what we are searching for
+            // keep going down
+            while(level>=0){
+                if (lookupTable.GetLeft(level)==LookupTable.EMPTY_NODE ||
+                        lookupTable.GetLeft(level).getNumID() < numID){
+                    level--;
+                }else{
+                    break;
+                }
+            }
+
+            // If the level is less than zero, then this node is the closest node to the numID being searched for from the right. Return.
+            if (level < 0) {
+                return getIdentity();
+            }
+
+            // Else, delegate the search to that node on the right
+            SkipNodeIdentity delegateNode = lookupTable.GetLeft(level);
+            return middleLayer.searchByNumID(delegateNode.getAddress(), delegateNode.getPort(), numID);
+        }
     }
 
     /**
