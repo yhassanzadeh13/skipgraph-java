@@ -31,6 +31,7 @@ public interface SkipNodeInterface {
      * no such SnipNode exists, the SkipNodeIdentity of the SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is returned.
      */
     SkipNodeIdentity searchByNumID(int numID);
+
     /**
      * Search for the given nameID
      * @param nameID The nameID to search for
@@ -40,10 +41,20 @@ public interface SkipNodeInterface {
     SkipNodeIdentity searchByNameID(String nameID);
 
     /**
+     * Used by the `searchByNameID` method. Implements a recursive name ID search algorithm.
+     * @param left the current left node.
+     * @param right the current right node.
+     * @param target the target name ID.
+     * @param level the current level.
+     * @return the identity of the node with the given name ID, or the node with the closest name ID.
+     */
+    SkipNodeIdentity searchByNameIDRecursive(SkipNodeIdentity left, SkipNodeIdentity right, String target, int level);
+
+    /**
      * Search for the given nameID on the given level. Helper method for searchByNameID
      * @param level The level to start the search from
      * @param nameID The nameID to search for
-     * @return Returns the SkipNodeIdentity of the closest SkipNode which has the common prefix length larger than `level`.
+     * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix length larger than `level`.
      */
     SkipNodeIdentity nameIDLevelSearch(int level, int direction, String nameID);
     /**

@@ -47,6 +47,12 @@ public class MiddleLayer {
             case SearchByNameID:
                 identity = overlay.searchByNameID(((SearchByNameIDRequest) request).targetNameID);
                 return new SkipNodeIdentityResponse(identity);
+            case SearchByNameIDRecursive:
+                identity = overlay.searchByNameIDRecursive(((SearchByNameIDRecursiveRequest) request).left,
+                        ((SearchByNameIDRecursiveRequest) request).right,
+                        ((SearchByNameIDRecursiveRequest) request).target,
+                        ((SearchByNameIDRecursiveRequest) request).level);
+                return new SkipNodeIdentityResponse(identity);
             case SearchByNumID:
                 identity = overlay.searchByNumID(((SearchByNumIDRequest) request).targetNumID);
                 return new SkipNodeIdentityResponse(identity);
@@ -83,6 +89,13 @@ public class MiddleLayer {
     public SkipNodeIdentity searchByNameID(String destinationAddress, int port, String nameID) {
         // Send the request through the underlay
         Response response = this.send(destinationAddress, port, new SearchByNameIDRequest(nameID));
+        return ((SkipNodeIdentityResponse) response).identity;
+    }
+
+    public SkipNodeIdentity searchByNameIDRecursive(String destinationAddress, int port, SkipNodeIdentity left,
+                                                    SkipNodeIdentity right, String target, int level) {
+        // Send the request through the underlay.
+        Response response = this.send(destinationAddress, port, new SearchByNameIDRecursiveRequest(left, right, target, level));
         return ((SkipNodeIdentityResponse) response).identity;
     }
 

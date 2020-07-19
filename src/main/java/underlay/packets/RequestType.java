@@ -5,6 +5,7 @@ package underlay.packets;
  */
 public enum RequestType {
     SearchByNameID,
+    SearchByNameIDRecursive,
     SearchByNumID,
     NameIDLevelSearch,
     UpdateLeftNode,
