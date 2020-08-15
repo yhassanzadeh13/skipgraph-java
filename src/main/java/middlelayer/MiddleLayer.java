@@ -4,7 +4,10 @@ import skipnode.SkipNodeInterface;
 import underlay.Underlay;
 import underlay.packets.*;
 import underlay.packets.requests.*;
-import underlay.packets.responses.SkipNodeIdentityResponse;
+import underlay.packets.responses.IdentityListResponse;
+import underlay.packets.responses.IdentityResponse;
+
+import java.util.List;
 
 /**
  * Represents a mediator between the overlay and the underlay. The requests coming from the underlay are directed
@@ -46,33 +49,41 @@ public class MiddleLayer {
         switch (request.type) {
             case SearchByNameID:
                 identity = overlay.searchByNameID(((SearchByNameIDRequest) request).targetNameID);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
             case SearchByNameIDRecursive:
                 identity = overlay.searchByNameIDRecursive(((SearchByNameIDRecursiveRequest) request).left,
                         ((SearchByNameIDRecursiveRequest) request).right,
                         ((SearchByNameIDRecursiveRequest) request).target,
                         ((SearchByNameIDRecursiveRequest) request).level);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
             case SearchByNumID:
                 identity = overlay.searchByNumID(((SearchByNumIDRequest) request).targetNumID);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
             case NameIDLevelSearch:
                 identity = overlay.nameIDLevelSearch(((NameIDLevelSearchRequest) request).level,
                         ((NameIDLevelSearchRequest) request).direction,
                         ((NameIDLevelSearchRequest) request).targetNameID);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
             case UpdateLeftNode:
                 identity = overlay.updateLeftNode(((UpdateLeftNodeRequest) request).snId, ((UpdateLeftNodeRequest) request).level);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
             case UpdateRightNode:
                 identity = overlay.updateRightNode(((UpdateRightNodeRequest) request).snId, ((UpdateRightNodeRequest) request).level);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
             case GetRightNode:
                 identity = overlay.getRightNode(((GetRightNodeRequest) request).level);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
             case GetLeftNode:
                 identity = overlay.getLeftNode(((GetLeftNodeRequest) request).level);
-                return new SkipNodeIdentityResponse(identity);
+                return new IdentityResponse(identity);
+            case GetPotentialNeighbors:
+                List<SkipNodeIdentity> neighbors = overlay.getPotentialNeighbors(((GetPotentialNeighborsRequest) request).newNode,
+                        ((GetPotentialNeighborsRequest) request).level);
+                return new IdentityListResponse(neighbors);
+            case FindLadder:
+                identity = overlay.findLadder(((FindLadderRequest) request).level, ((FindLadderRequest) request).direction,
+                        ((FindLadderRequest) request).target);
+                return new IdentityResponse(identity);
             default:
                 return null;
         }
@@ -89,48 +100,58 @@ public class MiddleLayer {
     public SkipNodeIdentity searchByNameID(String destinationAddress, int port, String nameID) {
         // Send the request through the underlay
         Response response = this.send(destinationAddress, port, new SearchByNameIDRequest(nameID));
-        return ((SkipNodeIdentityResponse) response).identity;
+        return ((IdentityResponse) response).identity;
     }
 
     public SkipNodeIdentity searchByNameIDRecursive(String destinationAddress, int port, SkipNodeIdentity left,
                                                     SkipNodeIdentity right, String target, int level) {
         // Send the request through the underlay.
         Response response = this.send(destinationAddress, port, new SearchByNameIDRecursiveRequest(left, right, target, level));
-        return ((SkipNodeIdentityResponse) response).identity;
+        return ((IdentityResponse) response).identity;
     }
 
     public SkipNodeIdentity searchByNumID(String destinationAddress, int port, int numID) {
         // Send the request through the underlay
         Response response = this.send(destinationAddress, port, new SearchByNumIDRequest(numID));
-        return ((SkipNodeIdentityResponse) response).identity;
+        return ((IdentityResponse) response).identity;
     }
 
     public SkipNodeIdentity nameIDLevelSearch(String destinationAddress, int port, int level, int direction, String nameID) {
         // Send the request through the underlay
         Response response = this.send(destinationAddress, port, new NameIDLevelSearchRequest(level, direction, nameID));
-        return ((SkipNodeIdentityResponse) response).identity;
+        return ((IdentityResponse) response).identity;
     }
 
     public SkipNodeIdentity updateRightNode(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
         // Send the request through the underlay
         Response response = this.send(destinationAddress, port, new UpdateRightNodeRequest(level, snId));
-        return ((SkipNodeIdentityResponse) response).identity;
+        return ((IdentityResponse) response).identity;
 
     }
 
     public SkipNodeIdentity updateLeftNode(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
         // Send the request through the underlay
         Response response = this.send(destinationAddress, port, new UpdateLeftNodeRequest(level, snId));
-        return ((SkipNodeIdentityResponse) response).identity;
+        return ((IdentityResponse) response).identity;
     }
 
     public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
         Response r = send(destinationAddress, port, new GetLeftNodeRequest(level));
-        return ((SkipNodeIdentityResponse) r).identity;
+        return ((IdentityResponse) r).identity;
     }
 
     public SkipNodeIdentity getRightNode(String destinationAddress, int port, int level) {
         Response r = send(destinationAddress, port, new GetRightNodeRequest(level));
-        return ((SkipNodeIdentityResponse) r).identity;
+        return ((IdentityResponse) r).identity;
+    }
+
+    public List<SkipNodeIdentity> getPotentialNeighbors(String destinationAddress, int port, SkipNodeIdentity newNodeID, int level) {
+        Response r = send(destinationAddress, port, new GetPotentialNeighborsRequest(newNodeID, level));
+        return ((IdentityListResponse) r).identities;
+    }
+
+    public SkipNodeIdentity findLadder(String destinationAddress, int port, int level, int direction, String target) {
+        Response r = send(destinationAddress, port, new FindLadderRequest(level, direction, target));
+        return ((IdentityResponse) r).identity;
     }
 }

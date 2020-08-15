@@ -2,6 +2,8 @@ package skipnode;
 
 import middlelayer.MiddleLayer;
 
+import java.util.List;
+
 public interface SkipNodeInterface {
     /**
      * Set the middle layer which would handle communication with remote nodes
@@ -9,12 +11,21 @@ public interface SkipNodeInterface {
     void setMiddleLayer(MiddleLayer middleLayer);
 
     /**
-     * Add the SkipNode sn the SkipGraph through the introducer SkipNode with address introducerAddress
-     * @param sn The node to insert to the SkipGraph
-     * @param introducerAddress The Introducer SkipNode
-     * @return True if insertion successful, false otherwise
+     * Add the SkipNode to the SkipGraph through an introducer.
+     * @param introducerAddress the address of the introducer.
+     * @param introducerPort the port of the introducer.
      */
-    boolean insert(SkipNodeInterface sn, String introducerAddress);
+    void insert(String introducerAddress, int introducerPort);
+
+    SkipNodeIdentity findLadder(int level, int direction, String target);
+
+    /**
+     * Returns the list of neighbors that the newly inserted node should have.
+     * @param newNeighbor the new node.
+     * @param level the level to insert the new node.
+     * @return the list of neighbors of the new node.
+     */
+    List<SkipNodeIdentity> getPotentialNeighbors(SkipNodeIdentity newNeighbor, int level);
 
     /**
      * Remove the node from the SkipGraph. Joins the neighbors on each level together
@@ -57,6 +68,7 @@ public interface SkipNodeInterface {
      * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix length larger than `level`.
      */
     SkipNodeIdentity nameIDLevelSearch(int level, int direction, String nameID);
+
     /**
      * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity
      * @param snId The new SkipNodeIdentity to be placed in the given level
