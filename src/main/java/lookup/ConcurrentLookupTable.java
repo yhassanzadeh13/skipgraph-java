@@ -76,13 +76,16 @@ public class ConcurrentLookupTable implements LookupTable {
     @Override
     public List<SkipNodeIdentity> getRights(int level) {
         List<SkipNodeIdentity> ls = new ArrayList<>(1);
-        ls.add(getRight(level));
+        SkipNodeIdentity id = getRight(level);
+        if(!id.equals(LookupTable.EMPTY_NODE)) ls.add(id);
         return ls;
     }
 
     @Override
     public List<SkipNodeIdentity> getLefts(int level) {
         List<SkipNodeIdentity> ls = new ArrayList<>(1);
+        SkipNodeIdentity id = getLeft(level);
+        if(!id.equals(LookupTable.EMPTY_NODE)) ls.add(id);
         ls.add(getLeft(level));
         return ls;
     }
@@ -118,32 +121,46 @@ public class ConcurrentLookupTable implements LookupTable {
         return this.numLevels;
     }
 
+    /**
+     * Returns the new neighbors (unsorted) of a newly inserted node. It is assumed that the newly inserted node
+     * will be a neighbor to the owner of this lookup table.
+     * @param owner the identity of the owner of the lookup table.
+     * @param newNameID the name ID of the newly inserted node.
+     * @param newNumID the num ID of the newly inserted node.
+     * @param level the level of the new neighbor.
+     * @return the list of neighbors (both right and left) of the newly inserted node.
+     */
     @Override
-    public List<SkipNodeIdentity> getPotentialNeighbors(SkipNodeIdentity owner, int newNumID, int level) {
+    public TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumID, String newNameID, int level) {
         lock.readLock().lock();
-        List<SkipNodeIdentity> potentialNeighbors = new ArrayList<>();
-        potentialNeighbors.add(owner);
+        List<List<SkipNodeIdentity>> newTable = new ArrayList<>();
+        newTable.add(new ArrayList<>());
+        newTable.get(0).add(owner);
         if(newNumID < owner.getNumID() && !getLeft(level).equals(LookupTable.EMPTY_NODE))
-            potentialNeighbors.add(getLeft(level));
+            newTable.get(0).add(getLeft(level));
         else if(!getRight(level).equals(LookupTable.EMPTY_NODE))
-            potentialNeighbors.add(getRight(level));
+            newTable.get(0).add(getRight(level));
         lock.readLock().unlock();
-        return potentialNeighbors;
+        return new TentativeTable(false, level, newTable);
     }
 
-    // Given a set of new neighbors, puts them into the correct place (left or right).
+    /**
+     * Given an incomplete tentative table, inserts the given level neighbors to their correct positions.
+     * @param owner the owner of the lookup table.
+     * @param tentativeTable the tentative table containing list of potential neighbors.
+     */
     @Override
-    public void initializeNeighbors(SkipNodeIdentity owner, List<SkipNodeIdentity> potentialNeighbors, int level) {
-        SkipNodeIdentity left = potentialNeighbors.stream()
+    public void initializeTable(SkipNodeIdentity owner, TentativeTable tentativeTable) {
+        SkipNodeIdentity left = tentativeTable.neighbors.get(0).stream()
                 .filter(x -> x.getNumID() <= owner.getNumID())
                 .findFirst()
                 .orElse(LookupTable.EMPTY_NODE);
-        SkipNodeIdentity right = potentialNeighbors.stream()
+        SkipNodeIdentity right = tentativeTable.neighbors.get(0).stream()
                 .filter(x -> x.getNumID() > owner.getNumID())
                 .findFirst()
                 .orElse(LookupTable.EMPTY_NODE);
-        updateLeft(left, level);
-        updateRight(right, level);
+        updateLeft(left, tentativeTable.specificLevel);
+        updateRight(right, tentativeTable.specificLevel);
     }
 
     private int getIndex(direction dir, int level) {

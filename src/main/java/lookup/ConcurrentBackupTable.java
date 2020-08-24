@@ -1,10 +1,7 @@
 package lookup;
 import skipnode.SkipNodeIdentity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -184,35 +181,67 @@ public class ConcurrentBackupTable implements LookupTable {
         return rightNodes;
     }
 
+    /**
+     * Returns the new neighbors (unsorted) of a newly inserted node. It is assumed that the newly inserted node
+     * will be a neighbor to the owner of this lookup table.
+     * @param owner the identity of the owner of the lookup table.
+     * @param newNameID the name ID of the newly inserted node.
+     * @param newNumID the num ID of the newly inserted node.
+     * @param level the level of the new neighbor.
+     * @return the list of neighbors (both right and left) of the newly inserted node.
+     */
     @Override
-    public List<SkipNodeIdentity> getPotentialNeighbors(SkipNodeIdentity owner, int newNumID, int level) {
+    public TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumID, String newNameID, int level) {
         lock.readLock().lock();
-        List<SkipNodeIdentity> potentialNeighbors = new ArrayList<>();
-        potentialNeighbors.add(owner);
-        potentialNeighbors.addAll(getLefts(level));
-        potentialNeighbors.addAll(getRights(level));
+        // We will return an unsorted list of level-lists.
+        List<List<SkipNodeIdentity>> newTable = new ArrayList<>(numLevels);
+        for(int i = 0; i < numLevels; i++) {
+            newTable.add(new ArrayList<>());
+        }
+        // Add the neighbors from the 0-level neighbors.
+        nodes.stream()
+                .limit(2)
+                .flatMap(Collection::stream)
+                .filter(x -> !x.equals(LookupTable.EMPTY_NODE))
+                .forEach(neighbor -> {
+                    int l = SkipNodeIdentity.commonBits(neighbor.getNameID(), newNameID);
+                    // Add the neighbor at the max level.
+                    newTable.get(l).add(neighbor);
+                });
+        // Add the owner of this lookup table to the appropriate levels.
+        int l = SkipNodeIdentity.commonBits(owner.getNameID(), newNameID);
+        newTable.get(l).add(owner);
         lock.readLock().unlock();
-        return potentialNeighbors;
+        // Return the new lookup table.
+        return new TentativeTable(true, -1, newTable);
     }
 
     @Override
-    public void initializeNeighbors(SkipNodeIdentity owner, List<SkipNodeIdentity> potentialNeighbors, int level) {
-        List<SkipNodeIdentity> leftList = potentialNeighbors.stream()
-                .filter(x -> x.getNumID() <= owner.getNumID())
-                .sorted()
-                .collect(Collectors.toList());
-        List<SkipNodeIdentity> rightList = potentialNeighbors.stream()
-                .filter(x -> x.getNumID() > owner.getNumID())
-                .sorted()
-                .collect(Collectors.toList());
-        // Left neighbors should be in descending order.
-        Collections.reverse(leftList);
+    public void initializeTable(SkipNodeIdentity owner, TentativeTable tentativeTable) {
         lock.writeLock().lock();
-        // Add the neighbors at the appropriate lists.
-        int l = getIndex(direction.LEFT, level);
-        int r = getIndex(direction.RIGHT, level);
-        nodes.get(l).addAll(leftList);
-        nodes.get(r).addAll(rightList);
+        // Insert every neighbor at the correct level & direction.
+        for(int l = 0; l < tentativeTable.neighbors.size(); l++) {
+            List<SkipNodeIdentity> leftList = tentativeTable.neighbors.get(l).stream()
+                    .filter(x -> x.getNumID() <= owner.getNumID())
+                    .collect(Collectors.toList());
+            List<SkipNodeIdentity> rightList = tentativeTable.neighbors.get(l).stream()
+                    .filter(x -> x.getNumID() > owner.getNumID())
+                    .collect(Collectors.toList());
+            for(int j = 0; j <= l; j++) {
+                int lIndex = getIndex(direction.LEFT, j);
+                int rIndex = getIndex(direction.RIGHT, j);
+                nodes.get(lIndex).addAll(leftList);
+                nodes.get(rIndex).addAll(rightList);
+            }
+        }
+        // Sort all the entries.
+        for(int l = 0; l < numLevels; l++) {
+            int lIndex = getIndex(direction.LEFT, l);
+            int rIndex = getIndex(direction.RIGHT, l);
+            Collections.sort(nodes.get(lIndex));
+            Collections.reverse(nodes.get(lIndex));
+            Collections.sort(nodes.get(rIndex));
+        }
         lock.writeLock().unlock();
     }
 
@@ -221,11 +250,11 @@ public class ConcurrentBackupTable implements LookupTable {
         return this.numLevels;
     }
 
-    private int getIndex(direction dir, int level){
-        if(level<0) return Integer.MAX_VALUE;
-        if(dir==direction.LEFT){
+    private int getIndex(direction dir, int level) {
+        if(level < 0) return Integer.MAX_VALUE;
+        if(dir == direction.LEFT) {
             return level*2;
-        }else{
+        } else {
             return level*2+1;
         }
     }

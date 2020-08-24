@@ -1,5 +1,6 @@
 package skipnode;
 
+import lookup.TentativeTable;
 import middlelayer.MiddleLayer;
 
 import java.util.List;
@@ -17,15 +18,33 @@ public interface SkipNodeInterface {
      */
     void insert(String introducerAddress, int introducerPort);
 
+    /**
+     * Returns whether the node is available to be used as a router. If the node is still being inserted,
+     * then, this will return false.
+     * @return whether the node is available for routing or not.
+     */
+    boolean isAvailable();
+
+    /**
+     * Finds the `ladder`, i.e. the node that should be used to propagate a newly joined node to the upper layer.
+     * @return the ladder's node information.
+     */
     SkipNodeIdentity findLadder(int level, int direction, String target);
 
     /**
      * Returns the list of neighbors that the newly inserted node should have.
      * @param newNeighbor the new node.
-     * @param level the level to insert the new node.
+     * @param level level of the newly inserted node.
      * @return the list of neighbors of the new node.
      */
-    List<SkipNodeIdentity> getPotentialNeighbors(SkipNodeIdentity newNeighbor, int level);
+    TentativeTable acquireNeighbors(SkipNodeIdentity newNeighbor, int level);
+
+    /**
+     * Adds the given neighbor to the appropriate lookup table entries of this node. Should only be used during concurrent
+     * insertion (i.e., ConcurrentBackupTable is being used.)
+     * @param newNeighbor the identity of the new neighbor.
+     */
+    void announceNeighbor(SkipNodeIdentity newNeighbor);
 
     /**
      * Remove the node from the SkipGraph. Joins the neighbors on each level together
@@ -98,4 +117,24 @@ public interface SkipNodeInterface {
      * @return the left neighbor at the given level.
      */
     SkipNodeIdentity getLeftNode(int level);
+
+    /**
+     * Returns the left ladder at the given level. Used by the search by name ID protocol. We determine
+     * the eligibility of a node as a ladder by checking its availability and comparing its name ID with
+     * the target name ID.
+     * @param level the level.
+     * @param target the target name ID of the search.
+     * @return the best ladder on the left.
+     */
+    SkipNodeIdentity getLeftLadder(int level, String target);
+
+    /**
+     * Returns the right ladder at the given level. Used by the search by name ID protocol. We determine
+     * the eligibility of a node as a ladder by checking its availability and comparing its name ID with
+     * the target name ID.
+     * @param level the level.
+     * @param target the target name ID of the search.
+     * @return the best ladder on the right.
+     */
+    SkipNodeIdentity getRightLadder(int level, String target);
 }

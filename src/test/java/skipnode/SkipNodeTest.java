@@ -3,6 +3,7 @@ package skipnode;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import misc.LocalSkipGraph;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
@@ -48,6 +49,7 @@ class SkipNodeTest {
             tableCorrectnessCheck(n.getNumID(), n.getNameID(), n.getLookupTable());
             tableConsistencyCheck(tableMap, n);
         }
+        underlays.forEach(Underlay::terminate);
     }
 
     @Test
@@ -60,7 +62,7 @@ class SkipNodeTest {
             underlays.add(underlay);
         }
         // Then, construct the local skip graph.
-        LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(), STARTING_PORT, true);
+        LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(), STARTING_PORT, false);
         // Create the middle layers.
         for(int i = 0; i < NODES; i++) {
             MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
@@ -68,6 +70,8 @@ class SkipNodeTest {
             underlays.get(i).setMiddleLayer(middleLayer);
             g.getNodes().get(i).setMiddleLayer(middleLayer);
         }
+        // Insert all the nodes in a randomized fashion.
+        g.insertAllRandomized();
         // We will now perform name ID searches for every node from each node in the skip graph.
         for(int i = 0; i < NODES; i++) {
             SkipNode initiator = g.getNodes().get(i);
@@ -77,6 +81,7 @@ class SkipNodeTest {
                 Assertions.assertEquals(target.getIdentity(), result);
             }
         }
+        underlays.forEach(Underlay::terminate);
     }
 
     @Test
@@ -107,6 +112,7 @@ class SkipNodeTest {
                 Assertions.assertEquals(target.getIdentity(), result);
             }
         }
+        underlays.forEach(Underlay::terminate);
     }
 
     // Checks the correctness of a lookup table owned by the node with the given identity parameters.

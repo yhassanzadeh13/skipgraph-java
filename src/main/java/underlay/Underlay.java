@@ -5,6 +5,7 @@ import underlay.javarmi.JavaRMIUnderlay;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 import underlay.packets.Response;
+import underlay.tcp.TCPUnderlay;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
@@ -91,7 +92,7 @@ public abstract class Underlay {
      * @return a new default underlay.
      */
     public static Underlay newDefaultUnderlay() {
-        // By default, we use Java RMI.
-        return new JavaRMIUnderlay();
+        // By default, we use TCP Underlay.
+        return new TCPUnderlay();
     }
 }

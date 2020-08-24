@@ -89,21 +89,22 @@ public interface LookupTable {
     int getNumLevels();
 
     /**
-     * Returns the new neighbors of a newly inserted node. It is assumed that the newly inserted node
+     * Returns the new neighbors (unsorted) of a newly inserted node. It is assumed that the newly inserted node
      * will be a neighbor to the owner of this lookup table.
      * @param owner the identity of the owner of the lookup table.
-     * @param newNumID the numerical ID of the newly inserted node.
-     * @param level the insertion level.
+     * @param newNameID the name ID of the newly inserted node.
+     * @param newNumID the num ID of the newly inserted node.
+     * @param level the level of the new neighbor.
      * @return the list of neighbors (both right and left) of the newly inserted node.
      */
-    List<SkipNodeIdentity> getPotentialNeighbors(SkipNodeIdentity owner, int newNumID, int level);
+    TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumID, String newNameID, int level);
 
     /**
      * Given a list of potential neighbors, inserts them at the appropriate positions. This should only be called
      * during the insertion of the owner of the lookup table.
      * @param owner the owner of the lookup table.
-     * @param potentialNeighbors the list of potential neighbors.
+     * @param tentativeTable the tentative table containing list of potential neighbors.
      */
-    void initializeNeighbors(SkipNodeIdentity owner, List<SkipNodeIdentity> potentialNeighbors, int level);
+    void initializeTable(SkipNodeIdentity owner, TentativeTable tentativeTable);
 
 }

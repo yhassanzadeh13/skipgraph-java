@@ -1,10 +1,13 @@
 package middlelayer;
+import lookup.TentativeTable;
 import skipnode.SkipNodeIdentity;
 import skipnode.SkipNodeInterface;
 import underlay.Underlay;
 import underlay.packets.*;
 import underlay.packets.requests.*;
-import underlay.packets.responses.IdentityListResponse;
+import underlay.packets.responses.AckResponse;
+import underlay.packets.responses.BooleanResponse;
+import underlay.packets.responses.TableResponse;
 import underlay.packets.responses.IdentityResponse;
 
 import java.util.List;
@@ -76,13 +79,24 @@ public class MiddleLayer {
             case GetLeftNode:
                 identity = overlay.getLeftNode(((GetLeftNodeRequest) request).level);
                 return new IdentityResponse(identity);
-            case GetPotentialNeighbors:
-                List<SkipNodeIdentity> neighbors = overlay.getPotentialNeighbors(((GetPotentialNeighborsRequest) request).newNode,
-                        ((GetPotentialNeighborsRequest) request).level);
-                return new IdentityListResponse(neighbors);
+            case AcquireNeighbors:
+                TentativeTable neighbors = overlay.acquireNeighbors(((AcquireNeighborsRequest) request).newNode,
+                        ((AcquireNeighborsRequest) request).level);
+                return new TableResponse(neighbors);
             case FindLadder:
                 identity = overlay.findLadder(((FindLadderRequest) request).level, ((FindLadderRequest) request).direction,
                         ((FindLadderRequest) request).target);
+                return new IdentityResponse(identity);
+            case AnnounceNeighbor:
+                overlay.announceNeighbor(((AnnounceNeighborRequest) request).newNeighbor);
+                return new AckResponse();
+            case IsAvailable:
+                return new BooleanResponse(overlay.isAvailable());
+            case GetLeftLadder:
+                identity = overlay.getLeftLadder(((GetLeftLadderRequest)request).level, ((GetLeftLadderRequest)request).nameID);
+                return new IdentityResponse(identity);
+            case GetRightLadder:
+                identity = overlay.getRightLadder(((GetRightLadderRequest)request).level, ((GetRightLadderRequest)request).nameID);
                 return new IdentityResponse(identity);
             default:
                 return null;
@@ -136,22 +150,48 @@ public class MiddleLayer {
     }
 
     public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
+        // Send the request through the underlay
         Response r = send(destinationAddress, port, new GetLeftNodeRequest(level));
         return ((IdentityResponse) r).identity;
     }
 
     public SkipNodeIdentity getRightNode(String destinationAddress, int port, int level) {
+        // Send the request through the underlay
         Response r = send(destinationAddress, port, new GetRightNodeRequest(level));
         return ((IdentityResponse) r).identity;
     }
 
-    public List<SkipNodeIdentity> getPotentialNeighbors(String destinationAddress, int port, SkipNodeIdentity newNodeID, int level) {
-        Response r = send(destinationAddress, port, new GetPotentialNeighborsRequest(newNodeID, level));
-        return ((IdentityListResponse) r).identities;
+    public TentativeTable acquireNeighbors(String destinationAddress, int port, SkipNodeIdentity newNodeID, int level) {
+        // Send the request through the underlay
+        Response r = send(destinationAddress, port, new AcquireNeighborsRequest(newNodeID, level));
+        return ((TableResponse) r).table;
     }
 
     public SkipNodeIdentity findLadder(String destinationAddress, int port, int level, int direction, String target) {
+        // Send the request through the underlay
         Response r = send(destinationAddress, port, new FindLadderRequest(level, direction, target));
+        return ((IdentityResponse) r).identity;
+    }
+
+    public void announceNeighbor(String destinationAddress, int port, SkipNodeIdentity newNeighbor) {
+        // Send the request through the underlay
+        send(destinationAddress, port, new AnnounceNeighborRequest(newNeighbor));
+    }
+
+    public boolean isAvailable(String destinationAddress, int port) {
+        Response r = send(destinationAddress, port, new IsAvailableRequest());
+        return ((BooleanResponse) r).answer;
+    }
+
+    public SkipNodeIdentity getLeftLadder(String destinationAddress, int port, int level, String nameID) {
+        // Send the request through the underlay
+        Response r = send(destinationAddress, port, new GetLeftLadderRequest(level, nameID));
+        return ((IdentityResponse) r).identity;
+    }
+
+    public SkipNodeIdentity getRightLadder(String destinationAddress, int port, int level, String nameID) {
+        // Send the request through the underlay
+        Response r = send(destinationAddress, port, new GetRightLadderRequest(level, nameID));
         return ((IdentityResponse) r).identity;
     }
 }
