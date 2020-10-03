@@ -11,7 +11,7 @@ import underlay.UnderlayTest;
 class TCPUnderlayTest extends UnderlayTest {
 
     // Create two TCP underlays at different ports.
-    @BeforeAll
+    // @BeforeAll
     static void setUp() {
         // Construct the underlays.
         localUnderlay = new TCPUnderlay();

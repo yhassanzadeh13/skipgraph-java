@@ -8,6 +8,7 @@ import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,6 +30,10 @@ public class LocalSkipGraph {
         List<String> nameIDs = numIDs.stream()
                 .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIDSize))
                 .collect(Collectors.toList());
+        // Randomly assign name IDs.
+        Collections.shuffle(nameIDs);
+        nameIDs.forEach(x -> System.out.print(x + " "));
+        System.out.println();
         // Create the identities.
         List<SkipNodeIdentity> identities = new ArrayList<>(size);
         for(int i = 0; i < size; i++) {

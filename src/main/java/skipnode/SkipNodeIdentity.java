@@ -10,11 +10,19 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     private final String address;
     private final int port;
 
-    public SkipNodeIdentity(String nameID, int numID, String address, int port){
-        this.nameID=nameID;
-        this.numID=numID;
+    // Denotes the lookup table version.
+    public int version;
+
+    public SkipNodeIdentity(String nameID, int numID, String address, int port, int version) {
+        this.nameID = nameID;
+        this.numID = numID;
         this.address = address;
         this.port = port;
+        this.version = version;
+    }
+
+    public SkipNodeIdentity(String nameID, int numID, String address, int port) {
+        this(nameID, numID, address, port, 0);
     }
 
     public String getNameID() {

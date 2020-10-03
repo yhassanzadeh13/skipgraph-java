@@ -10,7 +10,7 @@ import underlay.UnderlayTest;
  */
 class UDPUnderlayTest extends UnderlayTest {
 
-    @BeforeEach
+    // @BeforeEach
     void setUp() {
         // Construct the underlays.
         localUnderlay = new UDPUnderlay();

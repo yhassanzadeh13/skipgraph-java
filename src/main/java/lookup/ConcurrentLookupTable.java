@@ -21,7 +21,7 @@ public class ConcurrentLookupTable implements LookupTable {
      */
     private ArrayList<SkipNodeIdentity> nodes;
 
-    private enum direction{
+    private enum direction {
         LEFT,
         RIGHT
     }
@@ -39,8 +39,11 @@ public class ConcurrentLookupTable implements LookupTable {
     public SkipNodeIdentity updateLeft(SkipNodeIdentity node, int level) {
         lock.writeLock().lock();
         int idx = getIndex(direction.LEFT, level);
-        if(idx >= nodes.size()) return LookupTable.EMPTY_NODE;
-        SkipNodeIdentity prev = nodes.set(idx,node);
+        if(idx >= nodes.size()) {
+            lock.writeLock().unlock();
+            return LookupTable.EMPTY_NODE;
+        }
+        SkipNodeIdentity prev = nodes.set(idx, node);
         lock.writeLock().unlock();
         return prev;
     }
@@ -49,8 +52,11 @@ public class ConcurrentLookupTable implements LookupTable {
     public SkipNodeIdentity updateRight(SkipNodeIdentity node, int level) {
         lock.writeLock().lock();
         int idx = getIndex(direction.RIGHT, level);
-        if(idx >= nodes.size()) return LookupTable.EMPTY_NODE;
-        SkipNodeIdentity prev = nodes.set(idx,node);
+        if(idx >= nodes.size()) {
+            lock.writeLock().unlock();
+            return LookupTable.EMPTY_NODE;
+        }
+        SkipNodeIdentity prev = nodes.set(idx, node);
         lock.writeLock().unlock();
         return prev;
     }
@@ -86,7 +92,6 @@ public class ConcurrentLookupTable implements LookupTable {
         List<SkipNodeIdentity> ls = new ArrayList<>(1);
         SkipNodeIdentity id = getLeft(level);
         if(!id.equals(LookupTable.EMPTY_NODE)) ls.add(id);
-        ls.add(getLeft(level));
         return ls;
     }
 

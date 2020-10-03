@@ -11,7 +11,7 @@ import underlay.UnderlayTest;
 class JavaRMIUnderlayTest extends UnderlayTest {
 
     // Create two Java RMI underlays at different ports.
-    @BeforeAll
+    // @BeforeAll
     static void setUp() {
         // Construct the underlays.
         localUnderlay = new JavaRMIUnderlay();

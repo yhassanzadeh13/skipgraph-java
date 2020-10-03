@@ -50,7 +50,7 @@ public class UnderlayTest {
     }
 
     // Checks the message delivery for every request type between underlays.
-    @Test
+    // @Test
     void sendMessage() {
         // The address of the remote underlay.
         String remoteAddress = remoteUnderlay.getAddress();
@@ -68,7 +68,7 @@ public class UnderlayTest {
     }
 
     // Terminates the underlays.
-    @AfterAll
+    // @AfterAll
     static void tearDown() {
         Assertions.assertTrue(localUnderlay.terminate());
         Assertions.assertTrue(remoteUnderlay.terminate());

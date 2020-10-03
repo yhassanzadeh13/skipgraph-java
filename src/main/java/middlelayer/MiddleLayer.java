@@ -1,14 +1,13 @@
 package middlelayer;
+import lookup.LookupTable;
 import lookup.TentativeTable;
+import skipnode.SearchResult;
 import skipnode.SkipNodeIdentity;
 import skipnode.SkipNodeInterface;
 import underlay.Underlay;
 import underlay.packets.*;
 import underlay.packets.requests.*;
-import underlay.packets.responses.AckResponse;
-import underlay.packets.responses.BooleanResponse;
-import underlay.packets.responses.TableResponse;
-import underlay.packets.responses.IdentityResponse;
+import underlay.packets.responses.*;
 
 import java.util.List;
 
@@ -36,11 +35,36 @@ public class MiddleLayer {
      * @return the response emitted by the remote client.
      */
     protected Response send(String destinationAddress, int port, Request request) {
-        // Bounce the request up.
-        if(destinationAddress.equals(underlay.getAddress()) && port == underlay.getPort()) {
-            return receive(request);
-        }
-        return underlay.sendMessage(destinationAddress, port, request);
+        // Fill out the request's sender information to be used by the remote middle layer.
+        request.senderAddress = underlay.getAddress();
+        request.senderPort = underlay.getPort();
+        Response response = null;
+        int trial = 0;
+        do {
+            trial++;
+            // Backoff.
+            if(trial > 1) {
+                int sleepTime = (int) (Math.random() * 2000);
+                try {
+//                    System.out.println("[MiddleLayer.send] Backing off " + trial + " for " + sleepTime + " ms while sending " + request
+//                            + " from " + overlay.getIdentity().getNumID() + " to " + destinationAddress + ":" + port + ".");
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    System.err.println("[MiddleLayer.send] Could not back off.");
+                    e.printStackTrace();
+                }
+            }
+            // Check if the destination address == address of this node.
+            if (destinationAddress.equals(underlay.getAddress()) && port == underlay.getPort()) {
+                // Bounce the request up.
+                response = receive(request);
+            } else {
+                // Or receive it from the remote client.
+                response = underlay.sendMessage(destinationAddress, port, request);
+            }
+        } while(request.backoff && response.locked);
+
+        return response;
     }
 
     /**
@@ -49,55 +73,68 @@ public class MiddleLayer {
      */
     public Response receive(Request request) {
         SkipNodeIdentity identity;
+        SearchResult result;
+        // If the overlay is locked, return a response denoting the client to try again later.
         switch (request.type) {
             case SearchByNameID:
-                identity = overlay.searchByNameID(((SearchByNameIDRequest) request).targetNameID);
-                return new IdentityResponse(identity);
+                // Check whether the node is available for lookups (i.e., already inserted.)
+                if(!overlay.isAvailable()) return new Response(true);
+                result = overlay.searchByNameID(((SearchByNameIDRequest) request).targetNameID);
+                return new SearchResultResponse(result);
             case SearchByNameIDRecursive:
-                identity = overlay.searchByNameIDRecursive(((SearchByNameIDRecursiveRequest) request).left,
-                        ((SearchByNameIDRecursiveRequest) request).right,
-                        ((SearchByNameIDRecursiveRequest) request).target,
+                // Check whether the node is available for lookups (i.e., already inserted.)
+                if(!overlay.isAvailable()) return new Response(true);
+                result = overlay.searchByNameIDRecursive(((SearchByNameIDRecursiveRequest) request).target,
                         ((SearchByNameIDRecursiveRequest) request).level);
-                return new IdentityResponse(identity);
+                return new SearchResultResponse(result);
             case SearchByNumID:
+                // Check whether the node is available for lookups (i.e., already inserted.)
+                if(!overlay.isAvailable()) return new Response(true);
                 identity = overlay.searchByNumID(((SearchByNumIDRequest) request).targetNumID);
                 return new IdentityResponse(identity);
-            case NameIDLevelSearch:
-                identity = overlay.nameIDLevelSearch(((NameIDLevelSearchRequest) request).level,
-                        ((NameIDLevelSearchRequest) request).direction,
-                        ((NameIDLevelSearchRequest) request).targetNameID);
+            case GetIdentity:
+                identity = overlay.getIdentity();
                 return new IdentityResponse(identity);
+            case AcquireLock:
+                return new BooleanResponse(overlay.tryAcquire(((AcquireLockRequest) request).requester, ((AcquireLockRequest) request).version));
+            case ReleaseLock:
+                return new BooleanResponse(overlay.unlock(((ReleaseLockRequest) request).owner));
             case UpdateLeftNode:
+                // Can only be invoked when unlocked or by the lock owner.
+                if(overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort))
+                    return new Response(true);
                 identity = overlay.updateLeftNode(((UpdateLeftNodeRequest) request).snId, ((UpdateLeftNodeRequest) request).level);
                 return new IdentityResponse(identity);
             case UpdateRightNode:
+                // Can only be invoked when unlocked or by the lock owner.
+                if(overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort))
+                    return new Response(true);
                 identity = overlay.updateRightNode(((UpdateRightNodeRequest) request).snId, ((UpdateRightNodeRequest) request).level);
                 return new IdentityResponse(identity);
             case GetRightNode:
+                // Can only be invoked when unlocked or by the lock owner.
+                if(overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort))
+                    return new Response(true);
                 identity = overlay.getRightNode(((GetRightNodeRequest) request).level);
                 return new IdentityResponse(identity);
             case GetLeftNode:
+                // Can only be invoked when unlocked or by the lock owner.
+                if(overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort))
+                    return new Response(true);
                 identity = overlay.getLeftNode(((GetLeftNodeRequest) request).level);
                 return new IdentityResponse(identity);
-            case AcquireNeighbors:
-                TentativeTable neighbors = overlay.acquireNeighbors(((AcquireNeighborsRequest) request).newNode,
-                        ((AcquireNeighborsRequest) request).level);
-                return new TableResponse(neighbors);
             case FindLadder:
+                // Can only be invoked when unlocked or by the lock owner.
+                if(overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort))
+                    return new Response(true);
                 identity = overlay.findLadder(((FindLadderRequest) request).level, ((FindLadderRequest) request).direction,
                         ((FindLadderRequest) request).target);
                 return new IdentityResponse(identity);
             case AnnounceNeighbor:
-                overlay.announceNeighbor(((AnnounceNeighborRequest) request).newNeighbor);
+                overlay.announceNeighbor(((AnnounceNeighborRequest) request).newNeighbor, ((AnnounceNeighborRequest) request).minLevel);
                 return new AckResponse();
             case IsAvailable:
                 return new BooleanResponse(overlay.isAvailable());
-            case GetLeftLadder:
-                identity = overlay.getLeftLadder(((GetLeftLadderRequest)request).level, ((GetLeftLadderRequest)request).nameID);
-                return new IdentityResponse(identity);
-            case GetRightLadder:
-                identity = overlay.getRightLadder(((GetRightLadderRequest)request).level, ((GetRightLadderRequest)request).nameID);
-                return new IdentityResponse(identity);
             default:
                 return null;
         }
@@ -111,17 +148,16 @@ public class MiddleLayer {
     and can abstract away all the details, allowing for it to be used as if it was simply available locally.
      */
 
-    public SkipNodeIdentity searchByNameID(String destinationAddress, int port, String nameID) {
+    public SearchResult searchByNameID(String destinationAddress, int port, String nameID) {
         // Send the request through the underlay
         Response response = this.send(destinationAddress, port, new SearchByNameIDRequest(nameID));
-        return ((IdentityResponse) response).identity;
+        return ((SearchResultResponse) response).result;
     }
 
-    public SkipNodeIdentity searchByNameIDRecursive(String destinationAddress, int port, SkipNodeIdentity left,
-                                                    SkipNodeIdentity right, String target, int level) {
+    public SearchResult searchByNameIDRecursive(String destinationAddress, int port, String target, int level) {
         // Send the request through the underlay.
-        Response response = this.send(destinationAddress, port, new SearchByNameIDRecursiveRequest(left, right, target, level));
-        return ((IdentityResponse) response).identity;
+        Response response = this.send(destinationAddress, port, new SearchByNameIDRecursiveRequest(target, level));
+        return ((SearchResultResponse) response).result;
     }
 
     public SkipNodeIdentity searchByNumID(String destinationAddress, int port, int numID) {
@@ -130,10 +166,14 @@ public class MiddleLayer {
         return ((IdentityResponse) response).identity;
     }
 
-    public SkipNodeIdentity nameIDLevelSearch(String destinationAddress, int port, int level, int direction, String nameID) {
-        // Send the request through the underlay
-        Response response = this.send(destinationAddress, port, new NameIDLevelSearchRequest(level, direction, nameID));
-        return ((IdentityResponse) response).identity;
+    public boolean tryAcquire(String destinationAddress, int port, SkipNodeIdentity req, int version) {
+        Response response = this.send(destinationAddress, port, new AcquireLockRequest(req, version));
+        return ((BooleanResponse) response).answer;
+    }
+
+    public boolean unlock(String destinationAddress, int port, SkipNodeIdentity owner) {
+        Response response = this.send(destinationAddress, port, new ReleaseLockRequest(owner));
+        return ((BooleanResponse) response).answer;
     }
 
     public SkipNodeIdentity updateRightNode(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
@@ -149,15 +189,38 @@ public class MiddleLayer {
         return ((IdentityResponse) response).identity;
     }
 
-    public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
-        // Send the request through the underlay
-        Response r = send(destinationAddress, port, new GetLeftNodeRequest(level));
+    public SkipNodeIdentity getIdentity(String destinationAddress, int port) {
+        Response r = send(destinationAddress, port, new GetIdentityRequest());
         return ((IdentityResponse) r).identity;
     }
 
+    public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
+        return getLeftNode(true, destinationAddress, port, level);
+    }
+
     public SkipNodeIdentity getRightNode(String destinationAddress, int port, int level) {
+        return getRightNode(true, destinationAddress, port, level);
+    }
+
+    public SkipNodeIdentity getLeftNode(boolean backoff, String destinationAddress, int port, int level) {
         // Send the request through the underlay
-        Response r = send(destinationAddress, port, new GetRightNodeRequest(level));
+        GetLeftNodeRequest req = new GetLeftNodeRequest(level);
+        req.backoff = backoff;
+        Response r = send(destinationAddress, port, req);
+        // If the client has returned a locked response (i.e., has indicated that we should try again), return
+        // an invalid skip node identity.
+        if(r.locked) return LookupTable.INVALID_NODE;
+        return ((IdentityResponse) r).identity;
+    }
+
+    public SkipNodeIdentity getRightNode(boolean backoff, String destinationAddress, int port, int level) {
+        // Send the request through the underlay
+        GetRightNodeRequest req = new GetRightNodeRequest(level);
+        req.backoff = backoff;
+        Response r = send(destinationAddress, port, req);
+        // If the client has returned a locked response (i.e., has indicated that we should try again), return
+        // an invalid skip node identity.
+        if(r.locked) return LookupTable.INVALID_NODE;
         return ((IdentityResponse) r).identity;
     }
 
@@ -173,9 +236,9 @@ public class MiddleLayer {
         return ((IdentityResponse) r).identity;
     }
 
-    public void announceNeighbor(String destinationAddress, int port, SkipNodeIdentity newNeighbor) {
+    public void announceNeighbor(String destinationAddress, int port, SkipNodeIdentity newNeighbor, int minLevel) {
         // Send the request through the underlay
-        send(destinationAddress, port, new AnnounceNeighborRequest(newNeighbor));
+        send(destinationAddress, port, new AnnounceNeighborRequest(newNeighbor, minLevel));
     }
 
     public boolean isAvailable(String destinationAddress, int port) {
@@ -193,5 +256,28 @@ public class MiddleLayer {
         // Send the request through the underlay
         Response r = send(destinationAddress, port, new GetRightLadderRequest(level, nameID));
         return ((IdentityResponse) r).identity;
+    }
+
+    public SkipNodeIdentity increment(String destinationAddress, int port, SkipNodeIdentity snId, int level){
+        // Send the request through the underlay
+        try{
+            Thread.sleep(10000);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        Response response = send(destinationAddress, port, new IncrementRequest(level, snId));
+        if (response==null){
+            System.exit(1);
+        }
+        return ((IdentityResponse) response).identity;
+    }
+
+    public boolean inject(String destinationAddress, int port, List<SkipNodeIdentity> snIds){
+        // Send the request through the underlay
+        Response response = send(destinationAddress, port, new InjectionRequest(snIds));
+        if (response==null){
+            System.exit(1);
+        }
+        return ((BooleanResponse) response).answer;
     }
 }
