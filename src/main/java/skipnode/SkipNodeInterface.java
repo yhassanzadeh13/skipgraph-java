@@ -19,6 +19,14 @@ public interface SkipNodeInterface {
     void insert(String introducerAddress, int introducerPort);
 
     /**
+     * Adds a data node to the list of overlays of the middle layer
+     * Inserts the node into the Skip Graph
+     * @param node
+     */
+    void insertDataNode(SkipNodeInterface node);
+
+
+    /**
      * Returns whether the node is available to be used as a router. If the node is still being inserted,
      * then, this will return false.
      * @return whether the node is available for routing or not.

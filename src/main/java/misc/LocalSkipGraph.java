@@ -22,7 +22,10 @@ public class LocalSkipGraph {
     private final List<SkipNode> skipNodes;
 
     public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin) {
-        int nameIDSize = ((int) (Math.log(size)/Math.log(2)));
+        this(size, localAddress, startingPort, manualJoin, ((int) (Math.log(size)/Math.log(2))));
+    }
+
+    public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin, int nameIDSize) {
         // Create the numerical IDs.
         List<Integer> numIDs = new ArrayList<>(size);
         for(int i = 0; i < size; i++) numIDs.add(i);
@@ -87,7 +90,7 @@ public class LocalSkipGraph {
      * @param targetLength the desired length.
      * @return the prepended string.
      */
-    private static String prependToLength(String original, int targetLength) {
+    public static String prependToLength(String original, int targetLength) {
         StringBuilder originalBuilder = new StringBuilder(original);
         while(originalBuilder.length() < targetLength) {
             originalBuilder.insert(0, '0');

@@ -9,6 +9,7 @@ import underlay.packets.*;
 import underlay.packets.requests.*;
 import underlay.packets.responses.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,11 +21,14 @@ import java.util.List;
 public class MiddleLayer {
 
     private final Underlay underlay;
-    private final SkipNodeInterface overlay;
+    private final SkipNodeInterface masterOverlay;
+    private final ArrayList<SkipNodeInterface> overlays;
 
     public MiddleLayer(Underlay underlay, SkipNodeInterface overlay) {
         this.underlay = underlay;
-        this.overlay = overlay;
+        this.masterOverlay = overlay;
+        this.overlays = new ArrayList<>();
+        this.overlays.add(overlay);
     }
 
     /**
@@ -74,6 +78,11 @@ public class MiddleLayer {
     public Response receive(Request request) {
         SkipNodeIdentity identity;
         SearchResult result;
+        SkipNodeInterface overlay = request.receiverID == -1? masterOverlay : getByID(request.receiverID);
+        // Invalid ID
+        if (overlay == null){
+            return null;
+        }
         // If the overlay is locked, return a response denoting the client to try again later.
         switch (request.type) {
             case SearchByNameID:
@@ -140,6 +149,26 @@ public class MiddleLayer {
         }
     }
 
+    /**
+     * Adds a data node to the list of overlays of the middle layer
+     * Inserts the node into the Skip Graph
+     * @param node
+     */
+    public void insertDataNode(SkipNodeInterface node){
+        overlays.add(node);
+        node.setMiddleLayer(this);
+        node.insert(node.getIdentity().getAddress(), node.getIdentity().getPort());
+    }
+
+    private SkipNodeInterface getByID(int ID){
+        for( SkipNodeInterface overlay : this.overlays ){
+            if( overlay.getIdentity().getNumID() == ID ){
+               return overlay;
+            }
+        }
+        return null;
+    }
+
     /*
     Implemented methods.
     These are the methods that the Overlay will use to send messages using the middle layer
@@ -149,63 +178,121 @@ public class MiddleLayer {
      */
 
     public SearchResult searchByNameID(String destinationAddress, int port, String nameID) {
+        return searchByNameID(destinationAddress, port, -1, nameID);
+    }
+
+    public SearchResult searchByNameID(String destinationAddress, int port, int receiverID, String nameID) {
+        Request request = new SearchByNameIDRequest(nameID);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response response = this.send(destinationAddress, port, new SearchByNameIDRequest(nameID));
+        Response response = this.send(destinationAddress, port, request);
         return ((SearchResultResponse) response).result;
     }
 
     public SearchResult searchByNameIDRecursive(String destinationAddress, int port, String target, int level) {
+        return searchByNameIDRecursive(destinationAddress, port, -1, target, level) ;
+    }
+
+    public SearchResult searchByNameIDRecursive(String destinationAddress, int port, int receiverID, String target, int level) {
+        Request request = new SearchByNameIDRecursiveRequest(target, level);
+        request.receiverID = receiverID;
         // Send the request through the underlay.
-        Response response = this.send(destinationAddress, port, new SearchByNameIDRecursiveRequest(target, level));
+        Response response = this.send(destinationAddress, port, request);
         return ((SearchResultResponse) response).result;
     }
 
     public SkipNodeIdentity searchByNumID(String destinationAddress, int port, int numID) {
+        return searchByNumID(destinationAddress, port, -1, numID) ;
+    }
+
+    public SkipNodeIdentity searchByNumID(String destinationAddress, int port, int receiverID, int numID) {
+        Request request = new SearchByNumIDRequest(numID);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response response = this.send(destinationAddress, port, new SearchByNumIDRequest(numID));
+        Response response = this.send(destinationAddress, port, request);
         return ((IdentityResponse) response).identity;
     }
 
     public boolean tryAcquire(String destinationAddress, int port, SkipNodeIdentity req, int version) {
-        Response response = this.send(destinationAddress, port, new AcquireLockRequest(req, version));
+        return tryAcquire(destinationAddress, port, -1, req, version) ;
+    }
+
+    public boolean tryAcquire(String destinationAddress, int port, int receiverID, SkipNodeIdentity req, int version) {
+        Request request = new AcquireLockRequest(req, version);
+        request.receiverID = receiverID;
+
+        Response response = this.send(destinationAddress, port, request);
         return ((BooleanResponse) response).answer;
     }
 
     public boolean unlock(String destinationAddress, int port, SkipNodeIdentity owner) {
-        Response response = this.send(destinationAddress, port, new ReleaseLockRequest(owner));
+        return unlock(destinationAddress, port, -1, owner) ;
+    }
+
+    public boolean unlock(String destinationAddress, int port, int receiverID, SkipNodeIdentity owner) {
+        Request request = new ReleaseLockRequest(owner);
+        request.receiverID = receiverID;
+        Response response = this.send(destinationAddress, port, request);
         return ((BooleanResponse) response).answer;
     }
 
     public SkipNodeIdentity updateRightNode(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
+        return updateRightNode(destinationAddress, port, -1, snId, level) ;
+    }
+
+    public SkipNodeIdentity updateRightNode(String destinationAddress, int port, int receiverID, SkipNodeIdentity snId, int level) {
+        Request request = new UpdateRightNodeRequest(level, snId);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response response = this.send(destinationAddress, port, new UpdateRightNodeRequest(level, snId));
+        Response response = this.send(destinationAddress, port, request);
         return ((IdentityResponse) response).identity;
 
     }
 
     public SkipNodeIdentity updateLeftNode(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
+        return updateLeftNode(destinationAddress, port, -1, snId, level) ;
+    }
+
+    public SkipNodeIdentity updateLeftNode(String destinationAddress, int port, int receiverID, SkipNodeIdentity snId, int level) {
+        Request request = new UpdateLeftNodeRequest(level, snId);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response response = this.send(destinationAddress, port, new UpdateLeftNodeRequest(level, snId));
+        Response response = this.send(destinationAddress, port, request);
         return ((IdentityResponse) response).identity;
     }
 
     public SkipNodeIdentity getIdentity(String destinationAddress, int port) {
+        return getIdentity(destinationAddress, port, -1);
+    }
+
+    public SkipNodeIdentity getIdentity(String destinationAddress, int port, int receiverID) {
+        Request request = new GetIdentityRequest();
+        request.receiverID = receiverID;
         Response r = send(destinationAddress, port, new GetIdentityRequest());
         return ((IdentityResponse) r).identity;
     }
 
     public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
-        return getLeftNode(true, destinationAddress, port, level);
+        return getLeftNode(true, destinationAddress, port, -1, level);
+    }
+
+    public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int receiverID, int level) {
+        return getLeftNode(true, destinationAddress, port, receiverID, level);
     }
 
     public SkipNodeIdentity getRightNode(String destinationAddress, int port, int level) {
-        return getRightNode(true, destinationAddress, port, level);
+        return getRightNode(true, destinationAddress, port, -1, level);
     }
 
-    public SkipNodeIdentity getLeftNode(boolean backoff, String destinationAddress, int port, int level) {
+    public SkipNodeIdentity getRightNode(String destinationAddress, int port, int receiverID, int level) {
+        return getRightNode(true, destinationAddress, port, receiverID, level);
+    }
+
+    public SkipNodeIdentity getLeftNode(boolean backoff, String destinationAddress, int port, int receiverID, int level) {
         // Send the request through the underlay
         GetLeftNodeRequest req = new GetLeftNodeRequest(level);
         req.backoff = backoff;
+        req.receiverID = receiverID;
         Response r = send(destinationAddress, port, req);
         // If the client has returned a locked response (i.e., has indicated that we should try again), return
         // an invalid skip node identity.
@@ -213,59 +300,101 @@ public class MiddleLayer {
         return ((IdentityResponse) r).identity;
     }
 
-    public SkipNodeIdentity getRightNode(boolean backoff, String destinationAddress, int port, int level) {
+    public SkipNodeIdentity getRightNode(boolean backoff, String destinationAddress, int port, int receiverID, int level) {
         // Send the request through the underlay
         GetRightNodeRequest req = new GetRightNodeRequest(level);
         req.backoff = backoff;
+        req.receiverID = receiverID;
         Response r = send(destinationAddress, port, req);
         // If the client has returned a locked response (i.e., has indicated that we should try again), return
         // an invalid skip node identity.
         if(r.locked) return LookupTable.INVALID_NODE;
         return ((IdentityResponse) r).identity;
     }
-
     public TentativeTable acquireNeighbors(String destinationAddress, int port, SkipNodeIdentity newNodeID, int level) {
+        return acquireNeighbors(destinationAddress, port, -1, newNodeID, level) ;
+    }
+
+    public TentativeTable acquireNeighbors(String destinationAddress, int port, int receiverID, SkipNodeIdentity newNodeID, int level) {
+        Request request = new AcquireNeighborsRequest(newNodeID, level);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response r = send(destinationAddress, port, new AcquireNeighborsRequest(newNodeID, level));
+        Response r = send(destinationAddress, port, request);
         return ((TableResponse) r).table;
     }
 
     public SkipNodeIdentity findLadder(String destinationAddress, int port, int level, int direction, String target) {
+        return findLadder(destinationAddress, port, -1, level, direction, target) ;
+    }
+
+    public SkipNodeIdentity findLadder(String destinationAddress, int port, int receiverID, int level, int direction, String target) {
+        Request request = new FindLadderRequest(level, direction, target);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response r = send(destinationAddress, port, new FindLadderRequest(level, direction, target));
+        Response r = send(destinationAddress, port, request);
         return ((IdentityResponse) r).identity;
     }
 
     public void announceNeighbor(String destinationAddress, int port, SkipNodeIdentity newNeighbor, int minLevel) {
+        announceNeighbor(destinationAddress, port, -1, newNeighbor, minLevel);
+    }
+
+    public void announceNeighbor(String destinationAddress, int port, int receiverID, SkipNodeIdentity newNeighbor, int minLevel) {
+        Request request = new AnnounceNeighborRequest(newNeighbor, minLevel);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        send(destinationAddress, port, new AnnounceNeighborRequest(newNeighbor, minLevel));
+        send(destinationAddress, port, request);
     }
 
     public boolean isAvailable(String destinationAddress, int port) {
-        Response r = send(destinationAddress, port, new IsAvailableRequest());
+        return isAvailable(destinationAddress, port, -1);
+    }
+
+    public boolean isAvailable(String destinationAddress, int port, int receiverID) {
+        Request request = new IsAvailableRequest();
+        request.receiverID = receiverID;
+        Response r = send(destinationAddress, port, request);
         return ((BooleanResponse) r).answer;
     }
 
     public SkipNodeIdentity getLeftLadder(String destinationAddress, int port, int level, String nameID) {
+        return getLeftLadder(destinationAddress, port, -1, level, nameID) ;
+    }
+
+    public SkipNodeIdentity getLeftLadder(String destinationAddress, int port, int receiverID, int level, String nameID) {
+        Request request = new GetLeftLadderRequest(level, nameID);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response r = send(destinationAddress, port, new GetLeftLadderRequest(level, nameID));
+        Response r = send(destinationAddress, port, request);
         return ((IdentityResponse) r).identity;
     }
 
     public SkipNodeIdentity getRightLadder(String destinationAddress, int port, int level, String nameID) {
+        return getRightLadder(destinationAddress, port, -1, level, nameID) ;
+    }
+
+    public SkipNodeIdentity getRightLadder(String destinationAddress, int port, int receiverID, int level, String nameID) {
+        Request request = new GetRightLadderRequest(level, nameID);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response r = send(destinationAddress, port, new GetRightLadderRequest(level, nameID));
+        Response r = send(destinationAddress, port, request);
         return ((IdentityResponse) r).identity;
     }
 
     public SkipNodeIdentity increment(String destinationAddress, int port, SkipNodeIdentity snId, int level){
+        return increment(destinationAddress, port, -1, snId, level);
+    }
+
+    public SkipNodeIdentity increment(String destinationAddress, int port, int receiverID, SkipNodeIdentity snId, int level){
+        Request request = new IncrementRequest(level, snId);
+        request.receiverID = receiverID;
         // Send the request through the underlay
         try{
             Thread.sleep(10000);
         }catch (Exception e){
             e.printStackTrace();
         }
-        Response response = send(destinationAddress, port, new IncrementRequest(level, snId));
+        Response response = send(destinationAddress, port, request);
         if (response==null){
             System.exit(1);
         }
@@ -273,11 +402,18 @@ public class MiddleLayer {
     }
 
     public boolean inject(String destinationAddress, int port, List<SkipNodeIdentity> snIds){
+        return inject(destinationAddress, port, -1, snIds);
+    }
+
+    public boolean inject(String destinationAddress, int port, int receiverID, List<SkipNodeIdentity> snIds){
+        Request request = new InjectionRequest(snIds);
+        request.receiverID = receiverID;
         // Send the request through the underlay
-        Response response = send(destinationAddress, port, new InjectionRequest(snIds));
+        Response response = send(destinationAddress, port, request);
         if (response==null){
             System.exit(1);
         }
         return ((BooleanResponse) response).answer;
     }
+
 }
