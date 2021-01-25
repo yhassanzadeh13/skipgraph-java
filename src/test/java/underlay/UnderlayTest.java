@@ -61,10 +61,6 @@ public class UnderlayTest {
         // Check search by numerical ID request.
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNumIDRequest(0)));
 
-        // TODO: implement for NameIDLevelSearchRequest
-//        // Check level-based search by name ID request.
-//        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new NameIDLevelSearchRequest(0, 0, "")));
-
         // Check left/right update requests.
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateRightNodeRequest(0, LookupTable.EMPTY_NODE)));
