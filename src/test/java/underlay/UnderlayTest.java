@@ -50,7 +50,7 @@ public class UnderlayTest {
     }
 
     // Checks the message delivery for every request type between underlays.
-    // @Test
+    @Test
     void sendMessage() {
         // The address of the remote underlay.
         String remoteAddress = remoteUnderlay.getAddress();
@@ -60,15 +60,18 @@ public class UnderlayTest {
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIDRequest("")));
         // Check search by numerical ID request.
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNumIDRequest(0)));
-        // Check level-based search by name ID request.
-        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new NameIDLevelSearchRequest(0, 0, "")));
+
+        // TODO: implement for NameIDLevelSearchRequest
+//        // Check level-based search by name ID request.
+//        Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new NameIDLevelSearchRequest(0, 0, "")));
+
         // Check left/right update requests.
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateRightNodeRequest(0, LookupTable.EMPTY_NODE)));
     }
 
     // Terminates the underlays.
-    // @AfterAll
+    @AfterAll
     static void tearDown() {
         Assertions.assertTrue(localUnderlay.terminate());
         Assertions.assertTrue(remoteUnderlay.terminate());
