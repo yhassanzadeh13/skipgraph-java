@@ -3,10 +3,7 @@ package underlay;
 import lookup.LookupTable;
 import lookup.LookupTableFactory;
 import middlelayer.MiddleLayer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
 import underlay.packets.RequestType;
@@ -14,15 +11,15 @@ import underlay.packets.requests.*;
 
 /**
  * This test creates two underlays on the machine at different ports and checks the
- * connectivity between them. Uses the default underlay implementation.
+ * connectivity between them.
  */
-public class UnderlayTest {
+public abstract class UnderlayTest {
 
     protected static final int LOCAL_PORT = 9090;
     protected static final int REMOTE_PORT = 9091;
 
-    protected static Underlay localUnderlay;
-    protected static Underlay remoteUnderlay;
+    protected Underlay localUnderlay;
+    protected Underlay remoteUnderlay;
 
     /**
      * Builds the middle layer and overlay on top of the given underlay so that it can
@@ -36,18 +33,8 @@ public class UnderlayTest {
         overlay.setMiddleLayer(middleLayer);
     }
 
-    // Initializes the underlays.
-    @BeforeAll
-    static void setUp() {
-        localUnderlay = Underlay.newDefaultUnderlay();
-        remoteUnderlay = Underlay.newDefaultUnderlay();
-
-        buildLayers(localUnderlay);
-        buildLayers(remoteUnderlay);
-
-        Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT));
-        Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT));
-    }
+    @BeforeEach
+    public abstract void setup();
 
     // Checks the message delivery for every request type between underlays.
     @Test
@@ -67,8 +54,8 @@ public class UnderlayTest {
     }
 
     // Terminates the underlays.
-    @AfterAll
-    static void tearDown() {
+    @AfterEach
+    void tearDown() {
         Assertions.assertTrue(localUnderlay.terminate());
         Assertions.assertTrue(remoteUnderlay.terminate());
     }

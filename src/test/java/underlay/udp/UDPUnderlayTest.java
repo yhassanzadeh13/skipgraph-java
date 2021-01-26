@@ -9,17 +9,16 @@ import underlay.UnderlayTest;
  * connectivity between them. `sendMessage` and `terminate` tests are implemented in the `UnderlayTest` class.
  */
 class UDPUnderlayTest extends UnderlayTest {
-
-    // @BeforeEach
-    void setUp() {
+    @BeforeEach
+    public void setup() {
         // Construct the underlays.
-        localUnderlay = new UDPUnderlay();
-        remoteUnderlay = new UDPUnderlay();
+        this.localUnderlay = new UDPUnderlay();
+        this.remoteUnderlay = new UDPUnderlay();
 
-        buildLayers(localUnderlay);
-        buildLayers(remoteUnderlay);
+        buildLayers(this.localUnderlay);
+        buildLayers(this.remoteUnderlay);
 
-        Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT + 4));
-        Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT + 4));
+        Assertions.assertTrue(this.localUnderlay.initialize(LOCAL_PORT + 4));
+        Assertions.assertTrue(this.remoteUnderlay.initialize(REMOTE_PORT + 4));
     }
 }

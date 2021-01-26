@@ -2,6 +2,7 @@ package underlay.tcp;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import underlay.UnderlayTest;
 
 /**
@@ -9,10 +10,9 @@ import underlay.UnderlayTest;
  * connectivity between them. `sendMessage` and `terminate` tests are implemented in the `UnderlayTest` class.
  */
 class TCPUnderlayTest extends UnderlayTest {
-
     // Create two TCP underlays at different ports.
-    // @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    public void setup() {
         // Construct the underlays.
         localUnderlay = new TCPUnderlay();
         remoteUnderlay = new TCPUnderlay();
