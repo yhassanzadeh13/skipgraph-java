@@ -3,21 +3,22 @@ package underlay;
 import lookup.LookupTable;
 import lookup.LookupTableFactory;
 import middlelayer.MiddleLayer;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.Configurator;
 import org.junit.jupiter.api.*;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
 import underlay.packets.RequestType;
 import underlay.packets.requests.*;
 
+import java.net.BindException;
+import java.util.Random;
+
 /**
  * This test creates two underlays on the machine at different ports and checks the
  * connectivity between them.
  */
 public abstract class UnderlayTest {
-
-    protected static final int LOCAL_PORT = 9090;
-    protected static final int REMOTE_PORT = 9091;
-
     protected Underlay localUnderlay;
     protected Underlay remoteUnderlay;
 
@@ -53,10 +54,34 @@ public abstract class UnderlayTest {
         Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateRightNodeRequest(0, LookupTable.EMPTY_NODE)));
     }
 
+    protected void initialize(){
+        Assertions.assertTrue(initializer(localUnderlay));
+        Assertions.assertTrue(initializer(remoteUnderlay));
+    }
+
+    private boolean initializer(Underlay underlay){
+        Random random = new Random();
+        final int MAX_PORT_NUM = 9999;
+        final int MAX_RETRY_ITERATIONS = 1000; // tries at most 1000 randomly ports
+        int port = MAX_PORT_NUM; // initializes port at a point
+        int iterations = 0;
+
+        // tries random available ports for 1000 iterations
+        while(!underlay.initialize(port) && iterations < MAX_RETRY_ITERATIONS){
+            port = random.nextInt(MAX_PORT_NUM) + 1;
+            iterations++;
+        }
+
+        if(iterations >= 1000){
+            return false;
+        }
+        return true;
+    }
+
     // Terminates the underlays.
     @AfterEach
     void tearDown() {
-        Assertions.assertTrue(localUnderlay.terminate());
-        Assertions.assertTrue(remoteUnderlay.terminate());
+//        Assertions.assertTrue(localUnderlay.terminate());
+//        Assertions.assertTrue(remoteUnderlay.terminate());
     }
 }
