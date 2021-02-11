@@ -20,7 +20,8 @@ class TCPUnderlayTest extends UnderlayTest {
         buildLayers(localUnderlay);
         buildLayers(remoteUnderlay);
 
-        Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT + 6));
-        Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT + 6));
+//        Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT + 6));
+//        Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT + 6));
+        initialize();
     }
 }
