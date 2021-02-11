@@ -59,6 +59,9 @@ public abstract class Underlay {
             System.err.println("[Underlay] Could not acquire the local host name during initialization.");
             e.printStackTrace();
             return false;
+        } catch (Exception e){
+            // TODO: add more context
+            return false;
         }
         fullAddress = address + ":" + port;
         return initUnderlay(port);
