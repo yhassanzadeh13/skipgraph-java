@@ -1,5 +1,6 @@
 package underlay.udp;
 
+import org.apache.log4j.Logger;
 import underlay.packets.Request;
 import underlay.packets.Response;
 
@@ -23,6 +24,7 @@ public class UDPHandler implements Runnable {
     private final int clientPort;
     // The handler which will be handling this request.
     private final UDPUnderlay underlay;
+    protected final Logger logger = Logger.getLogger(this.getClass());
 
     public UDPHandler(DatagramSocket udpSocket, Request request, InetAddress clientAddress, int clientPort,
                       UDPUnderlay underlay) {
@@ -40,7 +42,7 @@ public class UDPHandler implements Runnable {
         // Serialize the response.
         byte[] responseBytes = UDPUtils.serialize(response);
         if(responseBytes == null) {
-            System.err.println("[UDPHandler] Invalid response.");
+            logger.error("[UDPHandler] Invalid response.");
             return;
         }
         // Construct the response packet.
@@ -49,7 +51,7 @@ public class UDPHandler implements Runnable {
         try {
             udpSocket.send(responsePacket);
         } catch (IOException e) {
-            System.err.println("[UDPHandler] Could not send the response.");
+            logger.error("[UDPHandler] Could not send the response.");
             e.printStackTrace();
         }
     }
