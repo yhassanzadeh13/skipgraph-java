@@ -1,5 +1,6 @@
 package underlay.tcp;
 
+import org.apache.log4j.Logger;
 import underlay.packets.Request;
 import underlay.packets.Response;
 
@@ -17,6 +18,7 @@ public class TCPHandler implements Runnable {
     private final Socket incomingConnection;
     // TCP underlay.
     private final TCPUnderlay underlay;
+    protected final Logger logger = Logger.getLogger(this.getClass());
 
     public TCPHandler(Socket incomingConnection, TCPUnderlay underlay) {
         this.incomingConnection = incomingConnection;
@@ -33,7 +35,7 @@ public class TCPHandler implements Runnable {
             requestStream = new ObjectInputStream(incomingConnection.getInputStream());
             responseStream = new ObjectOutputStream(incomingConnection.getOutputStream());
         } catch (IOException e) {
-            System.err.println("[TCPHandler] Could not acquire the streams from the connection.");
+            logger.error("[TCPHandler] Could not acquire the streams from the connection.");
             e.printStackTrace();
             return;
         }
@@ -42,7 +44,7 @@ public class TCPHandler implements Runnable {
         try {
             request = (Request) requestStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("[TCPHandler] Could not read the request.");
+            logger.error("[TCPHandler] Could not read the request.");
             e.printStackTrace();
             return;
         }
@@ -52,7 +54,7 @@ public class TCPHandler implements Runnable {
         try {
             responseStream.writeObject(responseParameters);
         } catch (IOException e) {
-            System.err.println("[TCPHandler] Could not send the response.");
+            logger.error("[TCPHandler] Could not send the response.");
             e.printStackTrace();
             return;
         }
@@ -62,7 +64,7 @@ public class TCPHandler implements Runnable {
             responseStream.close();
             incomingConnection.close();
         } catch (IOException e) {
-            System.err.println("[TCPHandler] Could not close the incoming connection.");
+            logger.error("[TCPHandler] Could not close the incoming connection.");
             e.printStackTrace();
         }
     }
