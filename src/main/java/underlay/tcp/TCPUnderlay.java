@@ -1,5 +1,6 @@
 package underlay.tcp;
 
+import org.apache.log4j.Logger;
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
@@ -20,6 +21,7 @@ public class TCPUnderlay extends Underlay {
     private Thread listenerThread;
     // The local TCP socket that can accept incoming TCP connections.
     private ServerSocket serverSocket;
+    protected final Logger logger = Logger.getLogger(this.getClass());
 
     /**
      * Creates a TCP socket at the given port and starts listening it.
@@ -59,7 +61,7 @@ public class TCPUnderlay extends Underlay {
         try {
             remote = new Socket(address, port);
         } catch (IOException e) {
-            System.err.println("[TCPUnderlay] Could not connect to the address: " + address + ":" + port);
+            logger.error("[TCPUnderlay] Could not connect to the address: " + address + ":" + port);
             e.printStackTrace();
             return null;
         }
@@ -68,7 +70,7 @@ public class TCPUnderlay extends Underlay {
             requestStream = new ObjectOutputStream(remote.getOutputStream());
             requestStream.writeObject(request);
         } catch(IOException e) {
-            System.err.println("[TCPUnderlay] Could not send the request.");
+            logger.error("[TCPUnderlay] Could not send the request.");
             e.printStackTrace();
             return null;
         }
@@ -78,7 +80,7 @@ public class TCPUnderlay extends Underlay {
             responseStream = new ObjectInputStream(remote.getInputStream());
             response = (Response) responseStream.readObject();
         } catch(IOException | ClassNotFoundException e) {
-            System.err.println("[TCPUnderlay] Could not receive the response.");
+            logger.error("[TCPUnderlay] Could not receive the response.");
             e.printStackTrace();
             return null;
         }
@@ -88,7 +90,7 @@ public class TCPUnderlay extends Underlay {
             responseStream.close();
             remote.close();
         } catch (IOException e) {
-            System.err.println("[TCPUnderlay] Could not close the outgoing connection.");
+            logger.error("[TCPUnderlay] Could not close the outgoing connection.");
             e.printStackTrace();
         }
         return response;
@@ -106,7 +108,7 @@ public class TCPUnderlay extends Underlay {
             // Terminate the listener thread.
             listenerThread.join();
         } catch (Exception e) {
-            System.err.println("[TCPUnderlay] Could not terminate.");
+            logger.error("[TCPUnderlay] could not terminate underlay");
             e.printStackTrace();
             return false;
         }
