@@ -122,7 +122,7 @@ public class SkipNode implements SkipNodeInterface {
         });
         // Complete the insertion.
         inserted = true;
-        System.out.println(getNumID() + " was inserted!");
+        logger.debug(getNumID() + " was inserted!");
         insertionLock.endInsertion();
     }
 
