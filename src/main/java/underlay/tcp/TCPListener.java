@@ -1,5 +1,7 @@
 package underlay.tcp;
 
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,6 +17,7 @@ public class TCPListener implements Runnable {
     private final ServerSocket serverSocket;
     // Owned resource by the `TCPUnderlay`.
     private final TCPUnderlay underlay;
+    protected final Logger logger = Logger.getLogger(this.getClass());
 
     public TCPListener(ServerSocket serverSocket, TCPUnderlay underlay) {
         this.serverSocket = serverSocket;
@@ -35,7 +38,7 @@ public class TCPListener implements Runnable {
                 // we will stop listening.
                 return;
             } catch (IOException e) {
-                System.err.println("[TCPListener] Could not acquire the incoming connection.");
+                logger.error("[TCPListener] Could not acquire the incoming connection.");
                 e.printStackTrace();
             }
         }
