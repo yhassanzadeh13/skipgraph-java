@@ -1,5 +1,8 @@
 package skipnode;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -12,6 +15,8 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
     // Denotes the lookup table version.
     public int version;
+
+    private static final Logger logger = LogManager.getLogger(SkipNodeIdentity.class);
 
     public SkipNodeIdentity(String nameID, int numID, String address, int port, int version) {
         this.nameID = nameID;
@@ -51,6 +56,9 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     }
 
     public static int commonBits(String name1, String name2) {
+        logger.debug("calculating common bits, " +
+                "name1: " + name1 +
+                " name2: "+ name2);
         if(name1 == null || name2 == null) {
             return -1;
         }
@@ -73,6 +81,9 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
     @Override
     public int compareTo(SkipNodeIdentity o) {
+        logger.debug("num_id: "+ this.numID +
+                " comparing to " +
+                "skip_node_identity: " + o);
         return Integer.compare(numID, o.numID);
     }
 }

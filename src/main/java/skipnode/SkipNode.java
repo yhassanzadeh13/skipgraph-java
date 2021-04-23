@@ -420,6 +420,8 @@ public class SkipNode implements SkipNodeInterface {
         }
         // If the node is not completely inserted yet, return a tentative identity.
         if(!isAvailable()) {
+            logger.debug("num_id: " + getNumID() +
+                    " not completely inserted yet, returning a tentative identity");
             return new SearchResult(unavailableIdentity);
         }
         // Find the level in which the search should be started from.
