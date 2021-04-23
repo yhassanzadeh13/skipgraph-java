@@ -74,7 +74,8 @@ public class SkipNode implements SkipNodeInterface {
         if(inserted) return;
         // Trivially insert the first node of the skip graph.
         if(introducerAddress == null) {
-            logger.debug("num_id: "+ getNumID() + " was inserted");
+            logger.debug("num_id: "+ getNumID() +
+                    " was inserted");
             inserted = true;
             insertionLock.endInsertion();
             return;
@@ -102,12 +103,14 @@ public class SkipNode implements SkipNodeInterface {
                    );
             if(acquireNeighborLocks(left, right)) break;
             // When we fail, backoff for a random interval before trying again.
-            logger.debug("num_id: "+ getNumID() + " could not acquire the locks. Backing off");
+            logger.debug("num_id: "+ getNumID() +
+                    " could not acquire the locks, backing off");
             int sleepTime = (int)(Math.random() * 2000);
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                logger.fatal("could not backoff.");
+                logger.fatal("could not backoff, "+
+                        "sleepTime: " + sleepTime, e);
             }
         }
         logger.debug("num_id: "+ getNumID() +
@@ -132,7 +135,8 @@ public class SkipNode implements SkipNodeInterface {
         });
         // Complete the insertion.
         inserted = true;
-        logger.debug("num_id: "+ getNumID() + " was inserted");
+        logger.debug("num_id: "+ getNumID() +
+                " was inserted");
         insertionLock.endInsertion();
     }
 
@@ -184,7 +188,8 @@ public class SkipNode implements SkipNodeInterface {
                 // Add the new lock to our list of locks.
                 ownedLocks.add(new InsertionLock.NeighborInstance(rightNeighbor, level));
             }
-            logger.debug("num_id: "+ getNumID() + " is climbing up");
+            logger.debug("num_id: "+ getNumID() +
+                    " is climbing up");
             // Acquire the ladders (i.e., the neighbors at the upper level) and check if they are new neighbors
             // or not. If they are not, we won't need to request a lock from them.
             logger.debug("num_id: "+ getNumID() +
@@ -207,9 +212,11 @@ public class SkipNode implements SkipNodeInterface {
                 allAcquired = false;
                 break;
             }
-            logger.debug("num_id: "+ getNumID() + " has climbed up.");
+            logger.debug("num_id: "+ getNumID() +
+                    " has climbed up");
         }
-        logger.debug("num_id: "+ getNumID() + " has completed proposal phase");
+        logger.debug("num_id: "+ getNumID() +
+                " has completed proposal phase");
         // If we were not able to acquire all the locks, then release the locks that were acquired.
         if(!allAcquired) {
             List<InsertionLock.NeighborInstance> toRelease = new ArrayList<>();
@@ -229,7 +236,7 @@ public class SkipNode implements SkipNodeInterface {
             logger.debug("num_id: "+ getNumID() +
                     " did not hand over the lock to " + requester.getNumID()
                     + " because it is already given to " +
-                    ((insertionLock.owner == null) ? "itself" : insertionLock.owner.getNumID()));
+                    ((insertionLock.owner == null) ? this.getNumID() : insertionLock.owner.getNumID()));
             return false;
         }
         // After acquiring the lock, make sure that the versions match.
@@ -248,7 +255,8 @@ public class SkipNode implements SkipNodeInterface {
     public boolean unlock(SkipNodeIdentity owner) {
         boolean unlocked = insertionLock.unlockOwned(owner);
         logger.debug("num_id: "+ getNumID() +
-                " has released the lock from " + owner.getNumID() + ": " + unlocked);
+                " has released the lock from " +
+                owner.getNumID() + ": " + unlocked);
         return unlocked;
     }
 
@@ -268,15 +276,21 @@ public class SkipNode implements SkipNodeInterface {
      * @return the `ladder` node information.
      */
     public SkipNodeIdentity findLadder(int level, int direction, String target) {
-        logger.debug("num_id: "+ getNumID() + " has received a findLadder request.");
+        logger.debug("num_id: "+ getNumID() +
+                " has received a findLadder request with"+
+                " level: "+ level +
+                " direction: " + direction +
+                " target: " + target);
         if(level >= lookupTable.getNumLevels() || level < 0) {
-            logger.debug("num_id: "+ getNumID() + " is returning a findLadder response.");
+            logger.debug("num_id: "+ getNumID() +
+                    " is returning a findLadder response");
             return LookupTable.EMPTY_NODE;
         }
         // If the current node and the inserted node have common bits more than the current level,
         // then this node is the neighbor so we return it
         if(SkipNodeIdentity.commonBits(target, getNameID()) > level) {
-            logger.debug("num_id: "+ getNumID() + " is returning a findLadder response.");
+            logger.debug("num_id: "+ getNumID() +
+                    " is returning a findLadder response");
             return getIdentity();
         }
         SkipNodeIdentity curr = (direction == 0) ? getLeftNode(level) : getRightNode(level);
@@ -291,7 +305,8 @@ public class SkipNode implements SkipNodeInterface {
             // that case.
             if(curr.equals(LookupTable.INVALID_NODE)) return curr;
         }
-        logger.debug("num_id: "+ getNumID() + " is returning a findLadder response.");
+        logger.debug("num_id: "+ getNumID() +
+                " is returning a findLadder response");
         return curr;
     }
 
@@ -309,7 +324,8 @@ public class SkipNode implements SkipNodeInterface {
      * @param node the node to insert.
      */
     private void insertIntoTable(SkipNodeIdentity node, int minLevel) {
-        logger.debug("num_id: "+ getNumID() + " has updated its table.");
+        logger.debug("num_id: "+ getNumID() +
+                " has updated its table");
         version++;
         int direction = (node.getNumID() < getNumID()) ? 0 : 1;
         int maxLevel = SkipNodeIdentity.commonBits(getNameID(), node.getNameID());
@@ -464,32 +480,46 @@ public class SkipNode implements SkipNodeInterface {
 
     @Override
     public SkipNodeIdentity updateLeftNode(SkipNodeIdentity snId, int level) {
+        logger.debug("num_id: "+ getNumID() +
+                " has received a updateLeftNode request with " +
+                "skip_node_identity: " + snId +
+                " level: "+ level);
         return lookupTable.updateLeft(snId, level);
     }
 
     @Override
     public SkipNodeIdentity updateRightNode(SkipNodeIdentity snId, int level) {
+        logger.debug("num_id: "+ getNumID() +
+                " has received a updateRightNode request with " +
+                "skip_node_identity: " + snId +
+                " level: "+ level);
         return lookupTable.updateRight(snId, level);
     }
 
 
     @Override
     public SkipNodeIdentity getRightNode(int level) {
-        logger.debug("num_id: "+ getNumID() + " has received a getRightNode request");
+        logger.debug("num_id: "+ getNumID() +
+                " has received a getRightNode request with "+
+                "level: "+level);
         SkipNodeIdentity right = lookupTable.getRight(level);
         SkipNodeIdentity r = (right.equals(LookupTable.EMPTY_NODE)) ? right
                 : middleLayer.getIdentity(right.getAddress(), right.getPort());
-        logger.debug("num_id: "+ getNumID() + " is returning a getRightNode response");
+        logger.debug("num_id: "+ getNumID() +
+                " is returning a getRightNode response");
         return r;
     }
 
     @Override
     public SkipNodeIdentity getLeftNode(int level) {
-        logger.debug("num_id: "+ getNumID() + " has received a getLeftNode request.");
+        logger.debug("num_id: "+ getNumID() +
+                " has received a getLeftNode request with "+
+                "level: "+level);
         SkipNodeIdentity left = lookupTable.getLeft(level);
         SkipNodeIdentity r = (left.equals(LookupTable.EMPTY_NODE)) ? left
                 : middleLayer.getIdentity(left.getAddress(), left.getPort());
-        logger.debug("num_id: "+ getNumID() + " is returning a getLeftNode response.");
+        logger.debug("num_id: "+ getNumID() +
+                " is returning a getLeftNode response");
         return r;
     }
 
