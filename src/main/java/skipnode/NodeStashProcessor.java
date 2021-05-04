@@ -37,7 +37,7 @@ public class NodeStashProcessor implements Runnable {
                 n = nodeStashRef.take();
             } catch (InterruptedException e) {
                 logger.fatal("NodeStashProcessor with" +
-                        " skip_node_identity: " + this.ownIdentity +
+                        " num_id: " + this.ownIdentity.getNumID() +
                         " could not take", e);
                 continue;
             }
