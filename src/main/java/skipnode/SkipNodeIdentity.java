@@ -1,5 +1,6 @@
 package skipnode;
 
+import misc.JsonMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,9 +57,11 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     }
 
     public static int commonBits(String name1, String name2) {
-        logger.debug("calculating common bits, " +
-                "name1: " + name1 +
-                " name2: "+ name2);
+        logger.debug(new JsonMessage().
+                add("name_1", name1).
+                add("name_2", name2).
+                add("msg", "calculating common bits").
+                toObjectMessage());
         if(name1 == null || name2 == null) {
             return -1;
         }
@@ -81,9 +84,11 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
     @Override
     public int compareTo(SkipNodeIdentity o) {
-        logger.debug("num_id: "+ this.numID +
-                " comparing to " +
-                "skip_node_identity: " + o);
+        logger.debug(new JsonMessage().
+                add("num_id", this.numID).
+                add("skip_node_identity", o).
+                add("msg", "currently comparing").
+                toObjectMessage());
         return Integer.compare(numID, o.numID);
     }
 }

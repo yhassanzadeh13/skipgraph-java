@@ -1,6 +1,7 @@
 package skipnode;
 
 import lookup.ConcurrentBackupTable;
+import misc.JsonMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,9 +37,10 @@ public class NodeStashProcessor implements Runnable {
             try {
                 n = nodeStashRef.take();
             } catch (InterruptedException e) {
-                logger.fatal("NodeStashProcessor with" +
-                        " num_id: " + this.ownIdentity.getNumID() +
-                        " could not take", e);
+                logger.fatal(new JsonMessage().
+                        add("num_id", this.ownIdentity.getNumID()).
+                        add("msg", "NodeStashProcessor could not take").
+                        toObjectMessage(), e);
                 continue;
             }
             if (n.equals(ownIdentity)) {
