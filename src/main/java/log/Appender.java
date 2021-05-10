@@ -1,6 +1,4 @@
-package misc;
-
-import org.apache.logging.log4j.message.ObjectMessage;
+package log;
 
 public interface Appender {
     Appender Int(String key, int value);

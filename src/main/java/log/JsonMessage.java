@@ -1,4 +1,4 @@
-package misc;
+package log;
 
 import org.apache.logging.log4j.message.ObjectMessage;
 

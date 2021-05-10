@@ -1,4 +1,4 @@
-package misc;
+package log;
 
 public interface LoggerInterface {
     Appender debug();
