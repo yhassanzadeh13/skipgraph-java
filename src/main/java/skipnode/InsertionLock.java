@@ -1,8 +1,7 @@
 package skipnode;
 
-import misc.JsonMessage;
+import log.Log4jLogger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.Semaphore;
 
@@ -33,7 +32,7 @@ public class InsertionLock {
     public SkipNodeIdentity owner;
 
     private final Semaphore locked = new Semaphore(1, true);
-    private static final Logger logger = LogManager.getLogger(InsertionLock.class);
+    private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(InsertionLock.class));
 
     public InsertionLock(SkipNodeIdentity owner) {
         this.owner = owner;
@@ -44,10 +43,9 @@ public class InsertionLock {
      * @return {@code true} if lock is acquired {@code false} otherwise
      */
     public boolean startInsertion() {
-        logger.debug(new JsonMessage().
-                add("owner_num_id", this.owner.getNumID()).
-                add("msg", "starting insertion").
-                toObjectMessage());
+        logger.debug().
+                Int("owner_num_id", this.owner.getNumID()).
+                Msg("starting insertion");
         boolean acquired = locked.tryAcquire();
         if(acquired) holder = null;
         return acquired;
@@ -57,10 +55,9 @@ public class InsertionLock {
      * releases the lock if no node holds this insertion lock
      */
     public void endInsertion() {
-        logger.debug(new JsonMessage().
-                add("owner_num_id", this.owner.getNumID()).
-                add("msg", "ending insertion").
-                toObjectMessage());
+        logger.debug().
+                Int("owner_num_id", this.owner.getNumID()).
+                Msg("ending insertion");
         if(holder == null) locked.release();
     }
 

@@ -1,8 +1,7 @@
 package skipnode;
 
-import misc.JsonMessage;
+import log.Log4jLogger;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -17,7 +16,7 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     // Denotes the lookup table version.
     public int version;
 
-    private static final Logger logger = LogManager.getLogger(SkipNodeIdentity.class);
+    private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(SkipNodeIdentity.class));
 
     public SkipNodeIdentity(String nameID, int numID, String address, int port, int version) {
         this.nameID = nameID;
@@ -57,11 +56,10 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     }
 
     public static int commonBits(String name1, String name2) {
-        logger.debug(new JsonMessage().
-                add("name_1", name1).
-                add("name_2", name2).
-                add("msg", "calculating common bits").
-                toObjectMessage());
+        logger.debug().
+                Str("name_1", name1).
+                Str("name_2", name2).
+                Msg("calculating common bits");
         if(name1 == null || name2 == null) {
             return -1;
         }
@@ -84,11 +82,10 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
     @Override
     public int compareTo(SkipNodeIdentity o) {
-        logger.debug(new JsonMessage().
-                add("num_id", this.numID).
-                add("skip_node_identity", o).
-                add("msg", "currently comparing").
-                toObjectMessage());
+        logger.debug().
+                Int("num_id", this.numID).
+                Int("compared_num_id", o.getNumID()).
+                Msg("currently comparing");
         return Integer.compare(numID, o.numID);
     }
 }
