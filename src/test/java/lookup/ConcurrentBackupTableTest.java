@@ -17,11 +17,12 @@ public class ConcurrentBackupTableTest {
     // Initializes the backup table.
     @BeforeEach
     void setUp() {
-        backupTable = new ConcurrentBackupTable(30);
+
+        backupTable = new ConcurrentBackupTable(30, new SkipNodeIdentity("0000", 1, "None", -1));
         nodesToInsert = new ArrayList<>();
 
-        for (int i = 1; i < 10; i++) {
-            SkipNodeIdentity sn = new SkipNodeIdentity("0000", i, "None", -1);
+        for (int i = 2; i < 11; i++) {
+            SkipNodeIdentity sn = new SkipNodeIdentity("000", i, "None", -1);
             nodesToInsert.add(sn);
         }
     }

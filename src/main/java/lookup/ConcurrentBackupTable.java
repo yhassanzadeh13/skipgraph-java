@@ -1,8 +1,9 @@
 package lookup;
+import log.Log4jLogger;
+import org.apache.logging.log4j.LogManager;
 import skipnode.SkipNodeIdentity;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -21,17 +22,22 @@ public class ConcurrentBackupTable implements LookupTable {
      * and 2*level+1 for a node on the right side. This is reflected in the getIndex
      * method.
      */
+    private final SkipNodeIdentity owner;
     private final ArrayList<List<SkipNodeIdentity>> nodes;
     private final List<SkipNodeIdentity> emptyLevel = new ArrayList<>();
+
+    private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(ConcurrentBackupTable.class));
+
 
     private enum direction {
         LEFT,
         RIGHT
     }
 
-    public ConcurrentBackupTable(int numLevels, int maxSize) {
+    public ConcurrentBackupTable(int numLevels, int maxSize, SkipNodeIdentity owner) {
         this.numLevels = numLevels;
         this.maxSize = maxSize;
+        this.owner = owner;
         lock = new ReentrantReadWriteLock(true);
         nodes = new ArrayList<>(2 * numLevels);
         for(int i = 0; i < 2 * numLevels; i++) {
@@ -40,18 +46,28 @@ public class ConcurrentBackupTable implements LookupTable {
         }
     }
 
-    public ConcurrentBackupTable(int numLevels) {
-        this(numLevels, 100);
+    public ConcurrentBackupTable(int numLevels, SkipNodeIdentity owner) {
+        this(numLevels, 100, owner);
     }
 
     @Override
     public SkipNodeIdentity updateLeft(SkipNodeIdentity node, int level) {
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("num_id", node.getNumID()).
+                Int("level", level).
+                Msg("updating left");
         addLeftNode(node, level);
         return getLeft(level);
     }
 
     @Override
     public SkipNodeIdentity updateRight(SkipNodeIdentity node, int level) {
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("num_id", node.getNumID()).
+                Int("level", level).
+                Msg("updating right");
         addRightNode(node, level);
         return getRight(level);
     }
@@ -60,6 +76,11 @@ public class ConcurrentBackupTable implements LookupTable {
     public List<SkipNodeIdentity> getRights(int level) {
         lock.readLock().lock();
         int idx = getIndex(direction.RIGHT, level);
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("level", level).
+                Int("idx", idx).
+                Msg("getting rights");
         if(idx >= nodes.size()){
             return emptyLevel;
         }
@@ -73,6 +94,11 @@ public class ConcurrentBackupTable implements LookupTable {
     public List<SkipNodeIdentity> getLefts(int level) {
         lock.readLock().lock();
         int idx = getIndex(direction.LEFT, level);
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("level", level).
+                Int("idx", idx).
+                Msg("getting lefts");
         if(idx >= nodes.size()){
             lock.readLock().unlock();
             return emptyLevel;
@@ -87,6 +113,11 @@ public class ConcurrentBackupTable implements LookupTable {
     public SkipNodeIdentity getRight(int level) {
         lock.readLock().lock();
         int idx = getIndex(direction.RIGHT, level);
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("level", level).
+                Int("idx", idx).
+                Msg("getting right");
         SkipNodeIdentity node = LookupTable.EMPTY_NODE;
         // If we have a non-empty backup list at the index, return the first
         // element of the backup list.
@@ -101,6 +132,11 @@ public class ConcurrentBackupTable implements LookupTable {
     public SkipNodeIdentity getLeft(int level) {
         lock.readLock().lock();
         int idx = getIndex(direction.LEFT, level);
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("level", level).
+                Int("idx", idx).
+                Msg("getting left");
         SkipNodeIdentity node = LookupTable.EMPTY_NODE;
         // If we have a non-empty backup list at the index, return the first
         // element of the backup list.
@@ -125,20 +161,40 @@ public class ConcurrentBackupTable implements LookupTable {
         int trial = 1;
         // Exponential backoff for writing.
         while(!lock.writeLock().tryLock()) {
+            int sleepTime = (int) (Math.random() * Math.pow(2, trial-1) * 50);
             try {
-                Thread.sleep((int) (Math.random() * Math.pow(2, trial-1) * 50));
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.fatal().
+                        Exception(e).
+                        Int("owner_num_id", owner.getNumID()).
+                        Int("num_id", node.getNumID()).
+                        Int("level", level).
+                        Int("sleep_time", sleepTime).
+                        Int("trial", trial).
+                        Msg("could not backoff");
             }
             trial++;
         }
         int idx = getIndex(direction.RIGHT, level);
         List<SkipNodeIdentity> entry = nodes.get(idx);
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("num_id", node.getNumID()).
+                Int("level", level).
+                Int("idx", idx).
+                Msg("adding right node");
         entry.add(node);
         // Sort the node list in ascending order.
         Collections.sort(entry);
         // Remove the last node if it exceeds the max node list size.
         if(entry.size() > this.maxSize) {
+            logger.debug().
+                    Int("owner_num_id", owner.getNumID()).
+                    Int("num_id", node.getNumID()).
+                    Int("level", level).
+                    Int("max_size", maxSize).
+                    Msg("removing last node");
             entry.remove(entry.size()-1);
         }
         lock.writeLock().unlock();
@@ -149,21 +205,41 @@ public class ConcurrentBackupTable implements LookupTable {
         int trial = 1;
         // Exponential backoff for writing.
         while(!lock.writeLock().tryLock()) {
+            int sleepTime = (int) (Math.random() * Math.pow(2, trial) * 50);
             try {
-                Thread.sleep((int) (Math.random() * Math.pow(2, trial) * 50));
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.fatal().
+                        Exception(e).
+                        Int("owner_num_id", owner.getNumID()).
+                        Int("num_id", node.getNumID()).
+                        Int("level", level).
+                        Int("sleep_time", sleepTime).
+                        Int("trial", trial).
+                        Msg("could not backoff");
             }
             trial++;
         }
         int idx = getIndex(direction.LEFT, level);
         List<SkipNodeIdentity> entry = nodes.get(idx);
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("num_id", node.getNumID()).
+                Int("level", level).
+                Int("idx", idx).
+                Msg("adding left node");
         entry.add(node);
         // Sort the node list in a descending order.
         Collections.sort(entry);
         Collections.reverse(entry);
         // Remove the latest node if it exceeds the max node list size.
         if(entry.size() > this.maxSize) {
+            logger.debug().
+                    Int("owner_num_id", owner.getNumID()).
+                    Int("num_id", node.getNumID()).
+                    Int("level", level).
+                    Int("max_size", maxSize).
+                    Msg("removing last node");
             entry.remove(entry.size()-1);
         }
         lock.writeLock().unlock();
@@ -186,6 +262,11 @@ public class ConcurrentBackupTable implements LookupTable {
 
     public List<SkipNodeIdentity> removeLeft(SkipNodeIdentity sn, int level) {
         lock.writeLock().lock();
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("num_id", sn.getNumID()).
+                Int("level", level).
+                Msg("removing left");
         List<SkipNodeIdentity> leftNodes = getLefts(level);
         leftNodes.removeIf(nd -> nd.equals(sn));
         lock.writeLock().unlock();
@@ -194,6 +275,11 @@ public class ConcurrentBackupTable implements LookupTable {
 
     public List<SkipNodeIdentity> removeRight(SkipNodeIdentity sn, int level) {
         lock.writeLock().lock();
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("num_id", sn.getNumID()).
+                Int("level", level).
+                Msg("removing right");
         List<SkipNodeIdentity> rightNodes = getRights(level);
         rightNodes.removeIf(nd -> nd.equals(sn));
         lock.writeLock().unlock();
@@ -203,15 +289,20 @@ public class ConcurrentBackupTable implements LookupTable {
     /**
      * Returns the new neighbors (unsorted) of a newly inserted node. It is assumed that the newly inserted node
      * will be a neighbor to the owner of this lookup table.
-     * @param owner the identity of the owner of the lookup table.
      * @param newNameID the name ID of the newly inserted node.
      * @param newNumID the num ID of the newly inserted node.
      * @param level the level of the new neighbor.
      * @return the list of neighbors (both right and left) of the newly inserted node.
      */
     @Override
-    public TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumID, String newNameID, int level) {
+    public TentativeTable acquireNeighbors(int newNumID, String newNameID, int level) {
         lock.readLock().lock();
+        logger.debug().
+                Int("owner_num_id", owner.getNumID()).
+                Int("new_num_id", newNumID).
+                Str("new_name_id", newNameID).
+                Int("level", level).
+                Msg("acquiring neighbours");
         // We will return an unsorted list of level-lists.
         List<List<SkipNodeIdentity>> newTable = new ArrayList<>(numLevels);
         for(int i = 0; i < numLevels; i++) {
@@ -236,7 +327,7 @@ public class ConcurrentBackupTable implements LookupTable {
     }
 
     @Override
-    public void initializeTable(SkipNodeIdentity owner, TentativeTable tentativeTable) {
+    public void initializeTable(TentativeTable tentativeTable) {
         lock.writeLock().lock();
         // Insert every neighbor at the correct level & direction.
         for(int l = 0; l < tentativeTable.neighbors.size(); l++) {

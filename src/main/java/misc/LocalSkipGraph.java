@@ -1,14 +1,11 @@
 package misc;
 
-import lookup.ConcurrentBackupTable;
-import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import lookup.LookupTableFactory;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,7 +38,7 @@ public class LocalSkipGraph {
         }
         // Construct the lookup tables.
         List<LookupTable> lookupTables = new ArrayList<>(size);
-        for(int i = 0; i < size; i++) lookupTables.add(LookupTableFactory.createDefaultLookupTable(nameIDSize));
+        for(int i = 0; i < size; i++) lookupTables.add(LookupTableFactory.createDefaultLookupTable(nameIDSize, identities.get(i)));
         // If manualJoin flag is set, then construct the lookup table manually, i.e. without using the join protocol.
         if(manualJoin) {
             // At each level...

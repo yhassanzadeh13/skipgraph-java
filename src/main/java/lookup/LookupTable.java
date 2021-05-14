@@ -92,13 +92,12 @@ public interface LookupTable {
     /**
      * Returns the new neighbors (unsorted) of a newly inserted node. It is assumed that the newly inserted node
      * will be a neighbor to the owner of this lookup table.
-     * @param owner the identity of the owner of the lookup table.
      * @param newNameID the name ID of the newly inserted node.
      * @param newNumID the num ID of the newly inserted node.
      * @param level the level of the new neighbor.
      * @return the list of neighbors (both right and left) of the newly inserted node.
      */
-    TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumID, String newNameID, int level);
+    TentativeTable acquireNeighbors(int newNumID, String newNameID, int level);
 
     /**
      * Given a list of potential neighbors, inserts them at the appropriate positions. This should only be called
@@ -106,6 +105,6 @@ public interface LookupTable {
      * @param owner the owner of the lookup table.
      * @param tentativeTable the tentative table containing list of potential neighbors.
      */
-    void initializeTable(SkipNodeIdentity owner, TentativeTable tentativeTable);
+    void initializeTable(TentativeTable tentativeTable);
 
 }
