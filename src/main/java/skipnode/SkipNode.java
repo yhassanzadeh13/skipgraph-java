@@ -19,11 +19,11 @@ public class SkipNode implements SkipNodeInterface {
     private final int numID;
     private final String nameID;
     private final LookupTable lookupTable;
+    private final InsertionLock insertionLock;
 
     private MiddleLayer middleLayer;
 
     private boolean inserted = false;
-    private final InsertionLock insertionLock = new InsertionLock();
     private final LinkedBlockingDeque<InsertionLock.NeighborInstance> ownedLocks = new LinkedBlockingDeque<>();
     // Incremented after each lookup table update.
     private int version = 0;
@@ -39,6 +39,7 @@ public class SkipNode implements SkipNodeInterface {
         this.numID = snID.getNumID();
         this.nameID = snID.getNameID();
         this.lookupTable = lookupTable;
+        this.insertionLock = new InsertionLock(snID);
         insertionLock.startInsertion();
     }
 
@@ -236,7 +237,7 @@ public class SkipNode implements SkipNodeInterface {
             logger.debug("num_id: "+ getNumID() +
                     " did not hand over the lock to " + requester.getNumID()
                     + " because it is already given to " +
-                    ((insertionLock.owner == null) ? this.getNumID() : insertionLock.owner.getNumID()));
+                    ((insertionLock.holder == null) ? this.getNumID() : insertionLock.holder.getNumID()));
             return false;
         }
         // After acquiring the lock, make sure that the versions match.
