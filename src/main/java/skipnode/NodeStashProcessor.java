@@ -1,6 +1,8 @@
 package skipnode;
 
+import log.Log4jLogger;
 import lookup.ConcurrentBackupTable;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.locks.Lock;
@@ -17,6 +19,8 @@ public class NodeStashProcessor implements Runnable {
 
     public boolean running = true;
 
+    private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(NodeStashProcessor.class));
+
     public NodeStashProcessor(LinkedBlockingDeque<SkipNodeIdentity> nodeStash, ConcurrentBackupTable backupTableRef,
                               SkipNodeIdentity ownIdentity, Lock nodeStashLock) {
         this.nodeStashRef = nodeStash;
@@ -32,8 +36,10 @@ public class NodeStashProcessor implements Runnable {
             try {
                 n = nodeStashRef.take();
             } catch (InterruptedException e) {
-                System.err.println("[NodeStashProcessor.run] Could not take.");
-                e.printStackTrace();
+                logger.fatal().
+                        Exception(e).
+                        Int("num_id", this.ownIdentity.getNumID()).
+                        Msg("NodeStashProcessor could not take");
                 continue;
             }
             if (n.equals(ownIdentity)) {
