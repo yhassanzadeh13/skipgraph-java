@@ -30,21 +30,27 @@ public class DataNodeTest {
             underlay.initialize(STARTING_PORT + i);
             underlays.add(underlay);
         }
+
         // Then, construct the local skip graph without manually constructing the lookup tables.
         int nameIDSize = ((int) (Math.log(NODES*(DATANODESPERNODE+1))/Math.log(2)));
         LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(), STARTING_PORT, false, nameIDSize);
+
         // Create the middle layers.
         for(int i = 0; i < NODES; i++) {
             MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+
             // Assign the middle layer to the underlay & overlay.
             underlays.get(i).setMiddleLayer(middleLayer);
             g.getNodes().get(i).setMiddleLayer(middleLayer);
         }
+
         // Now, insert every node in a randomized order.
         g.insertAll();
+
         // Create a map of num ids to their corresponding lookup tables.
         Map<Integer, LookupTable> tableMap = g.getNodes().stream()
                 .collect(Collectors.toMap(SkipNode::getNumID, SkipNode::getLookupTable));
+
         // Check the correctness of the tables.
         for(SkipNode n : g.getNodes()) {
             tableCorrectnessCheck(n.getNumID(), n.getNameID(), n.getLookupTable());
@@ -54,12 +60,13 @@ public class DataNodeTest {
         // Create datanodes
         List<Integer> numIDs = new ArrayList<>(NODES*DATANODESPERNODE);
         for(int i = NODES; i < NODES*(DATANODESPERNODE+1); i++) numIDs.add(i);
+
         // Create the name IDs.
         List<String> nameIDs = numIDs.stream()
                 .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIDSize))
                 .collect(Collectors.toList());
-        int numDNodes = 0;
 
+        int numDNodes = 0;
         for(SkipNodeInterface node : g.getNodes()){
             for(int i=0;i<DATANODESPERNODE;i++){
                 LookupTable lt = LookupTableFactory.createDefaultLookupTable(nameIDSize);
