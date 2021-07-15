@@ -1,6 +1,7 @@
 package skipnode;
 
 import lookup.LookupTable;
+import lookup.LookupTableFactory;
 import middlelayer.MiddleLayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +33,16 @@ public class SkipNode implements SkipNodeInterface {
     private static final SkipNodeIdentity unavailableIdentity = LookupTable.EMPTY_NODE;
 
     private static final Logger logger = LogManager.getLogger(SkipNode.class);
+
+    public SkipNode(SkipNodeIdentity snID, int nameIDSize){
+        this.address = snID.getAddress();
+        this.port = snID.getPort();
+        this.numID = snID.getNumID();
+        this.nameID = snID.getNameID();
+        this.lookupTable = LookupTableFactory.createDefaultLookupTable(nameIDSize);
+        this.insertionLock = new InsertionLock(snID);
+        insertionLock.startInsertion();
+    }
 
     public SkipNode(SkipNodeIdentity snID, LookupTable lookupTable) {
         this.address = snID.getAddress();
