@@ -84,16 +84,28 @@ public class mvpTest {
             skipNodes.add(skipNode);
         }
 
+
+        // Create the middle layers.
+        for(int i = 0; i < NODES; i++) {
+            MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNodes.get(i));
+            // Assign the middle layer to the underlay & overlay.
+            underlays.get(i).setMiddleLayer(middleLayer);
+            skipNodes.get(i).setMiddleLayer(middleLayer);
+        }
+
         SkipNode initiator = new SkipNode(identities.get(0), nameIDSize);
 
         Thread[] threads = new Thread[NODES-1];
+        System.out.println("testing");
+
         // Construct the threads.
         for(int i = 1; i <= threads.length; i++) {
-            final SkipNode node  = skipNodes.get(i);
+            final SkipNode node = skipNodes.get(i);
             threads[i-1] = new Thread(() -> {
                 node.insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
             });
         }
+
         // Initiate the insertions.
         for(Thread t : threads) t.start();
         // Wait for the insertions to complete.
@@ -106,19 +118,13 @@ public class mvpTest {
             }
         }
 
-        // Create the middle layers.
-        for(int i = 0; i < NODES; i++) {
-            MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNodes.get(i));
-            // Assign the middle layer to the underlay & overlay.
-            underlays.get(i).setMiddleLayer(middleLayer);
-            skipNodes.get(i).setMiddleLayer(middleLayer);
-        }
+        System.out.println("testing insertions 1");
 
         Thread[] searchThreads = new Thread[NODES * NODES];
-        for(int i = 0; i < NODES; i++) {
+        for(int i = 0; i < 1; i++) {
             // Choose the searcher.
             final SkipNode searcher = skipNodes.get(i);
-            for(int j = 0; j < NODES; j++) {
+            for(int j = 0; j < 1; j++) {
                 // Choose the target.
                 final SkipNode target = skipNodes.get(j);
                 searchThreads[i + NODES * j] = new Thread(() -> {
