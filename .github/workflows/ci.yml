@@ -19,26 +19,16 @@ jobs:
     - uses: actions/checkout@v2
     - name: Run CheckStyle
       run: mvn checkstyle:checkstyle
-    
-   
-  # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     name: Unit Tests
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-
     - name: clean
       run: mvn clean
-
-    # compile
     - name: compile project
       run: mvn compile
-
-    # run tests
     - name: run tests
       run: mvn test
