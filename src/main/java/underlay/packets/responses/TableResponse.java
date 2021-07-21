@@ -8,9 +8,9 @@ import java.util.List;
 
 public class TableResponse extends Response {
 
-    public final TentativeTable table;
+  public final TentativeTable table;
 
-    public TableResponse(TentativeTable table) {
-        this.table = table;
-    }
+  public TableResponse(TentativeTable table) {
+    this.table = table;
+  }
 }

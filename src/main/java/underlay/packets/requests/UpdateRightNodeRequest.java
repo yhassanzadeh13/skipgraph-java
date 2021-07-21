@@ -6,12 +6,12 @@ import underlay.packets.RequestType;
 
 public class UpdateRightNodeRequest extends Request {
 
-    public final int level;
-    public final SkipNodeIdentity snId;
+  public final int level;
+  public final SkipNodeIdentity snId;
 
-    public UpdateRightNodeRequest(int level, SkipNodeIdentity snId) {
-        super(RequestType.UpdateRightNode);
-        this.level = level;
-        this.snId = snId;
-    }
+  public UpdateRightNodeRequest(int level, SkipNodeIdentity snId) {
+    super(RequestType.UpdateRightNode);
+    this.level = level;
+    this.snId = snId;
+  }
 }

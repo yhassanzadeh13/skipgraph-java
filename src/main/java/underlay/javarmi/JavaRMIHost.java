@@ -12,14 +12,14 @@ import java.rmi.server.UnicastRemoteObject;
  */
 public class JavaRMIHost extends UnicastRemoteObject implements JavaRMIService {
 
-    private final JavaRMIUnderlay underlay;
+  private final JavaRMIUnderlay underlay;
 
-    public JavaRMIHost(JavaRMIUnderlay underlay) throws RemoteException {
-        this.underlay = underlay;
-    }
+  public JavaRMIHost(JavaRMIUnderlay underlay) throws RemoteException {
+    this.underlay = underlay;
+  }
 
-    @Override
-    public Response handleRequest(Request request) {
-        return underlay.dispatchRequest(request);
-    }
+  @Override
+  public Response handleRequest(Request request) {
+    return underlay.dispatchRequest(request);
+  }
 }

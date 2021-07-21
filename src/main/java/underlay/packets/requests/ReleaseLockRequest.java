@@ -6,10 +6,10 @@ import underlay.packets.RequestType;
 
 public class ReleaseLockRequest extends Request {
 
-    public final SkipNodeIdentity owner;
+  public final SkipNodeIdentity owner;
 
-    public ReleaseLockRequest(SkipNodeIdentity owner) {
-        super(RequestType.ReleaseLock);
-        this.owner = owner;
-    }
+  public ReleaseLockRequest(SkipNodeIdentity owner) {
+    super(RequestType.ReleaseLock);
+    this.owner = owner;
+  }
 }

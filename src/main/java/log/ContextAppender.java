@@ -1,4 +1,5 @@
 package log;
 
-public class ContextAppender{
+public class ContextAppender {
+
 }

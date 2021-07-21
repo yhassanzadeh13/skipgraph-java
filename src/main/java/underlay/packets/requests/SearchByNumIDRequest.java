@@ -5,10 +5,10 @@ import underlay.packets.RequestType;
 
 public class SearchByNumIDRequest extends Request {
 
-    public final int targetNumID;
+  public final int targetNumID;
 
-    public SearchByNumIDRequest(int targetNumID) {
-        super(RequestType.SearchByNumID);
-        this.targetNumID = targetNumID;
-    }
+  public SearchByNumIDRequest(int targetNumID) {
+    super(RequestType.SearchByNumID);
+    this.targetNumID = targetNumID;
+  }
 }

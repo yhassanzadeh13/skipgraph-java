@@ -9,7 +9,7 @@ import underlay.packets.RequestType;
  */
 public class IsAvailableRequest extends Request {
 
-    public IsAvailableRequest() {
-        super(RequestType.IsAvailable);
-    }
+  public IsAvailableRequest() {
+    super(RequestType.IsAvailable);
+  }
 }
