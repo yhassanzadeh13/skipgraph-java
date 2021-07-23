@@ -1,7 +1,6 @@
 package underlay.javarmi;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import underlay.UnderlayTest;
 
 /**
@@ -15,8 +14,8 @@ class JavaRMIUnderlayTest extends UnderlayTest {
   // @BeforeAll
   static void setUp() {
     // Construct the underlays.
-    localUnderlay = new JavaRMIUnderlay();
-    remoteUnderlay = new JavaRMIUnderlay();
+    localUnderlay = new JavaRmiUnderlay();
+    remoteUnderlay = new JavaRmiUnderlay();
 
     buildLayers(localUnderlay);
     buildLayers(remoteUnderlay);

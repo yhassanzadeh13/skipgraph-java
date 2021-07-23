@@ -1,9 +1,8 @@
 package lookup;
 
-import skipnode.SkipNodeIdentity;
-
 import java.io.Serializable;
 import java.util.List;
+import skipnode.SkipNodeIdentity;
 
 /**
  * Represents a list of level-lists that is returned to a newly joined node by its neighbor. In case
@@ -17,6 +16,13 @@ public class TentativeTable implements Serializable {
   public final int specificLevel;
   public final List<List<SkipNodeIdentity>> neighbors;
 
+  /**
+   * Constructor for TentativeTable.
+   *
+   * @param complete boolean representing if complete or not.
+   * @param specificLevel Integer representing the specific level.
+   * @param neighbors neighbour table.
+   */
   public TentativeTable(boolean complete, int specificLevel,
       List<List<SkipNodeIdentity>> neighbors) {
     this.complete = complete;

@@ -3,13 +3,10 @@ package underlay;
 import lookup.LookupTable;
 import lookup.LookupTableFactory;
 import middlelayer.MiddleLayer;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
-import underlay.packets.RequestType;
 import underlay.packets.requests.*;
 
 /**
@@ -59,13 +56,13 @@ public class UnderlayTest {
 
     // Check search by name ID request.
     Assertions.assertNotNull(
-        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIDRequest("")));
+        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIdRequest("")));
     // Check search by numerical ID request.
     Assertions.assertNotNull(
-        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNumIDRequest(0)));
+        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNumIdRequest(0)));
     // Check level-based search by name ID request.
     Assertions.assertNotNull(localUnderlay
-        .sendMessage(remoteAddress, remotePort, new NameIDLevelSearchRequest(0, 0, "")));
+        .sendMessage(remoteAddress, remotePort, new NameIdLevelSearchRequest(0, 0, "")));
     // Check left/right update requests.
     Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort,
         new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));

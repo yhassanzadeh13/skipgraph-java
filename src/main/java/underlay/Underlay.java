@@ -1,14 +1,11 @@
 package underlay;
 
-import middlelayer.MiddleLayer;
-import underlay.javarmi.JavaRMIUnderlay;
-import underlay.packets.Request;
-import underlay.packets.RequestType;
-import underlay.packets.Response;
-import underlay.tcp.TCPUnderlay;
-
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import middlelayer.MiddleLayer;
+import underlay.packets.Request;
+import underlay.packets.Response;
+import underlay.tcp.TcpUnderlay;
 
 /**
  * Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication.
@@ -99,6 +96,6 @@ public abstract class Underlay {
    */
   public static Underlay newDefaultUnderlay() {
     // By default, we use Java RMI Underlay.
-    return new TCPUnderlay();
+    return new TcpUnderlay();
   }
 }

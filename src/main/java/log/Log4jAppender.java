@@ -3,19 +3,35 @@ package log;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Appender implementation for Log4jLogger.
+ */
 public class Log4jAppender implements Appender {
 
   private JsonMessage message;
   private Logger logger;
   private Level level;
-  private Throwable e = null;
+  private Throwable exception = null;
 
+  /**
+   * Constructor forLog4jAppender.
+   *
+   * @param logger logger instance.
+   * @param level log level.
+   */
   public Log4jAppender(Logger logger, Level level) {
     this.message = new JsonMessage();
     this.logger = logger;
     this.level = level;
   }
 
+  /**
+   * Constructor forLog4jAppender.
+   *
+   * @param msg Initial json message.
+   * @param logger logger instance.
+   * @param level log level.
+   */
   public Log4jAppender(JsonMessage msg, Logger logger, Level level) {
     this.message = msg;
     this.logger = logger;
@@ -49,13 +65,13 @@ public class Log4jAppender implements Appender {
 
   @Override
   public Appender Exception(Exception e) {
-    this.e = e;
+    this.exception = e;
     return this;
   }
 
   @Override
   public void Msg(String value) {
     this.message.add("msg", value);
-    this.logger.log(this.level, this.message.toObjectMessage(), this.e);
+    this.logger.log(this.level, this.message.toObjectMessage(), this.exception);
   }
 }

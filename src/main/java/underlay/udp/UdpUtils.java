@@ -1,15 +1,20 @@
 package underlay.udp;
 
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * Contains various static helper methods to be used by the UDP Underlay implementation.
  */
-public class UDPUtils {
+public class UdpUtils {
 
   /**
-   * Converts the given serializable object into a byte array
+   * Converts the given serializable object into a byte array.
    *
    * @param obj object to serialize.
    * @return byte array representation of the object.
@@ -42,7 +47,7 @@ public class UDPUtils {
       e.printStackTrace();
     }
     // Make sure that the byte array size does not exceed the maximum allowed packet size.
-    if (bytes.length > UDPUnderlay.MAX_PACKET_SIZE) {
+    if (bytes.length > UdpUnderlay.MAX_PACKET_SIZE) {
       System.err.println("[UDPUtils] Packet of size " + bytes.length + " is too big.");
       return null;
     }

@@ -1,28 +1,36 @@
 package underlay.udp;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
 import underlay.packets.Request;
 import underlay.packets.Response;
-
-import java.io.IOException;
-import java.net.*;
 
 /**
  * Implements a routine that continuously listens a local UDP port for requests and responses, and
  * delegates the handling of each received request to a `UDPHandler` thread and each received
  * response to the main `UDPUnderlay` thread.
  */
-public class UDPListener implements Runnable {
+public class UdpListener implements Runnable {
 
   // Owned resource by the `UDPUnderlay`.
   private final DatagramSocket listenSocket;
   // Owned resource by the `UDPUnderlay`.
-  private final UDPUnderlay underlay;
+  private final UdpUnderlay underlay;
   // Owned resource by the `UDPUnderlay`. Used to dispatch the received
   // responses to the main thread.
-  private final UDPResponseLock responseLock;
+  private final UdpResponseLock responseLock;
 
-  public UDPListener(DatagramSocket listenSocket, UDPUnderlay underlay,
-      UDPResponseLock responseLock) {
+  /**
+   * Constructor for UdpListener.
+   *
+   * @param listenSocket listener socket.
+   * @param underlay UDP underlay instance.
+   * @param responseLock response lock.
+   */
+  public UdpListener(DatagramSocket listenSocket, UdpUnderlay underlay,
+      UdpResponseLock responseLock) {
     this.listenSocket = listenSocket;
     this.underlay = underlay;
     this.responseLock = responseLock;
@@ -33,16 +41,16 @@ public class UDPListener implements Runnable {
     while (true) {
       try {
         // Allocate the size for a packet.
-        byte[] packetBytes = new byte[UDPUnderlay.MAX_PACKET_SIZE];
+        byte[] packetBytes = new byte[UdpUnderlay.MAX_PACKET_SIZE];
         DatagramPacket packet = new DatagramPacket(packetBytes, packetBytes.length);
         // Wait for a packet.
         listenSocket.receive(packet);
         // Deserialize the packet.
-        Object packetObject = UDPUtils.deserialize(packet.getData(), packet.getLength());
+        Object packetObject = UdpUtils.deserialize(packet.getData(), packet.getLength());
         // If the packet is a request, handle it in a new `UDPHandler` thread.
         if (packetObject instanceof Request) {
           Request request = (Request) packetObject;
-          new Thread(new UDPHandler(listenSocket, request, packet.getAddress(), packet.getPort(),
+          new Thread(new UdpHandler(listenSocket, request, packet.getAddress(), packet.getPort(),
               underlay)).start();
         } else if (packetObject instanceof Response) {
           // If the packet is a response, dispatch the response to the main thread.

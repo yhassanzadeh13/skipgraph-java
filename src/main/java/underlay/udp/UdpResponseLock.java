@@ -8,7 +8,7 @@ import underlay.packets.Response;
  * receives the response. Using this object, we can transfer the response from the receiver thread
  * to the sender thread.
  */
-public class UDPResponseLock {
+public class UdpResponseLock {
 
   private Response response;
 

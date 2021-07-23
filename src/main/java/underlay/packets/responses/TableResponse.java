@@ -1,11 +1,11 @@
 package underlay.packets.responses;
 
 import lookup.TentativeTable;
-import skipnode.SkipNodeIdentity;
 import underlay.packets.Response;
 
-import java.util.List;
-
+/**
+ * Response for table.
+ */
 public class TableResponse extends Response {
 
   public final TentativeTable table;

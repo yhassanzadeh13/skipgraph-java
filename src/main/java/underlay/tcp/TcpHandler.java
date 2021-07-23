@@ -1,24 +1,23 @@
 package underlay.tcp;
 
-import underlay.packets.Request;
-import underlay.packets.Response;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import underlay.packets.Request;
+import underlay.packets.Response;
 
 /**
  * Represents a thread that handles an incoming TCP request and emits a response.
  */
-public class TCPHandler implements Runnable {
+public class TcpHandler implements Runnable {
 
   // TCP stream. We use this two-way stream to read the request and send back the response.
   private final Socket incomingConnection;
   // TCP underlay.
-  private final TCPUnderlay underlay;
+  private final TcpUnderlay underlay;
 
-  public TCPHandler(Socket incomingConnection, TCPUnderlay underlay) {
+  public TcpHandler(Socket incomingConnection, TcpUnderlay underlay) {
     this.incomingConnection = incomingConnection;
     this.underlay = underlay;
   }

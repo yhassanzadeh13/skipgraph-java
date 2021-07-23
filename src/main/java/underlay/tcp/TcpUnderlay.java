@@ -1,20 +1,18 @@
 package underlay.tcp;
 
-import underlay.Underlay;
-import underlay.packets.Request;
-import underlay.packets.RequestType;
-import underlay.packets.Response;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import underlay.Underlay;
+import underlay.packets.Request;
+import underlay.packets.Response;
 
 /**
  * TCP underlay implementation.
  */
-public class TCPUnderlay extends Underlay {
+public class TcpUnderlay extends Underlay {
 
   // The thread that continuously listens for incoming connection in the background.
   private Thread listenerThread;
@@ -39,12 +37,14 @@ public class TCPUnderlay extends Underlay {
     }
     // Create & start the listening thread which will continuously listen for incoming connections
     // and handle the requests as implemented in the `RequestHandler` class.
-    listenerThread = new Thread(new TCPListener(serverSocket, this));
+    listenerThread = new Thread(new TcpListener(serverSocket, this));
     listenerThread.start();
     return true;
   }
 
   /**
+   * Method for sending a message.
+   *
    * @param address address of the remote server.
    * @param port    port of the remote serve.r
    * @param request the request to send.

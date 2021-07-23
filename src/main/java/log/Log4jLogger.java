@@ -4,7 +4,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Example usage:
+ * Example usage:.
  * <p>
  * logger.debug().
  * <br>Int("owner_num_id", this.owner.getNumID()).
@@ -52,7 +52,7 @@ public class Log4jLogger implements LoggerInterface {
     return new Log4jAppender(this.logger, Level.TRACE);
   }
 
-  public ContextLoggerInterface With() {
+  public ContextLoggerInterface with() {
     return new ContextLogger(this.logger);
   }
 }

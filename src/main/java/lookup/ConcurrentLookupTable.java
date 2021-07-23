@@ -1,14 +1,13 @@
 package lookup;
 
-import skipnode.SkipNodeIdentity;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import skipnode.SkipNodeIdentity;
 
 /**
- * ConcurrentLookupTable is a lookup table that supports concurrent calls
+ * ConcurrentLookupTable is a lookup table that supports concurrent calls.
  */
 public class ConcurrentLookupTable implements LookupTable {
 
@@ -21,11 +20,16 @@ public class ConcurrentLookupTable implements LookupTable {
    */
   private ArrayList<SkipNodeIdentity> nodes;
 
-  private enum direction {
+  private enum Direction {
     LEFT,
     RIGHT
   }
 
+  /**
+   * Constructor for ConcurrentLookupTable.
+   *
+   * @param numLevels Integer representing number of levels.
+   */
   public ConcurrentLookupTable(int numLevels) {
     this.numLevels = numLevels;
     lock = new ReentrantReadWriteLock(true);
@@ -38,7 +42,7 @@ public class ConcurrentLookupTable implements LookupTable {
   @Override
   public SkipNodeIdentity updateLeft(SkipNodeIdentity node, int level) {
     lock.writeLock().lock();
-    int idx = getIndex(direction.LEFT, level);
+    int idx = getIndex(Direction.LEFT, level);
     if (idx >= nodes.size()) {
       lock.writeLock().unlock();
       return LookupTable.EMPTY_NODE;
@@ -51,7 +55,7 @@ public class ConcurrentLookupTable implements LookupTable {
   @Override
   public SkipNodeIdentity updateRight(SkipNodeIdentity node, int level) {
     lock.writeLock().lock();
-    int idx = getIndex(direction.RIGHT, level);
+    int idx = getIndex(Direction.RIGHT, level);
     if (idx >= nodes.size()) {
       lock.writeLock().unlock();
       return LookupTable.EMPTY_NODE;
@@ -64,7 +68,7 @@ public class ConcurrentLookupTable implements LookupTable {
   @Override
   public SkipNodeIdentity getRight(int level) {
     lock.readLock().lock();
-    int idx = getIndex(direction.RIGHT, level);
+    int idx = getIndex(Direction.RIGHT, level);
     SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
     lock.readLock().unlock();
     return node;
@@ -73,7 +77,7 @@ public class ConcurrentLookupTable implements LookupTable {
   @Override
   public SkipNodeIdentity getLeft(int level) {
     lock.readLock().lock();
-    int idx = getIndex(direction.LEFT, level);
+    int idx = getIndex(Direction.LEFT, level);
     SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
     lock.readLock().unlock();
     return node;
@@ -135,19 +139,19 @@ public class ConcurrentLookupTable implements LookupTable {
    * inserted node will be a neighbor to the owner of this lookup table.
    *
    * @param owner     the identity of the owner of the lookup table.
-   * @param newNameID the name ID of the newly inserted node.
-   * @param newNumID  the num ID of the newly inserted node.
+   * @param newNameId the name ID of the newly inserted node.
+   * @param newNumId  the num ID of the newly inserted node.
    * @param level     the level of the new neighbor.
    * @return the list of neighbors (both right and left) of the newly inserted node.
    */
   @Override
-  public TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumID, String newNameID,
+  public TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumId, String newNameId,
       int level) {
     lock.readLock().lock();
     List<List<SkipNodeIdentity>> newTable = new ArrayList<>();
     newTable.add(new ArrayList<>());
     newTable.get(0).add(owner);
-    if (newNumID < owner.getNumID() && !getLeft(level).equals(LookupTable.EMPTY_NODE)) {
+    if (newNumId < owner.getNumID() && !getLeft(level).equals(LookupTable.EMPTY_NODE)) {
       newTable.get(0).add(getLeft(level));
     } else if (!getRight(level).equals(LookupTable.EMPTY_NODE)) {
       newTable.get(0).add(getRight(level));
@@ -177,11 +181,11 @@ public class ConcurrentLookupTable implements LookupTable {
     updateRight(right, tentativeTable.specificLevel);
   }
 
-  private int getIndex(direction dir, int level) {
+  private int getIndex(Direction dir, int level) {
     if (level < 0) {
       return Integer.MAX_VALUE;
     }
-    if (dir == direction.LEFT) {
+    if (dir == Direction.LEFT) {
       return level * 2;
     } else {
       return level * 2 + 1;

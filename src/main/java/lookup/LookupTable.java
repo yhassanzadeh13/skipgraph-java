@@ -1,16 +1,18 @@
 package lookup;
 
+import java.util.List;
 import skipnode.SkipNodeIdentity;
 
-import java.util.List;
-
+/**
+ * Lookup Table interface.
+ */
 public interface LookupTable {
 
   SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity("EMPTY", -1, "EMPTY", -1);
   SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity("INVALID", -1, "INVALID", -1);
 
   /**
-   * Updates the left neighbor on the given level to be the node
+   * Updates the left neighbor on the given level to be the node.
    *
    * @param node  Node to be put on the lookup table
    * @param level The level on which to insert the node
@@ -19,7 +21,7 @@ public interface LookupTable {
   SkipNodeIdentity updateLeft(SkipNodeIdentity node, int level);
 
   /**
-   * Updates the right neighbor on the given level to be the node
+   * Updates the right neighbor on the given level to be the node.
    *
    * @param node  Node to be put on the lookup table
    * @param level The level on which to insert the node
@@ -28,7 +30,7 @@ public interface LookupTable {
   SkipNodeIdentity updateRight(SkipNodeIdentity node, int level);
 
   /**
-   * Returns the best right neighbor on the given level
+   * Returns the best right neighbor on the given level.
    *
    * @param level The level to get the node from
    * @return The right neighbor on the given level
@@ -36,7 +38,7 @@ public interface LookupTable {
   SkipNodeIdentity getRight(int level);
 
   /**
-   * Returns the best left neighbor on the given level
+   * Returns the best left neighbor on the given level.
    *
    * @param level The level to get the node from
    * @return The left neighbor on the given level
@@ -60,7 +62,7 @@ public interface LookupTable {
   List<SkipNodeIdentity> getLefts(int level);
 
   /**
-   * Remove the left neighbor on the given level
+   * Remove the left neighbor on the given level.
    *
    * @param level The level from which to remove the left neighbor
    * @return Removed node
@@ -68,7 +70,7 @@ public interface LookupTable {
   SkipNodeIdentity removeLeft(int level);
 
   /**
-   * Remove the right neighbor on the given level
+   * Remove the right neighbor on the given level.
    *
    * @param level The level from which to remove the right neighbor
    * @return Removed node
@@ -94,7 +96,7 @@ public interface LookupTable {
   boolean isRightNeighbor(SkipNodeIdentity neighbor, int level);
 
   /**
-   * Get the number of levels in the lookup table
+   * Get the number of levels in the lookup table.
    *
    * @return The number of levels in the lookup table
    */
@@ -105,12 +107,12 @@ public interface LookupTable {
    * inserted node will be a neighbor to the owner of this lookup table.
    *
    * @param owner     the identity of the owner of the lookup table.
-   * @param newNameID the name ID of the newly inserted node.
-   * @param newNumID  the num ID of the newly inserted node.
+   * @param newNameId the name ID of the newly inserted node.
+   * @param newNumId  the num ID of the newly inserted node.
    * @param level     the level of the new neighbor.
    * @return the list of neighbors (both right and left) of the newly inserted node.
    */
-  TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumID, String newNameID,
+  TentativeTable acquireNeighbors(SkipNodeIdentity owner, int newNumId, String newNameId,
       int level);
 
   /**

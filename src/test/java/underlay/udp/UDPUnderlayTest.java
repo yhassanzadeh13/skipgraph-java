@@ -1,7 +1,6 @@
 package underlay.udp;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import underlay.UnderlayTest;
 
 /**
@@ -14,8 +13,8 @@ class UDPUnderlayTest extends UnderlayTest {
   // @BeforeEach
   void setUp() {
     // Construct the underlays.
-    localUnderlay = new UDPUnderlay();
-    remoteUnderlay = new UDPUnderlay();
+    localUnderlay = new UdpUnderlay();
+    remoteUnderlay = new UdpUnderlay();
 
     buildLayers(localUnderlay);
     buildLayers(remoteUnderlay);

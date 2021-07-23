@@ -1,17 +1,16 @@
 package underlay.udp;
 
-import underlay.packets.Request;
-import underlay.packets.Response;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import underlay.packets.Request;
+import underlay.packets.Response;
 
 /**
  * Represents a thread that handles a UDP request and emits a response.
  */
-public class UDPHandler implements Runnable {
+public class UdpHandler implements Runnable {
 
   // The UDP socket that the response will be sent through.
   private final DatagramSocket udpSocket;
@@ -22,11 +21,20 @@ public class UDPHandler implements Runnable {
   // The port of the client that the request was sent from.
   private final int clientPort;
   // The handler which will be handling this request.
-  private final UDPUnderlay underlay;
+  private final UdpUnderlay underlay;
 
-  public UDPHandler(DatagramSocket udpSocket, Request request, InetAddress clientAddress,
+  /**
+   * Constructor for UdpHandler.
+   *
+   * @param udpSocket UDP socket instance.
+   * @param request Request that s going to be handled.
+   * @param clientAddress Client address.
+   * @param clientPort Integer representing client port.
+   * @param underlay UDP underlay instance.
+   */
+  public UdpHandler(DatagramSocket udpSocket, Request request, InetAddress clientAddress,
       int clientPort,
-      UDPUnderlay underlay) {
+      UdpUnderlay underlay) {
     this.udpSocket = udpSocket;
     this.request = request;
     this.clientAddress = clientAddress;
@@ -39,7 +47,7 @@ public class UDPHandler implements Runnable {
   public void run() {
     Response response = underlay.dispatchRequest(request);
     // Serialize the response.
-    byte[] responseBytes = UDPUtils.serialize(response);
+    byte[] responseBytes = UdpUtils.serialize(response);
     if (responseBytes == null) {
       System.err.println("[UDPHandler] Invalid response.");
       return;

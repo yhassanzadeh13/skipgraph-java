@@ -1,17 +1,20 @@
 package underlay.udp;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import underlay.Underlay;
 import underlay.packets.Request;
-import underlay.packets.RequestType;
 import underlay.packets.Response;
-
-import java.io.IOException;
-import java.net.*;
 
 /**
  * UDP Underlay implementation.
  */
-public class UDPUnderlay extends Underlay {
+public class UdpUnderlay extends Underlay {
 
   /**
    * The nature of UDP requires us to predefine the maximum size of a packet that could be
@@ -19,14 +22,14 @@ public class UDPUnderlay extends Underlay {
    */
   public static final int MAX_PACKET_SIZE = 512;
 
-  // The thread that continuously listens for incoming connection in the background. As opposed to TCP, both requests
-  // and responses will be received by this thread.
+  // The thread that continuously listens for incoming connection in the background.
+  // As opposed to TCP, both requests and responses will be received by this thread.
   private Thread listenerThread;
   // The local UDP socket that can accept incoming UDP connections.
   private DatagramSocket udpSocket;
-  // This object will be used to transfer the responses from the listener thread to the thread that the `sendMessage`
-  // was called from.
-  private final UDPResponseLock responseLock = new UDPResponseLock();
+  // This object will be used to transfer the responses from the listener thread
+  // to the thread that the `sendMessage` was called from.
+  private final UdpResponseLock responseLock = new UdpResponseLock();
 
   /**
    * Creates a UDP socket at the given port and starts listening it.
@@ -45,7 +48,7 @@ public class UDPUnderlay extends Underlay {
       return false;
     }
     // Create the listener thread that will continuously listen to the UDP packets.
-    listenerThread = new Thread(new UDPListener(udpSocket, this, responseLock));
+    listenerThread = new Thread(new UdpListener(udpSocket, this, responseLock));
     listenerThread.start();
     return true;
   }
@@ -71,7 +74,7 @@ public class UDPUnderlay extends Underlay {
       return null;
     }
     // Serialize the request.
-    byte[] requestBytes = UDPUtils.serialize(request);
+    byte[] requestBytes = UdpUtils.serialize(request);
     if (requestBytes == null) {
       System.err.println("[UDPUnderlay] Invalid request.");
       return null;

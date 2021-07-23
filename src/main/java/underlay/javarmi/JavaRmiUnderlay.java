@@ -1,20 +1,18 @@
 package underlay.javarmi;
 
-import underlay.Underlay;
-import underlay.packets.Request;
-import underlay.packets.RequestType;
-import underlay.packets.Response;
-
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
+import underlay.Underlay;
+import underlay.packets.Request;
+import underlay.packets.Response;
 
 /**
  * Java RMI connection underlay implementation.
  */
-public class JavaRMIUnderlay extends Underlay {
+public class JavaRmiUnderlay extends Underlay {
 
   // Java RMI instance running at the host machine.
-  JavaRMIHost host;
+  JavaRmiHost host;
 
   /**
    * Connects to the Java RMI adapter of a remote server.
@@ -22,14 +20,14 @@ public class JavaRMIUnderlay extends Underlay {
    * @param fullAddress address of the server in the form of IP:PORT
    * @return a remote Java RMI adapter.
    */
-  public JavaRMIService remote(String fullAddress) {
+  public JavaRmiService remote(String fullAddress) {
     if (host == null) {
       System.err.println("[JavaRMIUnderlay] Host does not exist.");
       return null;
     }
-    JavaRMIService remote;
+    JavaRmiService remote;
     try {
-      remote = (JavaRMIService) Naming.lookup("//" + fullAddress + "/node");
+      remote = (JavaRmiService) Naming.lookup("//" + fullAddress + "/node");
     } catch (Exception e) {
       System.err.println("[JavaRMIUnderlay] Could not connect to the remote RMI server!");
       return null;
@@ -46,7 +44,7 @@ public class JavaRMIUnderlay extends Underlay {
   @Override
   protected boolean initUnderlay(int port) {
     try {
-      host = new JavaRMIHost(this);
+      host = new JavaRmiHost(this);
       // Bind this RMI adapter to the given port.
       LocateRegistry.createRegistry(port).rebind("node", host);
     } catch (Exception e) {
@@ -72,7 +70,7 @@ public class JavaRMIUnderlay extends Underlay {
       return null;
     }
     // Connect to the remote adapter.
-    JavaRMIService remote = remote(address + ":" + port);
+    JavaRmiService remote = remote(address + ":" + port);
     if (remote == null) {
       System.err
           .println("[JavaRMIUnderlay] Could not connect to the address: " + address + ":" + port);

@@ -1,7 +1,6 @@
 package underlay.tcp;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import underlay.UnderlayTest;
 
 /**
@@ -15,8 +14,8 @@ class TCPUnderlayTest extends UnderlayTest {
   // @BeforeAll
   static void setUp() {
     // Construct the underlays.
-    localUnderlay = new TCPUnderlay();
-    remoteUnderlay = new TCPUnderlay();
+    localUnderlay = new TcpUnderlay();
+    remoteUnderlay = new TcpUnderlay();
 
     buildLayers(localUnderlay);
     buildLayers(remoteUnderlay);

@@ -4,11 +4,16 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Example usage:
+ * Example usage:.
+ *
  * <p>
  * Log4jLogger logger =  new Log4jLogger(LogManager.getLogger(Main.class));
+ * </p>
+
  * <p>
  * ContextLoggerInterface lg = logger.With().Str("name", "Ozgur");
+ * </p>
+ *
  * <p>
  * lg.debug().Int("name_id", 12).Msg("test 1"); -> {msg=test 1, name=Ozgur, name_id=12}
  * </p>
