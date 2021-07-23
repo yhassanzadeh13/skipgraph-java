@@ -1,12 +1,15 @@
 package log;
 
+/**
+ * Logger interface extended with context info in mind.
+ */
 public interface ContextLoggerInterface extends LoggerInterface {
 
-  ContextLoggerInterface Int(String key, int value);
+  ContextLoggerInterface addInt(String key, int value);
 
-  ContextLoggerInterface Str(String key, String value);
+  ContextLoggerInterface addStr(String key, String value);
 
-  ContextLoggerInterface Float(String key, float value);
+  ContextLoggerInterface addFloat(String key, float value);
 
-  ContextLoggerInterface Double(String key, double value);
+  ContextLoggerInterface addDouble(String key, double value);
 }

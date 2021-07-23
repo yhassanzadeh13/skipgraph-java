@@ -51,11 +51,11 @@ public class DataNodeTest {
 
     // Create a map of num ids to their corresponding lookup tables.
     Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumID, SkipNode::getLookupTable));
+        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
 
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumID(), n.getNameID(), n.getLookupTable());
+      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 
@@ -85,7 +85,7 @@ public class DataNodeTest {
 
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumID(), n.getNameID(), n.getLookupTable());
+      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 

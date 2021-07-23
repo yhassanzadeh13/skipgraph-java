@@ -151,7 +151,7 @@ public class ConcurrentLookupTable implements LookupTable {
     List<List<SkipNodeIdentity>> newTable = new ArrayList<>();
     newTable.add(new ArrayList<>());
     newTable.get(0).add(owner);
-    if (newNumId < owner.getNumID() && !getLeft(level).equals(LookupTable.EMPTY_NODE)) {
+    if (newNumId < owner.getNumId() && !getLeft(level).equals(LookupTable.EMPTY_NODE)) {
       newTable.get(0).add(getLeft(level));
     } else if (!getRight(level).equals(LookupTable.EMPTY_NODE)) {
       newTable.get(0).add(getRight(level));
@@ -170,11 +170,11 @@ public class ConcurrentLookupTable implements LookupTable {
   @Override
   public void initializeTable(SkipNodeIdentity owner, TentativeTable tentativeTable) {
     SkipNodeIdentity left = tentativeTable.neighbors.get(0).stream()
-        .filter(x -> x.getNumID() <= owner.getNumID())
+        .filter(x -> x.getNumId() <= owner.getNumId())
         .findFirst()
         .orElse(LookupTable.EMPTY_NODE);
     SkipNodeIdentity right = tentativeTable.neighbors.get(0).stream()
-        .filter(x -> x.getNumID() > owner.getNumID())
+        .filter(x -> x.getNumId() > owner.getNumId())
         .findFirst()
         .orElse(LookupTable.EMPTY_NODE);
     updateLeft(left, tentativeTable.specificLevel);

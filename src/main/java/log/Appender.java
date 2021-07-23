@@ -5,15 +5,15 @@ package log;
  */
 public interface Appender {
 
-  Appender Int(String key, int value);
+  Appender addInt(String key, int value);
 
-  Appender Str(String key, String value);
+  Appender addStr(String key, String value);
 
-  Appender Float(String key, float value);
+  Appender addFloat(String key, float value);
 
-  Appender Double(String key, double value);
+  Appender addDouble(String key, double value);
 
-  Appender Exception(Exception e);
+  Appender addException(Exception e);
 
-  void Msg(String value);
+  void addMsg(String value);
 }

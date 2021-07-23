@@ -71,7 +71,7 @@ public class LocalSkipGraph {
             LookupTable lt2 = lookupTables.get(j);
             // Connect the nodes at this level if they should be connected
             // according to their name ID.
-            if (SkipNodeIdentity.commonBits(id1.getNameID(), id2.getNameID()) >= l) {
+            if (SkipNodeIdentity.commonBits(id1.getNameId(), id2.getNameId()) >= l) {
               lt1.updateRight(id2, l);
               lt2.updateLeft(id1, l);
               break;

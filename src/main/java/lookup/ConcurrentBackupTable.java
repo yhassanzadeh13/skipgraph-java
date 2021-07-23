@@ -272,12 +272,12 @@ public class ConcurrentBackupTable implements LookupTable {
         .flatMap(Collection::stream)
         .filter(x -> !x.equals(LookupTable.EMPTY_NODE))
         .forEach(neighbor -> {
-          int l = SkipNodeIdentity.commonBits(neighbor.getNameID(), newNameId);
+          int l = SkipNodeIdentity.commonBits(neighbor.getNameId(), newNameId);
           // Add the neighbor at the max level.
           newTable.get(l).add(neighbor);
         });
     // Add the owner of this lookup table to the appropriate levels.
-    int l = SkipNodeIdentity.commonBits(owner.getNameID(), newNameId);
+    int l = SkipNodeIdentity.commonBits(owner.getNameId(), newNameId);
     newTable.get(l).add(owner);
     lock.readLock().unlock();
     // Return the new lookup table.
@@ -290,10 +290,10 @@ public class ConcurrentBackupTable implements LookupTable {
     // Insert every neighbor at the correct level & direction.
     for (int l = 0; l < tentativeTable.neighbors.size(); l++) {
       List<SkipNodeIdentity> leftList = tentativeTable.neighbors.get(l).stream()
-          .filter(x -> x.getNumID() <= owner.getNumID())
+          .filter(x -> x.getNumId() <= owner.getNumId())
           .collect(Collectors.toList());
       List<SkipNodeIdentity> rightList = tentativeTable.neighbors.get(l).stream()
-          .filter(x -> x.getNumID() > owner.getNumID())
+          .filter(x -> x.getNumId() > owner.getNumId())
           .collect(Collectors.toList());
       for (int j = 0; j <= l; j++) {
         int leftIndex = getIndex(Direction.LEFT, j);
@@ -329,14 +329,14 @@ public class ConcurrentBackupTable implements LookupTable {
       sb.append("Lefts:\t");
       List<SkipNodeIdentity> lefts = getLefts(i);
       for (int j = lefts.size() - 1; j >= 0; j--) {
-        sb.append(lefts.get(j).getNameID());
+        sb.append(lefts.get(j).getNameId());
         sb.append('\t');
       }
 
       sb.append("Rights:\t");
       List<SkipNodeIdentity> rights = getRights(i);
       for (int j = 0; j < rights.size(); j++) {
-        sb.append(rights.get(j).getNameID());
+        sb.append(rights.get(j).getNameId());
         sb.append('\t');
       }
       sb.append('\n');

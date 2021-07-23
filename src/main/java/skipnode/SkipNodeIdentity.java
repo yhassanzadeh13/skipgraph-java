@@ -1,16 +1,17 @@
 package skipnode;
 
+import java.io.Serializable;
+import java.util.Objects;
 import log.Log4jLogger;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-// Basic skipnode.SkipNodeIdentity class
+/**
+ * Basic skipnode.SkipNodeIdentity class
+ */
 public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdentity> {
 
-  private final String nameID;
-  private final int numID;
+  private final String nameId;
+  private final int numId;
   private final String address;
   private final int port;
 
@@ -20,24 +21,33 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
   private static final Log4jLogger logger = new Log4jLogger(
       LogManager.getLogger(SkipNodeIdentity.class));
 
-  public SkipNodeIdentity(String nameID, int numID, String address, int port, int version) {
-    this.nameID = nameID;
-    this.numID = numID;
+  /**
+   * Constructor for SkipNodeIdentity.
+   *
+   * @param nameId name id of the node.
+   * @param numId numerical id of the node.
+   * @param address String representing the address of the node.
+   * @param port Integer representing the port of the node.
+   * @param version Integer representing the vversion.
+   */
+  public SkipNodeIdentity(String nameId, int numId, String address, int port, int version) {
+    this.nameId = nameId;
+    this.numId = numId;
     this.address = address;
     this.port = port;
     this.version = version;
   }
 
-  public SkipNodeIdentity(String nameID, int numID, String address, int port) {
-    this(nameID, numID, address, port, 0);
+  public SkipNodeIdentity(String nameId, int numId, String address, int port) {
+    this(nameId, numId, address, port, 0);
   }
 
-  public String getNameID() {
-    return nameID;
+  public String getNameId() {
+    return nameId;
   }
 
-  public int getNumID() {
-    return numID;
+  public int getNumId() {
+    return numId;
   }
 
   public String getAddress() {
@@ -57,17 +67,24 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
       return false;
     }
     SkipNodeIdentity that = (SkipNodeIdentity) o;
-    return getNumID() == that.getNumID() &&
-        getNameID().equals(that.getNameID()) &&
-        getAddress().equals(that.getAddress()) &&
-        getPort() == that.getPort();
+    return getNumId() == that.getNumId()
+        && getNameId().equals(that.getNameId())
+        && getAddress().equals(that.getAddress())
+        && getPort() == that.getPort();
   }
 
+  /**
+   * Method that calculates common bits for 2 name ids.
+   *
+   * @param name1 String representing name id.
+   * @param name2 String representing name id.
+   * @return number of common bits.
+   */
   public static int commonBits(String name1, String name2) {
-    logger.debug().
-        Str("name_1", name1).
-        Str("name_2", name2).
-        Msg("calculating common bits");
+    logger.debug()
+        .addStr("name_1", name1)
+        .addStr("name_2", name2)
+        .addMsg("calculating common bits");
     if (name1 == null || name2 == null) {
       return -1;
     }
@@ -83,21 +100,21 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
   @Override
   public int hashCode() {
-    return Objects.hash(getNameID(), getNumID(), getAddress(), getPort());
+    return Objects.hash(getNameId(), getNumId(), getAddress(), getPort());
   }
 
   @Override
   public String toString() {
-    return "Name ID: " + nameID + "\tNum ID: " + numID + "\tAddress: " + address + "\tPort: "
+    return "Name ID: " + nameId + "\tNum ID: " + numId + "\tAddress: " + address + "\tPort: "
         + port;
   }
 
   @Override
   public int compareTo(SkipNodeIdentity o) {
-    logger.debug().
-        Int("num_id", this.numID).
-        Int("compared_num_id", o.getNumID()).
-        Msg("currently comparing");
-    return Integer.compare(numID, o.numID);
+    logger.debug()
+        .addInt("num_id", this.numId)
+        .addInt("compared_num_id", o.getNumId())
+        .addMsg("currently comparing");
+    return Integer.compare(numId, o.numId);
   }
 }

@@ -46,21 +46,21 @@ public class NodeStashProcessor implements Runnable {
         n = nodeStashRef.take();
       } catch (InterruptedException e) {
         logger.fatal()
-            .Exception(e)
-            .Int("num_id", this.ownIdentity.getNumID())
-            .Msg("NodeStashProcessor could not take");
+            .addException(e)
+            .addInt("num_id", this.ownIdentity.getNumId())
+            .addMsg("NodeStashProcessor could not take");
         continue;
       }
       if (n.equals(ownIdentity)) {
         continue;
       }
-      int level = SkipNodeIdentity.commonBits(n.getNameID(), ownIdentity.getNameID());
-      if (n.getNumID() < ownIdentity.getNumID()
+      int level = SkipNodeIdentity.commonBits(n.getNameId(), ownIdentity.getNameId());
+      if (n.getNumId() < ownIdentity.getNumId()
           && !backupTableRef.getLefts(level).contains(n)) {
         for (int j = level; j >= 0; j--) {
           backupTableRef.addLeftNode(n, j);
         }
-      } else if (n.getNumID() >= ownIdentity.getNumID()
+      } else if (n.getNumId() >= ownIdentity.getNumId()
           && !backupTableRef.getRights(level).contains(n)) {
         for (int j = level; j >= 0; j--) {
           backupTableRef.addRightNode(n, j);

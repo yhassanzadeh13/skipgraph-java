@@ -1,14 +1,15 @@
 package skipnode;
 
-import lookup.TentativeTable;
+import java.util.List;
 import middlelayer.MiddleLayer;
 
-import java.util.List;
-
+/**
+ * Skip Node interface.
+ */
 public interface SkipNodeInterface {
 
   /**
-   * Set the middle layer which would handle communication with remote nodes
+   * Set the middle layer which would handle communication with remote nodes.
    */
   void setMiddleLayer(MiddleLayer middleLayer);
 
@@ -22,9 +23,9 @@ public interface SkipNodeInterface {
 
   /**
    * Adds a data node to the list of overlays of the middle layer Inserts the node into the Skip
-   * Graph
+   * Graph.
    *
-   * @param node
+   * @param node skip node instance
    */
   void insertDataNode(SkipNodeInterface node);
 
@@ -47,7 +48,7 @@ public interface SkipNodeInterface {
 
   /**
    * Adds the given neighbor to the appropriate lookup table entries of this node. Should only be
-   * used during concurrent insertion (i.e., ConcurrentBackupTable is being used.)
+   * used during concurrent insertion (i.e., ConcurrentBackupTable is being used.).
    *
    * @param newNeighbor the identity of the new neighbor.
    * @param minLevel    the minimum level in which the new neighbor should be connected.
@@ -55,34 +56,37 @@ public interface SkipNodeInterface {
   void announceNeighbor(SkipNodeIdentity newNeighbor, int minLevel);
 
   /**
-   * Remove the node from the SkipGraph. Joins the neighbors on each level together
+   * Remove the node from the SkipGraph. Joins the neighbors on each level together.
    *
    * @return True is successful, false otherwise
    */
   boolean delete();
 
   /**
-   * Search for the given numID
-   *
-   * @param numID The numID to search for
-   * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   * the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the direction
-   * the search is initiated. For example: Initiating a search for a SkipNode with NumID 50 from a
-   * SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode with NumID 50 is it
-   * exists. If no such SnipNode exists, the SkipNodeIdentity of the SnipNode whose NumID is closest
-   * to 50 among the nodes whose NumID is less than 50 is returned.
-   */
-  SkipNodeIdentity searchByNumID(int numID);
+  * Search for the given numID.
+  *
+  * @param numId The numID to search for
+  * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
+  *     the SkipNodeIdentity of the SkipNode with NumID closest to
+  *     the given numID from the direction the search is initiated. For example:
+  *     Initiating a search for a SkipNode with NumID 50 from a
+  *     SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode with NumID 50 is it
+  *     exists. If no such SnipNode exists, the SkipNodeIdentity
+  *     of the SnipNode whose NumID is closest
+  *     to 50 among the nodes whose NumID is less than 50 is returned.
+  */
+  SkipNodeIdentity searchByNumId(int numId);
 
   /**
-   * Search for the given nameID
+   * Search for the given nameID.
    *
-   * @param nameID The nameID to search for
-   * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist,
-   * returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the nodes in
-   * the SkipGraph. Also contains the piggybacked information.
+   * @param nameId The nameID to search for
+   * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist
+   *     returns the SkipNodeIdentity of the SkipNode which shares the
+   *     longest prefix among the nodes in
+   *     the SkipGraph. Also contains the piggybacked information.
    */
-  SearchResult searchByNameID(String nameID);
+  SearchResult searchByNameId(String nameId);
 
   /**
    * Used by the `searchByNameID` method. Implements a recursive name ID search algorithm.
@@ -91,10 +95,10 @@ public interface SkipNodeInterface {
    * @param level  the current level.
    * @return the identity of the node with the given name ID, or the node with the closest name ID.
    */
-  SearchResult searchByNameIDRecursive(String target, int level);
+  SearchResult searchByNameIdRecursive(String target, int level);
 
   /**
-   * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity
+   * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity.
    *
    * @param snId  The new SkipNodeIdentity to be placed in the given level
    * @param level The level to place the given SkipNodeIdentity
@@ -103,7 +107,7 @@ public interface SkipNodeInterface {
   SkipNodeIdentity updateLeftNode(SkipNodeIdentity snId, int level);
 
   /**
-   * Updates the SkipNode on the right on the given level to the given SkipNodeIdentity
+   * Updates the SkipNode on the right on the given level to the given SkipNodeIdentity.
    *
    * @param snId  The new SkipNodeIdentity to be placed in the given level
    * @param level The level to place the given SkipNodeIdentity
@@ -135,26 +139,33 @@ public interface SkipNodeInterface {
   SkipNodeIdentity getLeftNode(int level);
 
   /**
-   * @param owner
-   * @return
+   * Method for releasing the lock.
+   *
+   * @param owner owner node instance.
+   * @return Boolean value whether the lock is held by that node or not.
    */
   boolean unlock(SkipNodeIdentity owner);
 
-  /**
-   * @param requester
-   * @return
+  /** Method for trying to acquire the lock.
+   *
+   * @param requester Skip node that requested the lock.
+   * @return boolean value for whether the lock is acquired or not.
    */
   boolean tryAcquire(SkipNodeIdentity requester, int version);
 
   /**
-   * @return
+   * Method for checking whether is lock is locked or not.
+   *
+   * @return Boolean value whether is lock is locked or not.
    */
   boolean isLocked();
 
   /**
-   * @param address
-   * @param port
-   * @return
+   * Method for checking if the lock is locked by that address port combination.
+   *
+   * @param address String value representing the address.
+   * @param port Integer value representing the port.
+   * @return Boolean value for whether the lock is locked by that address port combination or not.
    */
   boolean isLockedBy(String address, int port);
 

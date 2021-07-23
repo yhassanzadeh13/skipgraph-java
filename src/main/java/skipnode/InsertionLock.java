@@ -50,8 +50,8 @@ public class InsertionLock {
    */
   public boolean startInsertion() {
     logger.debug()
-        .Int("owner_num_id", this.owner.getNumID())
-        .Msg("starting insertion");
+        .addInt("owner_num_id", this.owner.getNumId())
+        .addMsg("starting insertion");
     boolean acquired = locked.tryAcquire();
     if (acquired) {
       holder = null;
@@ -64,8 +64,8 @@ public class InsertionLock {
    */
   public void endInsertion() {
     logger.debug()
-        .Int("owner_num_id", this.owner.getNumID())
-        .Msg("ending insertion");
+        .addInt("owner_num_id", this.owner.getNumId())
+        .addMsg("ending insertion");
     if (holder == null) {
       locked.release();
     }

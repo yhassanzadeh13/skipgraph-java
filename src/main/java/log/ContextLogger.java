@@ -28,25 +28,25 @@ public class ContextLogger implements ContextLoggerInterface {
   }
 
   @Override
-  public ContextLoggerInterface Int(String key, int value) {
+  public ContextLoggerInterface addInt(String key, int value) {
     this.msg.add(key, value);
     return this;
   }
 
   @Override
-  public ContextLoggerInterface Str(String key, String value) {
+  public ContextLoggerInterface addStr(String key, String value) {
     this.msg.add(key, value);
     return this;
   }
 
   @Override
-  public ContextLoggerInterface Float(String key, float value) {
+  public ContextLoggerInterface addFloat(String key, float value) {
     this.msg.add(key, value);
     return this;
   }
 
   @Override
-  public ContextLoggerInterface Double(String key, double value) {
+  public ContextLoggerInterface addDouble(String key, double value) {
     this.msg.add(key, value);
     return this;
   }

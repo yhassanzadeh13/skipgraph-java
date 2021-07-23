@@ -3,7 +3,6 @@ package skipnode;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import misc.LocalSkipGraph;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
@@ -11,7 +10,6 @@ import underlay.Underlay;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -128,10 +126,10 @@ class SkipNodeTest {
     // First, check the correctness and consistency of the lookup tables.
     // Create a map of num ids to their corresponding lookup tables.
     Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumID, SkipNode::getLookupTable));
+        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
     // Check the correctness & consistency of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumID(), n.getNameID(), n.getLookupTable());
+      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
     System.out.println("INSERTIONS COMPLETE.");
@@ -166,9 +164,9 @@ class SkipNodeTest {
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          SearchResult res = initiator.searchByNameID(target.getNameID());
-          Assertions.assertEquals(target.getNameID(), res.result.getNameID(),
-              "Source: " + initiator.getNumID() + " Target: " + target.getNameID() + " " + excp
+          SearchResult res = initiator.searchByNameId(target.getNameId());
+          Assertions.assertEquals(target.getNameId(), res.result.getNameId(),
+              "Source: " + initiator.getNumId() + " Target: " + target.getNameId() + " " + excp
                   + "\n" + fnl);
         });
       }
@@ -234,10 +232,10 @@ class SkipNodeTest {
     }
     // Create a map of num ids to their corresponding lookup tables.
     Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumID, SkipNode::getLookupTable));
+        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
     // Check the correctness & consistency of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumID(), n.getNameID(), n.getLookupTable());
+      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
   }
@@ -265,10 +263,10 @@ class SkipNodeTest {
     g.insertAllRandomized();
     // Create a map of num ids to their corresponding lookup tables.
     Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumID, SkipNode::getLookupTable));
+        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumID(), n.getNameID(), n.getLookupTable());
+      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
     underlays.forEach(Underlay::terminate);
@@ -298,9 +296,9 @@ class SkipNodeTest {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
         SkipNode target = g.getNodes().get(j);
-        SearchResult result = initiator.searchByNameID(target.getNameID());
+        SearchResult result = initiator.searchByNameId(target.getNameId());
         if (!result.result.equals(target.getIdentity())) {
-          initiator.searchByNameID(target.getNameID());
+          initiator.searchByNameId(target.getNameId());
         }
         Assertions.assertEquals(target.getIdentity(), result.result);
       }
@@ -333,7 +331,7 @@ class SkipNodeTest {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
         SkipNode target = g.getNodes().get(j);
-        SkipNodeIdentity result = initiator.searchByNumID(target.getNumID());
+        SkipNodeIdentity result = initiator.searchByNumId(target.getNumId());
         Assertions.assertEquals(target.getIdentity(), result);
       }
     }
@@ -346,12 +344,12 @@ class SkipNodeTest {
       List<SkipNodeIdentity> lefts = table.getLefts(i);
       List<SkipNodeIdentity> rights = table.getRights(i);
       for (SkipNodeIdentity l : lefts) {
-        Assertions.assertTrue(l.getNumID() < numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(l.getNameID(), nameID) >= i);
+        Assertions.assertTrue(l.getNumId() < numID);
+        Assertions.assertTrue(SkipNodeIdentity.commonBits(l.getNameId(), nameID) >= i);
       }
       for (SkipNodeIdentity r : rights) {
-        Assertions.assertTrue(r.getNumID() > numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(r.getNameID(), nameID) >= i);
+        Assertions.assertTrue(r.getNumId() > numID);
+        Assertions.assertTrue(SkipNodeIdentity.commonBits(r.getNameId(), nameID) >= i);
       }
     }
   }
@@ -365,11 +363,11 @@ class SkipNodeTest {
       List<SkipNodeIdentity> rights = table.getRights(i);
       // Check whether the neighbors agree on the neighborship relationships.
       for (SkipNodeIdentity l : lefts) {
-        LookupTable neighborMap = tableMap.get(l.getNumID());
+        LookupTable neighborMap = tableMap.get(l.getNumId());
         Assertions.assertTrue(neighborMap.isRightNeighbor(node.getIdentity(), i));
       }
       for (SkipNodeIdentity r : rights) {
-        LookupTable neighborMap = tableMap.get(r.getNumID());
+        LookupTable neighborMap = tableMap.get(r.getNumId());
         Assertions.assertTrue(neighborMap.isLeftNeighbor(node.getIdentity(), i));
       }
     }

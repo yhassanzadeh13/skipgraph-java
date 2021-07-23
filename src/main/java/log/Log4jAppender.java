@@ -44,33 +44,33 @@ public class Log4jAppender implements Appender {
   }
 
   @Override
-  public Appender Int(String key, int value) {
+  public Appender addInt(String key, int value) {
     return this.append(key, value);
   }
 
   @Override
-  public Appender Str(String key, String value) {
+  public Appender addStr(String key, String value) {
     return this.append(key, value);
   }
 
   @Override
-  public Appender Float(String key, float value) {
+  public Appender addFloat(String key, float value) {
     return this.append(key, value);
   }
 
   @Override
-  public Appender Double(String key, double value) {
+  public Appender addDouble(String key, double value) {
     return this.append(key, value);
   }
 
   @Override
-  public Appender Exception(Exception e) {
+  public Appender addException(Exception e) {
     this.exception = e;
     return this;
   }
 
   @Override
-  public void Msg(String value) {
+  public void addMsg(String value) {
     this.message.add("msg", value);
     this.logger.log(this.level, this.message.toObjectMessage(), this.exception);
   }
