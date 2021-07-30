@@ -26,6 +26,7 @@ and searchByNumID. However, we need to be mindful that these tests are using Loc
 import lookup.LookupTable;
 import lookup.LookupTableFactory;
 import middlelayer.MiddleLayer;
+import model.NameID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import skipnode.SearchResult;
@@ -56,7 +57,7 @@ public class mvpTest {
 
         String localAddress = underlays.get(0).getAddress();
 
-        int nameIDSize = ((int) (Math.log(NODES)/Math.log(2)));
+        int nameIDSize = NameID.computeSize(NODES);
         // Create the numerical IDs.
         List<Integer> numIDs = new ArrayList<>(NODES);
         for(int i = 0; i < NODES; i++) numIDs.add(i);
