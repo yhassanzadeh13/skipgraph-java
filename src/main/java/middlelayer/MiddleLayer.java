@@ -252,6 +252,16 @@ public class MiddleLayer {
     return searchByNameIdRecursive(destinationAddress, port, -1, target, level);
   }
 
+  /**
+   * Method for searching by name id recursively.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param target String value representing the target.
+   * @param level Integer representing level.
+   * @return search result instance.
+   */
   public SearchResult searchByNameIdRecursive(String destinationAddress, int port, int receiverId,
       String target, int level) {
     Request request = new SearchByNameIdRecursiveRequest(target, level);
@@ -265,6 +275,15 @@ public class MiddleLayer {
     return searchByNumId(destinationAddress, port, -1, numId);
   }
 
+  /**
+   * Method for searching with numerical id.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param numId target numerical id.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity searchByNumId(String destinationAddress, int port, int receiverId,
       int numId) {
     Request request = new SearchByNumIdRequest(numId);
@@ -279,6 +298,16 @@ public class MiddleLayer {
     return tryAcquire(destinationAddress, port, -1, req, version);
   }
 
+  /**
+   * Method for trying to acquire the lock.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param req skip node identity.
+   * @param version Integer representing the version.
+   * @return boolean value representing whether the lock is acquired or not.
+   */
   public boolean tryAcquire(String destinationAddress, int port, int receiverId,
       SkipNodeIdentity req, int version) {
     Request request = new AcquireLockRequest(req, version);
@@ -292,6 +321,15 @@ public class MiddleLayer {
     return unlock(destinationAddress, port, -1, owner);
   }
 
+  /**
+   * Method for unlocking the lock.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param owner owner node.
+   * @return boolean value representing if the lock is unlocked or not.
+   */
   public boolean unlock(String destinationAddress, int port, int receiverId,
       SkipNodeIdentity owner) {
     Request request = new ReleaseLockRequest(owner);
@@ -305,6 +343,16 @@ public class MiddleLayer {
     return updateRightNode(destinationAddress, port, -1, snId, level);
   }
 
+  /**
+   * Method for updating the right node.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param snId skip node identity.
+   * @param level Integer representing the level.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity updateRightNode(String destinationAddress, int port, int receiverId,
       SkipNodeIdentity snId, int level) {
     Request request = new UpdateRightNodeRequest(level, snId);
@@ -320,6 +368,16 @@ public class MiddleLayer {
     return updateLeftNode(destinationAddress, port, -1, snId, level);
   }
 
+  /**
+   * Method for updating the left node.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param snId skip node identity.
+   * @param level Integer representing the level.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity updateLeftNode(String destinationAddress, int port, int receiverId,
       SkipNodeIdentity snId, int level) {
     Request request = new UpdateLeftNodeRequest(level, snId);
@@ -333,20 +391,19 @@ public class MiddleLayer {
     return getIdentity(destinationAddress, port, -1);
   }
 
+  /**
+   * Method for getting the identity.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity getIdentity(String destinationAddress, int port, int receiverId) {
     Request request = new GetIdentityRequest();
     request.receiverId = receiverId;
     Response r = send(destinationAddress, port, new GetIdentityRequest());
     return ((IdentityResponse) r).identity;
-  }
-
-  public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
-    return getLeftNode(true, destinationAddress, port, -1, level);
-  }
-
-  public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int receiverId,
-      int level) {
-    return getLeftNode(true, destinationAddress, port, receiverId, level);
   }
 
   public SkipNodeIdentity getRightNode(String destinationAddress, int port, int level) {
@@ -358,10 +415,20 @@ public class MiddleLayer {
     return getRightNode(true, destinationAddress, port, receiverId, level);
   }
 
-  public SkipNodeIdentity getLeftNode(boolean backoff, String destinationAddress, int port,
-      int receiverId, int level) {
+  /**
+   * Method for getting the right node.
+   *
+   * @param backoff boolean value for back off.
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param level Integer representing the level
+   * @return skip node identity.
+   */
+  public SkipNodeIdentity getRightNode(boolean backoff, String destinationAddress, int port,
+                                       int receiverId, int level) {
     // Send the request through the underlay
-    GetLeftNodeRequest req = new GetLeftNodeRequest(level);
+    GetRightNodeRequest req = new GetRightNodeRequest(level);
     req.backoff = backoff;
     req.receiverId = receiverId;
     Response r = send(destinationAddress, port, req);
@@ -373,10 +440,29 @@ public class MiddleLayer {
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getRightNode(boolean backoff, String destinationAddress, int port,
+  public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
+    return getLeftNode(true, destinationAddress, port, -1, level);
+  }
+
+  public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int receiverId,
+                                      int level) {
+    return getLeftNode(true, destinationAddress, port, receiverId, level);
+  }
+
+  /**
+   * Method for getting the left node.
+   *
+   * @param backoff boolean value for back off.
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param level Integer representing the level
+   * @return skip node identity.
+   */
+  public SkipNodeIdentity getLeftNode(boolean backoff, String destinationAddress, int port,
       int receiverId, int level) {
     // Send the request through the underlay
-    GetRightNodeRequest req = new GetRightNodeRequest(level);
+    GetLeftNodeRequest req = new GetLeftNodeRequest(level);
     req.backoff = backoff;
     req.receiverId = receiverId;
     Response r = send(destinationAddress, port, req);
@@ -393,6 +479,16 @@ public class MiddleLayer {
     return acquireNeighbors(destinationAddress, port, -1, newNodeId, level);
   }
 
+  /**
+   * Method for acquiring neighbours.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param newNodeId skip node identity of the new node.
+   * @param level Integer representing the level.
+   * @return tentative table instance.
+   */
   public TentativeTable acquireNeighbors(String destinationAddress, int port, int receiverId,
       SkipNodeIdentity newNodeId, int level) {
     Request request = new AcquireNeighborsRequest(newNodeId, level);
@@ -407,6 +503,17 @@ public class MiddleLayer {
     return findLadder(destinationAddress, port, -1, level, direction, target);
   }
 
+  /**
+   * Method for finding a ladder.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param level Integer representing the level.
+   * @param direction Integer representing the direction.
+   * @param target String representing the target.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity findLadder(String destinationAddress, int port, int receiverId, int level,
       int direction, String target) {
     Request request = new FindLadderRequest(level, direction, target);
@@ -421,6 +528,15 @@ public class MiddleLayer {
     announceNeighbor(destinationAddress, port, -1, newNeighbor, minLevel);
   }
 
+  /**
+   * Method for announcing a new neighbour.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param newNeighbor skip node identity of the new neighbour.
+   * @param minLevel Integer representing the minimum level.
+   */
   public void announceNeighbor(String destinationAddress, int port, int receiverId,
       SkipNodeIdentity newNeighbor, int minLevel) {
     Request request = new AnnounceNeighborRequest(newNeighbor, minLevel);
@@ -433,6 +549,14 @@ public class MiddleLayer {
     return isAvailable(destinationAddress, port, -1);
   }
 
+  /**
+   * Method for checking if node is available or not.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @return boolean representing if node is available or not.
+   */
   public boolean isAvailable(String destinationAddress, int port, int receiverId) {
     Request request = new IsAvailableRequest();
     request.receiverId = receiverId;
@@ -445,6 +569,16 @@ public class MiddleLayer {
     return getLeftLadder(destinationAddress, port, -1, level, nameId);
   }
 
+  /**
+   * Method for getting the left ladder.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param level Integer representing the level.
+   * @param nameId String representing the name id of the node.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity getLeftLadder(String destinationAddress, int port, int receiverId,
       int level, String nameId) {
     Request request = new GetLeftLadderRequest(level, nameId);
@@ -459,6 +593,16 @@ public class MiddleLayer {
     return getRightLadder(destinationAddress, port, -1, level, nameId);
   }
 
+  /**
+   * Method for getting the right ladder.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param level Integer representing the level.
+   * @param nameId String representing the name id of the node.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity getRightLadder(String destinationAddress, int port, int receiverId,
       int level, String nameId) {
     Request request = new GetRightLadderRequest(level, nameId);
@@ -473,6 +617,16 @@ public class MiddleLayer {
     return increment(destinationAddress, port, -1, snId, level);
   }
 
+  /**
+   * Method for increment.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param snId skip node identity.
+   * @param level Integer representing the level.
+   * @return skip node identity.
+   */
   public SkipNodeIdentity increment(String destinationAddress, int port, int receiverId,
       SkipNodeIdentity snId, int level) {
     Request request = new IncrementRequest(level, snId);
@@ -494,6 +648,15 @@ public class MiddleLayer {
     return inject(destinationAddress, port, -1, snIds);
   }
 
+  /**
+   * Method for injection.
+   *
+   * @param destinationAddress String value representing the destination address.
+   * @param port Integer value representing the port.
+   * @param receiverId receiver id.
+   * @param snIds list of skip node identities for injection.
+   * @return boolean value representing if injection succeeded or not.
+   */
   public boolean inject(String destinationAddress, int port, int receiverId,
       List<SkipNodeIdentity> snIds) {
     Request request = new InjectionRequest(snIds);
