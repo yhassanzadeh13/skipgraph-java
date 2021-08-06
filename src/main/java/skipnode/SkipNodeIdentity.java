@@ -81,10 +81,6 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
    * @return number of common bits.
    */
   public static int commonBits(String name1, String name2) {
-    logger.debug()
-        .addStr("name_1", name1)
-        .addStr("name_2", name2)
-        .addMsg("calculating common bits");
     if (name1 == null || name2 == null) {
       return -1;
     }
