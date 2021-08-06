@@ -7,9 +7,9 @@ import underlay.packets.Response;
  */
 public class BooleanResponse extends Response {
 
-    public final boolean answer;
+  public final boolean answer;
 
-    public BooleanResponse(boolean answer) {
-        this.answer = answer;
-    }
+  public BooleanResponse(boolean answer) {
+    this.answer = answer;
+  }
 }
