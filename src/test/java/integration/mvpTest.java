@@ -25,9 +25,9 @@ import static misc.LocalSkipGraph.prependToLength;
 public class mvpTest {
     static int STARTING_PORT = 4444;
     static int NODES = 32;
+    static ArrayList<SkipNode> skipNodes;
 
-    @Test
-    void MVPTEST(){
+    void createSkipGraph(){
         List<Underlay> underlays = new ArrayList<>(NODES);
         for(int i = 0; i < NODES; i++) {
             Underlay underlay = Underlay.newDefaultUnderlay();
@@ -59,7 +59,7 @@ public class mvpTest {
         for(int i = 0; i < NODES; i++) lookupTables.add(LookupTableFactory.createDefaultLookupTable(nameIDSize));
 
         // Finally, construct the nodes.
-        ArrayList<SkipNode> skipNodes = new ArrayList<>(NODES);
+        skipNodes = new ArrayList<>(NODES);
         for(int i = 0; i < NODES; i++) {
             SkipNode skipNode = new SkipNode(identities.get(i), lookupTables.get(i));
             skipNodes.add(skipNode);
@@ -75,7 +75,9 @@ public class mvpTest {
         }
 
         skipNodes.get(0).insert(null, -1);
+    }
 
+    void doInsertions(){
         Thread[] threads = new Thread[NODES-1];
         // Construct the threads.
         for(int i = 1; i <= threads.length; i++) {
@@ -97,7 +99,9 @@ public class mvpTest {
                 e.printStackTrace();
             }
         }
+    }
 
+    void doSearches(){
         Thread[] searchThreads = new Thread[NODES * NODES];
         for(int i = 0; i < NODES; i++) {
             // Choose the searcher.
@@ -128,5 +132,12 @@ public class mvpTest {
             System.err.println("Could not join the thread.");
             e.printStackTrace();
         }
+    }
+
+    @Test
+    void MVPTEST(){
+        createSkipGraph();
+        doInsertions();
+        doSearches();
     }
 }
