@@ -3,9 +3,7 @@ package underlay.packets.requests;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/**
- * Request for name id level search.
- */
+/** Request for name id level search. */
 public class NameIdLevelSearchRequest extends Request {
 
   public final int level;

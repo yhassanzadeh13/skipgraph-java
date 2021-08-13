@@ -3,9 +3,7 @@ package underlay.packets.responses;
 import lookup.TentativeTable;
 import underlay.packets.Response;
 
-/**
- * Response for table.
- */
+/** Response for table. */
 public class TableResponse extends Response {
 
   public final TentativeTable table;

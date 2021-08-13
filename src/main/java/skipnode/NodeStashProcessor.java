@@ -6,9 +6,7 @@ import log.Log4jLogger;
 import lookup.ConcurrentBackupTable;
 import org.apache.logging.log4j.LogManager;
 
-/**
- * Node stash processor.
- */
+/** Node stash processor. */
 public class NodeStashProcessor implements Runnable {
 
   private final LinkedBlockingDeque<SkipNodeIdentity> nodeStashRef;
@@ -18,8 +16,8 @@ public class NodeStashProcessor implements Runnable {
 
   public boolean running = true;
 
-  private static final Log4jLogger logger = new Log4jLogger(
-      LogManager.getLogger(NodeStashProcessor.class));
+  private static final Log4jLogger logger =
+      new Log4jLogger(LogManager.getLogger(NodeStashProcessor.class));
 
   /**
    * Constructor for NodeStashProcessor.
@@ -29,9 +27,11 @@ public class NodeStashProcessor implements Runnable {
    * @param ownIdentity nodes own identity.
    * @param nodeStashLock node stash lock.
    */
-  public NodeStashProcessor(LinkedBlockingDeque<SkipNodeIdentity> nodeStash,
+  public NodeStashProcessor(
+      LinkedBlockingDeque<SkipNodeIdentity> nodeStash,
       ConcurrentBackupTable backupTableRef,
-      SkipNodeIdentity ownIdentity, Lock nodeStashLock) {
+      SkipNodeIdentity ownIdentity,
+      Lock nodeStashLock) {
     this.nodeStashRef = nodeStash;
     this.backupTableRef = backupTableRef;
     this.ownIdentity = ownIdentity;
@@ -45,7 +45,8 @@ public class NodeStashProcessor implements Runnable {
       try {
         n = nodeStashRef.take();
       } catch (InterruptedException e) {
-        logger.fatal()
+        logger
+            .fatal()
             .addException(e)
             .addInt("num_id", this.ownIdentity.getNumId())
             .addMsg("NodeStashProcessor could not take");
@@ -55,8 +56,7 @@ public class NodeStashProcessor implements Runnable {
         continue;
       }
       int level = SkipNodeIdentity.commonBits(n.getNameId(), ownIdentity.getNameId());
-      if (n.getNumId() < ownIdentity.getNumId()
-          && !backupTableRef.getLefts(level).contains(n)) {
+      if (n.getNumId() < ownIdentity.getNumId() && !backupTableRef.getLefts(level).contains(n)) {
         for (int j = level; j >= 0; j--) {
           backupTableRef.addLeftNode(n, j);
         }

@@ -33,9 +33,9 @@ public class DataNodeTest {
     }
 
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    int nameIDSize = ((int) (Math.log(NODES * (DATANODESPERNODE + 1)) / Math.log(2)));
+    int nameIdSize = ((int) (Math.log(NODES * (DATANODESPERNODE + 1)) / Math.log(2)));
     LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(), STARTING_PORT,
-        false, nameIDSize);
+        false, nameIdSize);
 
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
@@ -67,15 +67,15 @@ public class DataNodeTest {
 
     // Create the name IDs.
     List<String> nameIDs = numIDs.stream()
-        .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIDSize))
+        .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
         .collect(Collectors.toList());
 
     int numDNodes = 0;
     for (SkipNodeInterface node : g.getNodes()) {
       for (int i = 0; i < DATANODESPERNODE; i++) {
-        LookupTable lt = LookupTableFactory.createDefaultLookupTable(nameIDSize);
         SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(numDNodes), numIDs.get(numDNodes),
             node.getIdentity().getAddress(), node.getIdentity().getPort());
+        LookupTable lt = LookupTableFactory.createDefaultLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
         tableMap.put(numIDs.get(numDNodes), lt);
         node.insertDataNode(dNode);

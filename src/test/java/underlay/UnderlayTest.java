@@ -28,7 +28,7 @@ public class UnderlayTest {
    */
   protected static void buildLayers(Underlay underlay) {
     SkipNodeInterface overlay = new SkipNode(LookupTable.EMPTY_NODE,
-        LookupTableFactory.createDefaultLookupTable(2));
+        LookupTableFactory.createDefaultLookupTable(2, LookupTable.EMPTY_NODE));
     MiddleLayer middleLayer = new MiddleLayer(underlay, overlay);
     underlay.setMiddleLayer(middleLayer);
     overlay.setMiddleLayer(middleLayer);

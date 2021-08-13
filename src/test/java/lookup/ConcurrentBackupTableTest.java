@@ -17,7 +17,7 @@ public class ConcurrentBackupTableTest {
   // Initializes the backup table.
   @BeforeEach
   void setUp() {
-    backupTable = new ConcurrentBackupTable(30);
+    backupTable = new ConcurrentBackupTable(30, new SkipNodeIdentity("0000", 1, "None", -1));
     nodesToInsert = new ArrayList<>();
 
     for (int i = 1; i < 10; i++) {

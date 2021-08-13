@@ -31,17 +31,18 @@ public class LocalSkipGraph {
    * @param manualJoin Boolean representing if its manual join or not.
    * @param nameIdSize Integer representing the manual id size.
    */
-  public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin,
-      int nameIdSize) {
+  public LocalSkipGraph(
+      int size, String localAddress, int startingPort, boolean manualJoin, int nameIdSize) {
     // Create the numerical IDs.
     List<Integer> numIds = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       numIds.add(i);
     }
     // Create the name IDs.
-    List<String> nameIds = numIds.stream()
-        .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
-        .collect(Collectors.toList());
+    List<String> nameIds =
+        numIds.stream()
+            .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
+            .collect(Collectors.toList());
     // Randomly assign name IDs.
     Collections.shuffle(nameIds);
     nameIds.forEach(x -> System.out.print(x + " "));
@@ -49,13 +50,13 @@ public class LocalSkipGraph {
     // Create the identities.
     List<SkipNodeIdentity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      identities
-          .add(new SkipNodeIdentity(nameIds.get(i), numIds.get(i), localAddress, startingPort + i));
+      identities.add(
+          new SkipNodeIdentity(nameIds.get(i), numIds.get(i), localAddress, startingPort + i));
     }
     // Construct the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      lookupTables.add(LookupTableFactory.createDefaultLookupTable(nameIdSize));
+      lookupTables.add(LookupTableFactory.createDefaultLookupTable(nameIdSize, identities.get(i)));
     }
     // If manualJoin flag is set, then construct the lookup table manually,
     // i.e. without using the join protocol.
@@ -105,7 +106,7 @@ public class LocalSkipGraph {
   /**
    * Prepends `0`s on the beginning of the given string until the desired length is reached.
    *
-   * @param original     the original string to prepend `0`s on.
+   * @param original the original string to prepend `0`s on.
    * @param targetLength the desired length.
    * @return the prepended string.
    */
@@ -127,7 +128,8 @@ public class LocalSkipGraph {
     // Insert the remaining nodes.
     for (int i = 1; i < getNodes().size(); i++) {
       SkipNode initiator = getNodes().get(i - 1);
-      getNodes().get(i)
+      getNodes()
+          .get(i)
           .insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
     }
   }
@@ -147,7 +149,5 @@ public class LocalSkipGraph {
       SkipNode initiator = list.get(i - 1);
       list.get(i).insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
     }
-
   }
-
 }

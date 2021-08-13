@@ -4,9 +4,7 @@ import skipnode.SkipNodeIdentity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/**
- * Request for releasing lock.
- */
+/** Request for releasing lock. */
 public class ReleaseLockRequest extends Request {
 
   public final SkipNodeIdentity owner;

@@ -3,9 +3,7 @@ package underlay.packets.requests;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/**
- * Request for getting left ladder.
- */
+/** Request for getting left ladder. */
 public class GetLeftLadderRequest extends Request {
 
   public final int level;

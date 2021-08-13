@@ -23,8 +23,8 @@ public class TentativeTable implements Serializable {
    * @param specificLevel Integer representing the specific level.
    * @param neighbors neighbour table.
    */
-  public TentativeTable(boolean complete, int specificLevel,
-      List<List<SkipNodeIdentity>> neighbors) {
+  public TentativeTable(
+      boolean complete, int specificLevel, List<List<SkipNodeIdentity>> neighbors) {
     this.complete = complete;
     this.specificLevel = specificLevel;
     this.neighbors = neighbors;

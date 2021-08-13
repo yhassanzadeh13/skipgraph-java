@@ -4,9 +4,7 @@ import skipnode.SkipNodeIdentity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/**
- * Request for increment.
- */
+/** Request for increment. */
 public class IncrementRequest extends Request {
 
   public final int level;
@@ -23,5 +21,4 @@ public class IncrementRequest extends Request {
     this.level = level;
     this.snId = snId;
   }
-
 }

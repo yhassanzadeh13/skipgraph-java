@@ -4,9 +4,7 @@ import skipnode.SkipNodeIdentity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/**
- * Request for updating left node.
- */
+/** Request for updating left node. */
 public class UpdateLeftNodeRequest extends Request {
 
   public final int level;
@@ -23,5 +21,4 @@ public class UpdateLeftNodeRequest extends Request {
     this.level = level;
     this.snId = snId;
   }
-
 }
