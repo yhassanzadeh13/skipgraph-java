@@ -47,18 +47,18 @@ public class ConcurrentLookupTable implements LookupTable {
   public SkipNodeIdentity updateLeft(SkipNodeIdentity node, int level) {
     lock.writeLock().lock();
     int idx = getIndex(Direction.LEFT, level);
-    logger
-        .debug()
-        .addInt("owner_num_id", owner.getNumId())
-        .addInt("num_id", node.getNumId())
-        .addInt("level", level)
-        .addMsg("updating left");
     if (idx >= nodes.size()) {
       lock.writeLock().unlock();
       return LookupTable.EMPTY_NODE;
     }
     SkipNodeIdentity prev = nodes.set(idx, node);
     lock.writeLock().unlock();
+    logger
+        .debug()
+        .addInt("owner_num_id", owner.getNumId())
+        .addInt("num_id", node.getNumId())
+        .addInt("level", level)
+        .addMsg("updated left");
     return prev;
   }
 
@@ -66,18 +66,18 @@ public class ConcurrentLookupTable implements LookupTable {
   public SkipNodeIdentity updateRight(SkipNodeIdentity node, int level) {
     lock.writeLock().lock();
     int idx = getIndex(Direction.RIGHT, level);
-    logger
-        .debug()
-        .addInt("owner_num_id", owner.getNumId())
-        .addInt("num_id", node.getNumId())
-        .addInt("level", level)
-        .addMsg("updating right");
     if (idx >= nodes.size()) {
       lock.writeLock().unlock();
       return LookupTable.EMPTY_NODE;
     }
     SkipNodeIdentity prev = nodes.set(idx, node);
     lock.writeLock().unlock();
+    logger
+        .debug()
+        .addInt("owner_num_id", owner.getNumId())
+        .addInt("num_id", node.getNumId())
+        .addInt("level", level)
+        .addMsg("updated right");
     return prev;
   }
 
@@ -85,14 +85,14 @@ public class ConcurrentLookupTable implements LookupTable {
   public SkipNodeIdentity getRight(int level) {
     lock.readLock().lock();
     int idx = getIndex(Direction.RIGHT, level);
+    SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
+    lock.readLock().unlock();
     logger
         .debug()
         .addInt("owner_num_id", owner.getNumId())
         .addInt("level", level)
         .addInt("idx", idx)
-        .addMsg("getting right");
-    SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
-    lock.readLock().unlock();
+        .addMsg("got right node");
     return node;
   }
 
@@ -100,14 +100,14 @@ public class ConcurrentLookupTable implements LookupTable {
   public SkipNodeIdentity getLeft(int level) {
     lock.readLock().lock();
     int idx = getIndex(Direction.LEFT, level);
+    SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
+    lock.readLock().unlock();
     logger
         .debug()
         .addInt("owner_num_id", owner.getNumId())
         .addInt("level", level)
         .addInt("idx", idx)
-        .addMsg("getting left");
-    SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
-    lock.readLock().unlock();
+        .addMsg("got right node");
     return node;
   }
 
@@ -184,13 +184,6 @@ public class ConcurrentLookupTable implements LookupTable {
   @Override
   public TentativeTable acquireNeighbors(int newNumId, String newNameId, int level) {
     lock.readLock().lock();
-    logger
-        .debug()
-        .addInt("owner_num_id", owner.getNumId())
-        .addInt("new_num_id", newNumId)
-        .addStr("new_name_id", newNameId)
-        .addInt("level", level)
-        .addMsg("acquiring neighbours");
     List<List<SkipNodeIdentity>> newTable = new ArrayList<>();
     newTable.add(new ArrayList<>());
     newTable.get(0).add(owner);
@@ -200,6 +193,13 @@ public class ConcurrentLookupTable implements LookupTable {
       newTable.get(0).add(getRight(level));
     }
     lock.readLock().unlock();
+    logger
+        .debug()
+        .addInt("owner_num_id", owner.getNumId())
+        .addInt("new_num_id", newNumId)
+        .addStr("new_name_id", newNameId)
+        .addInt("level", level)
+        .addMsg("acquired neighbours");
     return new TentativeTable(false, level, newTable);
   }
 
