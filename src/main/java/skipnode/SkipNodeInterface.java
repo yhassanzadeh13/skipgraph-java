@@ -162,11 +162,4 @@ public interface SkipNodeInterface {
    * @return Boolean value for whether the lock is locked by that address port combination or not.
    */
   boolean isLockedBy(String address, int port);
-
-  /*
-  Test
-   */
-  SkipNodeIdentity increment(SkipNodeIdentity snId, int level);
-
-  boolean inject(List<SkipNodeIdentity> injections);
 }
