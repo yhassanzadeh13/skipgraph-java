@@ -451,12 +451,12 @@ public class SkipNode implements SkipNodeInterface {
    *
    * @param numId The numID to search for
    * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   * the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
-   * direction the search is initiated. For example: Initiating a search for a SkipNode with
-   * NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   * with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   * SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
-   * returned.
+   *         the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
+   *         direction the search is initiated. For example: Initiating a search for a SkipNode with
+   *         NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
+   *         with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   *         SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
+   *         returned.
    */
   @Override
   public SkipNodeIdentity searchByNumId(int numId) {
@@ -552,8 +552,8 @@ public class SkipNode implements SkipNodeInterface {
    *
    * @param targetNameId the target name ID.
    * @param level        the current level.
-   * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix length larger
-   * than `level`.
+   * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix
+   *          length larger than `level`.
    */
   @Override
   public SearchResult searchByNameIdRecursive(String targetNameId, int level) {
