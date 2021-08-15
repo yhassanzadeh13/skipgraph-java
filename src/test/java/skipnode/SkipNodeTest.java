@@ -1,16 +1,15 @@
 package skipnode;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Contains the skip-node tests.
@@ -78,6 +77,43 @@ class SkipNodeTest {
 //        System.out.println(sum);
 //    }
 
+  // Checks the correctness of a lookup table owned by the node with the given identity parameters.
+  static void tableCorrectnessCheck(int numID, String nameID, LookupTable table) {
+    for (int i = 0; i < table.getNumLevels(); i++) {
+      SkipNodeIdentity left = table.getLeft(i);
+      SkipNodeIdentity right = table.getRight(i);
+
+      if (!left.equals(LookupTable.EMPTY_NODE)) {
+        Assertions.assertTrue(left.getNumId() < numID);
+        Assertions.assertTrue(SkipNodeIdentity.commonBits(left.getNameId(), nameID) >= i);
+      }
+
+      if (!right.equals(LookupTable.EMPTY_NODE)) {
+        Assertions.assertTrue(right.getNumId() > numID);
+        Assertions.assertTrue(SkipNodeIdentity.commonBits(right.getNameId(), nameID) >= i);
+      }
+    }
+  }
+
+  // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
+  // then y is a neighbor of x at level l (in opposite directions).
+  static void tableConsistencyCheck(Map<Integer, LookupTable> tableMap, SkipNode node) {
+    LookupTable table = node.getLookupTable();
+    for (int i = 0; i < table.getNumLevels(); i++) {
+      SkipNodeIdentity left = table.getLeft(i);
+      SkipNodeIdentity right = table.getRight(i);
+
+      if (!left.equals(LookupTable.EMPTY_NODE)) {
+        LookupTable neighborMap = tableMap.get(left.getNumId());
+        Assertions.assertTrue(neighborMap.isRightNeighbor(node.getIdentity(), i));
+      }
+
+      if (!right.equals(LookupTable.EMPTY_NODE)) {
+        LookupTable neighborMap = tableMap.get(right.getNumId());
+        Assertions.assertTrue(neighborMap.isLeftNeighbor(node.getIdentity(), i));
+      }
+    }
+  }
 
   @Test
   void concurrentInsertionsAndSearches() {
@@ -336,40 +372,5 @@ class SkipNodeTest {
       }
     }
     underlays.forEach(Underlay::terminate);
-  }
-
-  // Checks the correctness of a lookup table owned by the node with the given identity parameters.
-  static void tableCorrectnessCheck(int numID, String nameID, LookupTable table) {
-    for (int i = 0; i < table.getNumLevels(); i++) {
-      List<SkipNodeIdentity> lefts = table.getLefts(i);
-      List<SkipNodeIdentity> rights = table.getRights(i);
-      for (SkipNodeIdentity l : lefts) {
-        Assertions.assertTrue(l.getNumId() < numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(l.getNameId(), nameID) >= i);
-      }
-      for (SkipNodeIdentity r : rights) {
-        Assertions.assertTrue(r.getNumId() > numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(r.getNameId(), nameID) >= i);
-      }
-    }
-  }
-
-  // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
-  // then y is a neighbor of x at level l (in opposite directions).
-  static void tableConsistencyCheck(Map<Integer, LookupTable> tableMap, SkipNode node) {
-    LookupTable table = node.getLookupTable();
-    for (int i = 0; i < table.getNumLevels(); i++) {
-      List<SkipNodeIdentity> lefts = table.getLefts(i);
-      List<SkipNodeIdentity> rights = table.getRights(i);
-      // Check whether the neighbors agree on the neighborship relationships.
-      for (SkipNodeIdentity l : lefts) {
-        LookupTable neighborMap = tableMap.get(l.getNumId());
-        Assertions.assertTrue(neighborMap.isRightNeighbor(node.getIdentity(), i));
-      }
-      for (SkipNodeIdentity r : rights) {
-        LookupTable neighborMap = tableMap.get(r.getNumId());
-        Assertions.assertTrue(neighborMap.isLeftNeighbor(node.getIdentity(), i));
-      }
-    }
   }
 }

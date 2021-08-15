@@ -1,7 +1,7 @@
 package skipnode;
 
+import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import lookup.LookupTableFactory;
 import middlelayer.MiddleLayer;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
@@ -75,7 +75,7 @@ public class DataNodeTest {
       for (int i = 0; i < DATANODESPERNODE; i++) {
         SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(numDNodes), numIDs.get(numDNodes),
             node.getIdentity().getAddress(), node.getIdentity().getPort());
-        LookupTable lt = LookupTableFactory.createDefaultLookupTable(nameIdSize, dnID);
+        LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
         tableMap.put(numIDs.get(numDNodes), lt);
         node.insertDataNode(dNode);

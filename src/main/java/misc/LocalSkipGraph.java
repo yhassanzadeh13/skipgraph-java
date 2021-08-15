@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import lookup.LookupTableFactory;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
 
@@ -25,11 +25,11 @@ public class LocalSkipGraph {
   /**
    * Constructor for LocalSkipGraph.
    *
-   * @param size Integer representing the size.
+   * @param size         Integer representing the size.
    * @param localAddress String representing the local address.
    * @param startingPort Integer representing the starting port.
-   * @param manualJoin Boolean representing if its manual join or not.
-   * @param nameIdSize Integer representing the manual id size.
+   * @param manualJoin   Boolean representing if its manual join or not.
+   * @param nameIdSize   Integer representing the manual id size.
    */
   public LocalSkipGraph(
       int size, String localAddress, int startingPort, boolean manualJoin, int nameIdSize) {
@@ -45,8 +45,8 @@ public class LocalSkipGraph {
             .collect(Collectors.toList());
     // Randomly assign name IDs.
     Collections.shuffle(nameIds);
-    nameIds.forEach(x -> System.out.print(x + " "));
-    System.out.println();
+    // nameIds.forEach(x -> System.out.print(x + " "));
+
     // Create the identities.
     List<SkipNodeIdentity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
@@ -56,8 +56,11 @@ public class LocalSkipGraph {
     // Construct the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      lookupTables.add(LookupTableFactory.createDefaultLookupTable(nameIdSize, identities.get(i)));
+      ConcurrentLookupTable lookupTable = new ConcurrentLookupTable(nameIdSize, identities.get(i));
+      lookupTables.add(lookupTable);
     }
+
+
     // If manualJoin flag is set, then construct the lookup table manually,
     // i.e. without using the join protocol.
     if (manualJoin) {
@@ -94,19 +97,9 @@ public class LocalSkipGraph {
   }
 
   /**
-   * Returns the list of nodes. Their middle layer needs to be assigned in order for them to be
-   * usable.
-   *
-   * @return the list of nodes.
-   */
-  public List<SkipNode> getNodes() {
-    return skipNodes;
-  }
-
-  /**
    * Prepends `0`s on the beginning of the given string until the desired length is reached.
    *
-   * @param original the original string to prepend `0`s on.
+   * @param original     the original string to prepend `0`s on.
    * @param targetLength the desired length.
    * @return the prepended string.
    */
@@ -117,6 +110,16 @@ public class LocalSkipGraph {
     }
     original = originalBuilder.toString();
     return original;
+  }
+
+  /**
+   * Returns the list of nodes. Their middle layer needs to be assigned in order for them to be
+   * usable.
+   *
+   * @return the list of nodes.
+   */
+  public List<SkipNode> getNodes() {
+    return skipNodes;
   }
 
   /**

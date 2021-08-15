@@ -3,7 +3,6 @@ package middlelayer;
 import java.util.ArrayList;
 import java.util.List;
 import lookup.LookupTable;
-import lookup.TentativeTable;
 import skipnode.SearchResult;
 import skipnode.SkipNodeIdentity;
 import skipnode.SkipNodeInterface;
@@ -32,7 +31,7 @@ import underlay.packets.responses.AckResponse;
 import underlay.packets.responses.BooleanResponse;
 import underlay.packets.responses.IdentityResponse;
 import underlay.packets.responses.SearchResultResponse;
-import underlay.packets.responses.TableResponse;
+
 
 /**
  * Represents a mediator between the overlay and the underlay. The requests coming from the underlay
@@ -479,35 +478,6 @@ public class MiddleLayer {
       return LookupTable.INVALID_NODE;
     }
     return ((IdentityResponse) r).identity;
-  }
-
-  public TentativeTable acquireNeighbors(
-      String destinationAddress, int port, SkipNodeIdentity newNodeId, int level) {
-    return acquireNeighbors(destinationAddress, port, -1, newNodeId, level);
-  }
-
-  /**
-   * Method for acquiring neighbours.
-   *
-   * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param newNodeId skip node identity of the new node.
-   * @param level Integer representing the level.
-   * @return tentative table instance.
-   */
-  public TentativeTable acquireNeighbors(
-      String destinationAddress, int port, int receiverId, SkipNodeIdentity newNodeId, int level) {
-    Request request = new AcquireNeighborsRequest(newNodeId, level);
-    request.receiverId = receiverId;
-    // Send the request through the underlay
-    Response r = send(destinationAddress, port, request);
-    return ((TableResponse) r).table;
-  }
-
-  public SkipNodeIdentity findLadder(
-      String destinationAddress, int port, int level, int direction, String target) {
-    return findLadder(destinationAddress, port, -1, level, direction, target);
   }
 
   /**
