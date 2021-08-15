@@ -5,14 +5,13 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * Example usage:.
- * <p>
- * logger.debug().
- * <br>Int("owner_num_id", this.owner.getNumID()).
- * <br>Float("string key", value).
- * <br>Double("key", value).
- * <br>Str("str", value).
- * <br>Msg("starting insertion");
- * </p>
+ *
+ * <p>logger.debug(). <br>
+ * Int("owner_num_id", this.owner.getNumID()). <br>
+ * Float("string key", value). <br>
+ * Double("key", value). <br>
+ * Str("str", value). <br>
+ * Msg("starting insertion");
  */
 public class Log4jLogger implements LoggerInterface {
 

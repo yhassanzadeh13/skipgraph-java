@@ -7,9 +7,7 @@ import underlay.packets.Request;
 import underlay.packets.Response;
 import underlay.tcp.TcpUnderlay;
 
-/**
- * Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication.
- */
+/** Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication. */
 public abstract class Underlay {
 
   private MiddleLayer middleLayer;
@@ -75,12 +73,11 @@ public abstract class Underlay {
    * Can be used to send a request to a remote server that runs the same underlay architecture.
    *
    * @param address address of the remote server.
-   * @param port    port of the remote server.
+   * @param port port of the remote server.
    * @param request the request.
    * @return response emitted by the remote server.
    */
   public abstract Response sendMessage(String address, int port, Request request);
-
 
   /**
    * Terminates the underlay.

@@ -4,9 +4,7 @@ import skipnode.SkipNodeIdentity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/**
- * Request for acquiring a lock.
- */
+/** Request for acquiring a lock. */
 public class AcquireLockRequest extends Request {
 
   public final SkipNodeIdentity requester;

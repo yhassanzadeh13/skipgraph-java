@@ -3,9 +3,7 @@ package log;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Appender implementation for Log4jLogger.
- */
+/** Appender implementation for Log4jLogger. */
 public class Log4jAppender implements Appender {
 
   private JsonMessage message;

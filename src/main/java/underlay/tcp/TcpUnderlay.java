@@ -9,9 +9,7 @@ import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
 
-/**
- * TCP underlay implementation.
- */
+/** TCP underlay implementation. */
 public class TcpUnderlay extends Underlay {
 
   // The thread that continuously listens for incoming connection in the background.
@@ -46,7 +44,7 @@ public class TcpUnderlay extends Underlay {
    * Method for sending a message.
    *
    * @param address address of the remote server.
-   * @param port    port of the remote serve.r
+   * @param port port of the remote serve.r
    * @param request the request to send.
    * @return the response emitted by the remote server.
    */
