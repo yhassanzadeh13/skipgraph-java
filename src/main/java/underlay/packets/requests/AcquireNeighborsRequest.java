@@ -4,9 +4,7 @@ import skipnode.SkipNodeIdentity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/**
- * Request for acquiring neighbour.
- */
+/** Request for acquiring neighbour. */
 public class AcquireNeighborsRequest extends Request {
 
   public final SkipNodeIdentity newNode;

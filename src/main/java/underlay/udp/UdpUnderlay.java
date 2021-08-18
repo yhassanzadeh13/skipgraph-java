@@ -11,9 +11,7 @@ import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
 
-/**
- * UDP Underlay implementation.
- */
+/** UDP Underlay implementation. */
 public class UdpUnderlay extends Underlay {
 
   /**
@@ -58,7 +56,7 @@ public class UdpUnderlay extends Underlay {
    * defined in `UDPUtils.MAX_PACKET_SIZE`.
    *
    * @param address address of the remote server.
-   * @param port    port of the remote server.
+   * @param port port of the remote server.
    * @param request request to send.
    * @return the response emitted by the server.
    */
@@ -80,8 +78,8 @@ public class UdpUnderlay extends Underlay {
       return null;
     }
     // Then, send the request.
-    DatagramPacket requestPacket = new DatagramPacket(requestBytes, requestBytes.length,
-        destAddress, port);
+    DatagramPacket requestPacket =
+        new DatagramPacket(requestBytes, requestBytes.length, destAddress, port);
     try {
       udpSocket.send(requestPacket);
     } catch (IOException e) {

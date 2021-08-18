@@ -7,9 +7,7 @@ import java.net.InetAddress;
 import underlay.packets.Request;
 import underlay.packets.Response;
 
-/**
- * Represents a thread that handles a UDP request and emits a response.
- */
+/** Represents a thread that handles a UDP request and emits a response. */
 public class UdpHandler implements Runnable {
 
   // The UDP socket that the response will be sent through.
@@ -32,7 +30,10 @@ public class UdpHandler implements Runnable {
    * @param clientPort Integer representing client port.
    * @param underlay UDP underlay instance.
    */
-  public UdpHandler(DatagramSocket udpSocket, Request request, InetAddress clientAddress,
+  public UdpHandler(
+      DatagramSocket udpSocket,
+      Request request,
+      InetAddress clientAddress,
       int clientPort,
       UdpUnderlay underlay) {
     this.udpSocket = udpSocket;
@@ -53,8 +54,8 @@ public class UdpHandler implements Runnable {
       return;
     }
     // Construct the response packet.
-    DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length,
-        clientAddress, clientPort);
+    DatagramPacket responsePacket =
+        new DatagramPacket(responseBytes, responseBytes.length, clientAddress, clientPort);
     // Send the response packet.
     try {
       udpSocket.send(responsePacket);

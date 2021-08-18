@@ -5,9 +5,7 @@ import java.util.Objects;
 import log.Log4jLogger;
 import org.apache.logging.log4j.LogManager;
 
-/**
- * Basic skipnode.SkipNodeIdentity class
- */
+/** Basic skipnode.SkipNodeIdentity class */
 public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdentity> {
 
   private final String nameId;
@@ -18,8 +16,8 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
   // Denotes the lookup table version.
   public int version;
 
-  private static final Log4jLogger logger = new Log4jLogger(
-      LogManager.getLogger(SkipNodeIdentity.class));
+  private static final Log4jLogger logger =
+      new Log4jLogger(LogManager.getLogger(SkipNodeIdentity.class));
 
   /**
    * Constructor for SkipNodeIdentity.
@@ -101,13 +99,20 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
   @Override
   public String toString() {
-    return "Name ID: " + nameId + "\tNum ID: " + numId + "\tAddress: " + address + "\tPort: "
+    return "Name ID: "
+        + nameId
+        + "\tNum ID: "
+        + numId
+        + "\tAddress: "
+        + address
+        + "\tPort: "
         + port;
   }
 
   @Override
   public int compareTo(SkipNodeIdentity o) {
-    logger.debug()
+    logger
+        .debug()
         .addInt("num_id", this.numId)
         .addInt("compared_num_id", o.getNumId())
         .addMsg("currently comparing");

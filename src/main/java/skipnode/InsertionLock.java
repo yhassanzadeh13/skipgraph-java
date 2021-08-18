@@ -12,9 +12,7 @@ public class InsertionLock {
 
   // Represents an acquired lock from a neighbor.
 
-  /**
-   * neighbour instance.
-   */
+  /** neighbour instance. */
   public static class NeighborInstance {
 
     public final SkipNodeIdentity node;
@@ -26,18 +24,14 @@ public class InsertionLock {
     }
   }
 
-  /**
-   * Represents the holder node of this insertion lock.
-   */
+  /** Represents the holder node of this insertion lock. */
   public SkipNodeIdentity holder = null;
-  /**
-   * Represents the node that owns this insertion lock.
-   */
+  /** Represents the node that owns this insertion lock. */
   public SkipNodeIdentity owner;
 
   private final Semaphore locked = new Semaphore(1, true);
-  private static final Log4jLogger logger = new Log4jLogger(
-      LogManager.getLogger(InsertionLock.class));
+  private static final Log4jLogger logger =
+      new Log4jLogger(LogManager.getLogger(InsertionLock.class));
 
   public InsertionLock(SkipNodeIdentity owner) {
     this.owner = owner;
@@ -49,9 +43,7 @@ public class InsertionLock {
    * @return {@code true} if lock is acquired {@code false} otherwise
    */
   public boolean startInsertion() {
-    logger.debug()
-        .addInt("owner_num_id", this.owner.getNumId())
-        .addMsg("starting insertion");
+    logger.debug().addInt("owner_num_id", this.owner.getNumId()).addMsg("starting insertion");
     boolean acquired = locked.tryAcquire();
     if (acquired) {
       holder = null;
@@ -59,19 +51,16 @@ public class InsertionLock {
     return acquired;
   }
 
-  /**
-   * releases the lock if no node holds this insertion lock.
-   */
+  /** releases the lock if no node holds this insertion lock. */
   public void endInsertion() {
-    logger.debug()
-        .addInt("owner_num_id", this.owner.getNumId())
-        .addMsg("ending insertion");
+    logger.debug().addInt("owner_num_id", this.owner.getNumId()).addMsg("ending insertion");
     if (holder == null) {
       locked.release();
     }
   }
 
-  /** Method for trying to acquire insertion lock.
+  /**
+   * Method for trying to acquire insertion lock.
    *
    * @param receiver node that wants to acquire owners insertion lock
    * @return {@code true} if the lock is receiver holds the lock {@code false} otherwise
@@ -84,7 +73,8 @@ public class InsertionLock {
     return acquired;
   }
 
-  /** Method for checking if the lock is locked.
+  /**
+   * Method for checking if the lock is locked.
    *
    * @return {@code true} representing if the lock is locked {@code false} otherwise
    */
@@ -92,15 +82,18 @@ public class InsertionLock {
     return locked.availablePermits() == 0;
   }
 
-  /** Method for checking if the lock holder of this lock has specified address and port.
+  /**
+   * Method for checking if the lock holder of this lock has specified address and port.
    *
    * @param address represents a node address
-   * @param port    represents a node port
+   * @param port represents a node port
    * @return {@code true} if the lock holder of this lock has specified address and port {@code
-   * false} otherwise
+   *     false} otherwise
    */
   public boolean isLockedBy(String address, int port) {
-    return isLocked() && holder != null && holder.getAddress().equals(address)
+    return isLocked()
+        && holder != null
+        && holder.getAddress().equals(address)
         && holder.getPort() == port;
   }
 
