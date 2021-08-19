@@ -14,7 +14,7 @@ import underlay.Underlay;
 /**
  * Contains the skip-node tests.
  */
-class SkipNodeTest {
+public class SkipNodeTest {
 
   static int STARTING_PORT = 8080;
   static int NODES = 16;
@@ -78,7 +78,7 @@ class SkipNodeTest {
 //    }
 
   // Checks the correctness of a lookup table owned by the node with the given identity parameters.
-  static void tableCorrectnessCheck(int numID, String nameID, LookupTable table) {
+  public static void tableCorrectnessCheck(int numID, String nameID, LookupTable table) {
     for (int i = 0; i < table.getNumLevels(); i++) {
       SkipNodeIdentity left = table.getLeft(i);
       SkipNodeIdentity right = table.getRight(i);
@@ -97,7 +97,7 @@ class SkipNodeTest {
 
   // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
   // then y is a neighbor of x at level l (in opposite directions).
-  static void tableConsistencyCheck(Map<Integer, LookupTable> tableMap, SkipNode node) {
+  public static void tableConsistencyCheck(Map<Integer, LookupTable> tableMap, SkipNode node) {
     LookupTable table = node.getLookupTable();
     for (int i = 0; i < table.getNumLevels(); i++) {
       SkipNodeIdentity left = table.getLeft(i);
