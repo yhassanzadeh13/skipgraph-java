@@ -6,9 +6,8 @@ package integration;
  i.e., each node should be able to query every other node by both name and numerical IDs and get the correct response.
  */
 
-
-import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
+import lookup.ConcurrentLookupTable;
 import middlelayer.MiddleLayer;
 import model.NameId;
 import org.junit.jupiter.api.Assertions;
@@ -28,8 +27,12 @@ public class mvpTest {
     static int NODES = 32;
     static ArrayList<SkipNode> skipNodes;
 
-    void createSkipGraph() {
-        underlays = new ArrayList<>(NODES);
+    /**
+     * Creates the skip graph (generates skip nodes), initializes the underlays and middle layers. Inserts the first node.
+     */
+    void createSkipGraph(){
+        List<Underlay> underlays = new ArrayList<>(NODES);
+
         for (int i = 0; i < NODES; i++) {
             Underlay underlay = Underlay.newDefaultUnderlay();
             underlay.initialize(STARTING_PORT + i);
@@ -75,7 +78,9 @@ public class mvpTest {
 
         skipNodes.get(0).insert(null, -1);
     }
-
+    /**
+     * Inserts all of the skip graph nodes (besides the first one), concurrently
+     */
     void doInsertions(){
         Thread[] threads = new Thread[NODES-1];
         // Construct the threads.
@@ -100,6 +105,9 @@ public class mvpTest {
         }
     }
 
+    /**
+     * Does searches based on nameID and numID concurrently for all of the node pairs.
+     */
     void doSearches(){
         Thread[] searchThreads = new Thread[NODES * NODES];
         for(int i = 0; i < NODES; i++) {
@@ -133,6 +141,9 @@ public class mvpTest {
         }
     }
 
+    /**
+     * Create a decentralized skipGraph, insert the nodes concurrently, do searches based on nameID and numID concurrently.
+     */
     @Test
     void MVPTEST(){
         createSkipGraph();
