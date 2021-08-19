@@ -6,8 +6,9 @@ package integration;
  i.e., each node should be able to query every other node by both name and numerical IDs and get the correct response.
  */
 
+
+import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import lookup.LookupTableFactory;
 import middlelayer.MiddleLayer;
 import model.NameId;
 import org.junit.jupiter.api.Assertions;
@@ -27,9 +28,9 @@ public class mvpTest {
     static int NODES = 32;
     static ArrayList<SkipNode> skipNodes;
 
-    void createSkipGraph(){
-        List<Underlay> underlays = new ArrayList<>(NODES);
-        for(int i = 0; i < NODES; i++) {
+    void createSkipGraph() {
+        underlays = new ArrayList<>(NODES);
+        for (int i = 0; i < NODES; i++) {
             Underlay underlay = Underlay.newDefaultUnderlay();
             underlay.initialize(STARTING_PORT + i);
             underlays.add(underlay);
@@ -37,37 +38,35 @@ public class mvpTest {
 
         String localAddress = underlays.get(0).getAddress();
 
-        int nameIDSize = NameId.computeSize(NODES);
+        nameIdSize = NameId.computeSize(NODES);
         // Create the numerical IDs.
         List<Integer> numIDs = new ArrayList<>(NODES);
-        for(int i = 0; i < NODES; i++) numIDs.add(i);
+        for (int i = 0; i < NODES; i++) numIDs.add(i);
         // Create the name IDs.
         List<String> nameIDs = numIDs.stream()
-                .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIDSize))
+                .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
                 .collect(Collectors.toList());
         // Randomly assign name IDs.
         Collections.shuffle(nameIDs);
-        nameIDs.forEach(x -> System.out.print(x + " "));
-        System.out.println();
         // Create the identities.
         List<SkipNodeIdentity> identities = new ArrayList<>(NODES);
-        for(int i = 0; i < NODES; i++) {
+        for (int i = 0; i < NODES; i++) {
             identities.add(new SkipNodeIdentity(nameIDs.get(i), numIDs.get(i), localAddress, STARTING_PORT + i));
         }
         // Construct the lookup tables.
         List<LookupTable> lookupTables = new ArrayList<>(NODES);
-        for(int i = 0; i < NODES; i++) lookupTables.add(LookupTableFactory.createDefaultLookupTable(nameIDSize));
+        for (int i = 0; i < NODES; i++) lookupTables.add(new ConcurrentLookupTable(nameIdSize, identities.get(i)));
 
         // Finally, construct the nodes.
         skipNodes = new ArrayList<>(NODES);
-        for(int i = 0; i < NODES; i++) {
+        for (int i = 0; i < NODES; i++) {
             SkipNode skipNode = new SkipNode(identities.get(i), lookupTables.get(i));
             skipNodes.add(skipNode);
         }
 
 
         // Create the middle layers.
-        for(int i = 0; i < NODES; i++) {
+        for (int i = 0; i < NODES; i++) {
             MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNodes.get(i));
             // Assign the middle layer to the underlay & overlay.
             underlays.get(i).setMiddleLayer(middleLayer);
