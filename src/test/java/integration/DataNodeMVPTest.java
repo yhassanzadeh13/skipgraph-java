@@ -85,8 +85,11 @@ public class DataNodeMVPTest {
 
         skipNodes.get(0).insert(null, -1);
     }
+    
 
-    // the node might be chosen randomly here
+    /**
+     * Just inserts a single data node
+     */
     void insertASingleDataNode() {
         SkipNodeInterface node = skipNodes.get(0);
         SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(0), numIDs.get(0),
@@ -97,7 +100,9 @@ public class DataNodeMVPTest {
         node.insertDataNode(dNode);
     }
 
-    // again the node might be chosen randomly here
+    /**
+     * Inserts multiple data nodes to a single skip node
+     */
     void insertMultipleDataNodesToASingleSkipNode() {
         ArrayList<Thread> threads = new ArrayList<>();
 
@@ -127,6 +132,9 @@ public class DataNodeMVPTest {
         }
     }
 
+    /**
+     * Inserts multiple data nodes to two skip nodes
+     */
     void insertMultipleDataNodesToTwoSkipNodes() {
         ArrayList<Thread> threads = new ArrayList<>();
         int numDNodes = 0;
@@ -159,6 +167,9 @@ public class DataNodeMVPTest {
         }
     }
 
+    /**
+     * The most complete test
+     */
     void insertAllDataNodes() {
         int numDNodes = 0;
         ArrayList<Thread> threads = new ArrayList<>();
@@ -298,8 +309,9 @@ public class DataNodeMVPTest {
         insertNodes();
 
         createIDs();
-        // we can test different combinations using the methods above
-        insertMultipleDataNodesToTwoSkipNodes();
+
+        // we can test different combinations by changing the line below, using the methods above
+        insertAllDataNodes();
 
         tableChecks();
         doSearches();
