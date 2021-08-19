@@ -85,7 +85,7 @@ public class DataNodeMVPTest {
 
         skipNodes.get(0).insert(null, -1);
     }
-    
+
 
     /**
      * Just inserts a single data node
