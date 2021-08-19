@@ -56,8 +56,6 @@ public class DataNodeMVPTest {
                 .collect(Collectors.toList());
         // Randomly assign name IDs.
         Collections.shuffle(nameIDs);
-        nameIDs.forEach(x -> System.out.print(x + " "));
-        System.out.println();
         // Create the identities.
         List<SkipNodeIdentity> identities = new ArrayList<>(NODES);
         for (int i = 0; i < NODES; i++) {
@@ -300,22 +298,36 @@ public class DataNodeMVPTest {
      */
     @Test
     public void dataNodeMVPTest() {
-        createSkipGraph();
-        // Create a map of num ids to their corresponding lookup tables.
-        tableMap = skipNodes.stream()
+        for (int i=0; i<4; i++) {
+            createSkipGraph();
+            // Create a map of num ids to their corresponding lookup tables.
+            tableMap = skipNodes.stream()
                 .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
-        tableChecks();
+            tableChecks();
 
-        insertNodes();
+            insertNodes();
 
-        createIDs();
+            createIDs();
 
-        // we can test different combinations by changing the line below, using the methods above
-        insertAllDataNodes();
+            switch (i){
+                case 0:
+                    insertASingleDataNode();
+                    break;
+                case 1:
+                    insertMultipleDataNodesToASingleSkipNode();
+                    break;
+                case 2:
+                    insertMultipleDataNodesToTwoSkipNodes();
+                    break;
+                case 3:
+                    insertAllDataNodes();
+                    break;
+            }
 
-        tableChecks();
-        doSearches();
-        underlays.forEach(Underlay::terminate);
+            tableChecks();
+            doSearches();
+            underlays.forEach(Underlay::terminate);
+        }
     }
 
 
