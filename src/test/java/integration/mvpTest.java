@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lookup.ConcurrentLookupTable;
@@ -125,6 +127,8 @@ public class mvpTest {
   private void doSearches() {
     AtomicInteger assertionErrorCount = new AtomicInteger();
     Thread[] searchThreads = new Thread[NODES * NODES];
+    CountDownLatch searchDone = new CountDownLatch(searchThreads.length);
+
     for (int i = 0; i < NODES; i++) {
       // Choose the searcher.
       final SkipNode searcher = skipNodes.get(i);
@@ -138,6 +142,8 @@ public class mvpTest {
           } catch (AssertionError error) {
             assertionErrorCount.getAndIncrement();
           }
+
+          searchDone.countDown();
         });
       }
     }
@@ -149,9 +155,9 @@ public class mvpTest {
     }
     // Complete the threads.
     try {
-      for (Thread t : searchThreads) t.join(NODES * 500);
+      boolean doneOnTime = searchDone.await(NODES, TimeUnit.SECONDS);
+      Assertions.assertTrue(doneOnTime, "could not perform searches on time");
     } catch (InterruptedException e) {
-      System.err.println("Could not join the thread.");
       e.printStackTrace();
     }
 
