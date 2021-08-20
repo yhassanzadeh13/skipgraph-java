@@ -41,7 +41,7 @@ public class mvpTest {
 
         String localAddress = underlays.get(0).getAddress();
 
-        nameIdSize = NameId.computeSize(NODES);
+        int nameIdSize = NameId.computeSize(NODES);
         // Create the numerical IDs.
         List<Integer> numIDs = new ArrayList<>(NODES);
         for (int i = 0; i < NODES; i++) numIDs.add(i);
