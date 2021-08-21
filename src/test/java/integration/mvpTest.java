@@ -95,14 +95,17 @@ public class mvpTest {
   private void doInsertions() {
     Thread[] threads = new Thread[NODES - 1];
     Random random = new Random();
+    CountDownLatch insertionDone = new CountDownLatch(threads.length);
 
     // Construct the threads.
     for (int i = 1; i <= threads.length; i++) {
+
       final SkipNode node = skipNodes.get(i);
       // picks random introducer for a node
       final SkipNode introducer = (SkipNode) Utils.randomIndex(skipNodes, random, i);
       threads[i - 1] = new Thread(() -> {
         node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
+        insertionDone.countDown();
       });
     }
 
@@ -111,15 +114,15 @@ public class mvpTest {
       t.start();
     }
     // Wait for the insertions to complete.
-    for (Thread t : threads) {
-      try {
-        t.join(NODES * 500); // join with timeout
-      } catch (InterruptedException e) {
-        System.err.println("Could not join the thread.");
-        e.printStackTrace();
-      }
+    try {
+      boolean doneOnTime = insertionDone.await(60, TimeUnit.SECONDS);
+      Assertions.assertTrue(doneOnTime, "could not perform insertion on time");
+    } catch (InterruptedException e) {
+      System.err.println("Could not join the thread.");
+      e.printStackTrace();
     }
   }
+
 
   /**
    * Does searches based on nameID and numID concurrently for all of the node pairs.
@@ -151,17 +154,17 @@ public class mvpTest {
 
     // Start the search threads.
     for (Thread t : searchThreads) {
-        t.start();
+      t.start();
     }
     // Complete the threads.
     try {
-      boolean doneOnTime = searchDone.await(NODES, TimeUnit.SECONDS);
+      boolean doneOnTime = searchDone.await(60, TimeUnit.SECONDS);
       Assertions.assertTrue(doneOnTime, "could not perform searches on time");
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
 
-    Assertions.assertEquals( 0, assertionErrorCount.get(), "unsuccessful searches results"); // no assertion error should happen in any search thread.
+    Assertions.assertEquals(0, assertionErrorCount.get(), "unsuccessful searches results"); // no assertion error should happen in any search thread.
   }
 
   /**
