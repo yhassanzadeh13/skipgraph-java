@@ -3,17 +3,33 @@ package middlelayer;
 import java.util.ArrayList;
 import java.util.List;
 import lookup.LookupTable;
+import skipnode.SearchResult;
+import skipnode.SkipNodeIdentity;
+import skipnode.SkipNodeInterface;
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
-import underlay.packets.requests.*;
+import underlay.packets.requests.AcquireLockRequest;
+import underlay.packets.requests.AnnounceNeighborRequest;
+import underlay.packets.requests.FindLadderRequest;
+import underlay.packets.requests.GetIdentityRequest;
+import underlay.packets.requests.GetLeftLadderRequest;
+import underlay.packets.requests.GetLeftNodeRequest;
+import underlay.packets.requests.GetRightLadderRequest;
+import underlay.packets.requests.GetRightNodeRequest;
+import underlay.packets.requests.IncrementRequest;
+import underlay.packets.requests.InjectionRequest;
+import underlay.packets.requests.IsAvailableRequest;
+import underlay.packets.requests.ReleaseLockRequest;
+import underlay.packets.requests.SearchByNameIdRecursiveRequest;
+import underlay.packets.requests.SearchByNameIdRequest;
+import underlay.packets.requests.SearchByNumIdRequest;
+import underlay.packets.requests.UpdateLeftNodeRequest;
+import underlay.packets.requests.UpdateRightNodeRequest;
 import underlay.packets.responses.AckResponse;
 import underlay.packets.responses.BooleanResponse;
 import underlay.packets.responses.IdentityResponse;
 import underlay.packets.responses.SearchResultResponse;
-import skipnode.SearchResult;
-import skipnode.SkipNodeIdentity;
-import skipnode.SkipNodeInterface;
 
 
 /**
@@ -641,8 +657,7 @@ public class MiddleLayer {
   /**
    * Terminates the middlelayer and its underlying network.
    *
-   * @return true if the middlelayer stopped successfully. False if there is
-   * an error stopping it.
+   * @return true if the middlelayer stopped successfully. False if there is an error stopping it.
    */
   public boolean terminate() {
     this.underlay.terminate();

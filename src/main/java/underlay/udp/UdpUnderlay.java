@@ -33,22 +33,22 @@ public class UdpUnderlay extends Underlay {
    * Creates a UDP socket at the given port and starts listening it.
    *
    * @param port the port that the underlay should be bound to.
-   * @return whether the initialization was successful.
+   * @return port number underlay initialized on or -1 if initialization is unsuccessful.
    */
   @Override
-  protected boolean initUnderlay(int port) {
+  protected int initUnderlay(int port) {
     // Bind to the given port.
     try {
       udpSocket = new DatagramSocket(port);
     } catch (SocketException e) {
       System.err.println("[UDPUnderlay] Could not initialize at the given port.");
       e.printStackTrace();
-      return false;
+      return -1;
     }
     // Create the listener thread that will continuously listen to the UDP packets.
     listenerThread = new Thread(new UdpListener(udpSocket, this, responseLock));
     listenerThread.start();
-    return true;
+    return udpSocket.getPort();
   }
 
   /**

@@ -166,7 +166,7 @@ public interface SkipNodeInterface {
   /**
    * Terminates the node and its underlying network.
    *
-   * @return true if the node stopped, otherwise, false if there is an error preventing node from stop.
+   * @return true if the node stopped. False if there is an error preventing node from stop.
    */
   boolean terminate();
 }
