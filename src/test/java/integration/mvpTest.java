@@ -14,6 +14,7 @@ import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import misc.Utils;
 import model.NameId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
@@ -27,10 +28,10 @@ import skipnode.SkipNodeIdentity;
  * i.e., each node should be able to query every other node by both name and numerical IDs and get the correct response.
  */
 public class mvpTest {
-  static final int STARTING_PORT = 4444;
-  static final int NODES = 32;
-  static final int NameIdSize = NameId.computeSize(NODES);
-  static ArrayList<SkipNode> skipNodes;
+  private static final int STARTING_PORT = 4444;
+  private static final int NODES = 32;
+  private static final int NameIdSize = NameId.computeSize(NODES);
+  private static ArrayList<SkipNode> skipNodes;
 
   /**
    * Creates the skip graph (generates skip nodes), initializes the underlays and middle layers. Inserts the first node.
@@ -144,9 +145,9 @@ public class mvpTest {
             Assertions.assertEquals(target.getNameId(), res.result.getNameId(), "Source: " + searcher.getNumId() + " Target: " + target.getNameId());
           } catch (AssertionError error) {
             assertionErrorCount.getAndIncrement();
+          } finally {
+            searchDone.countDown();
           }
-
-          searchDone.countDown();
         });
       }
     }
@@ -175,5 +176,15 @@ public class mvpTest {
     createSkipGraph();
     doInsertions();
     doSearches();
+  }
+
+  /**
+   * Terminates all nodes to free up resources.
+   */
+  @AfterAll
+  public static void TearDown(){
+    for(SkipNode skipNode: skipNodes){
+      Assertions.assertTrue(skipNode.terminate());
+    }
   }
 }

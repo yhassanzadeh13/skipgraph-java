@@ -162,4 +162,11 @@ public interface SkipNodeInterface {
    * @return Boolean value for whether the lock is locked by that address port combination or not.
    */
   boolean isLockedBy(String address, int port);
+
+  /**
+   * Terminates the node and its underlying network.
+   *
+   * @return true if the node stopped, otherwise, false if there is an error preventing node from stop.
+   */
+  boolean terminate();
 }
