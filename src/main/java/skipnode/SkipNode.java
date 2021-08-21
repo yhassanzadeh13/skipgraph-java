@@ -520,6 +520,12 @@ public class SkipNode implements SkipNodeInterface {
     return insertionLock.isLockedBy(address, port);
   }
 
+  @Override
+  public boolean terminate() {
+    this.middleLayer.terminate();
+    return true;
+  }
+
   /**
    * Performs a name ID lookup over the skip-graph. If the exact name ID is not found, the most
    * similar one is returned.

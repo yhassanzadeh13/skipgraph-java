@@ -10,7 +10,6 @@ import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
 import underlay.packets.requests.AcquireLockRequest;
-import underlay.packets.requests.AcquireNeighborsRequest;
 import underlay.packets.requests.AnnounceNeighborRequest;
 import underlay.packets.requests.FindLadderRequest;
 import underlay.packets.requests.GetIdentityRequest;
@@ -49,7 +48,7 @@ public class MiddleLayer {
    * Constructor for MiddleLayer.
    *
    * @param underlay underlay instance.
-   * @param overlay Skip node implementation which represents the overlay.
+   * @param overlay  Skip node implementation which represents the overlay.
    */
   public MiddleLayer(Underlay underlay, SkipNodeInterface overlay) {
     this.underlay = underlay;
@@ -62,8 +61,8 @@ public class MiddleLayer {
    * Called by the overlay to send requests to the underlay.
    *
    * @param destinationAddress destination address.
-   * @param port destination port.
-   * @param request the request.
+   * @param port               destination port.
+   * @param request            the request.
    * @return the response emitted by the remote client.
    */
   protected Response send(String destinationAddress, int port, Request request) {
@@ -240,9 +239,9 @@ public class MiddleLayer {
    * Method for searching by the name id.
    *
    * @param destinationAddress String representing the destination address.
-   * @param port Integer representing the port.
-   * @param receiverId ID of the receiver.
-   * @param nameId name id to be searched.
+   * @param port               Integer representing the port.
+   * @param receiverId         ID of the receiver.
+   * @param nameId             name id to be searched.
    * @return Search results from the search.
    */
   public SearchResult searchByNameId(
@@ -263,10 +262,10 @@ public class MiddleLayer {
    * Method for searching by name id recursively.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param target String value representing the target.
-   * @param level Integer representing level.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param target             String value representing the target.
+   * @param level              Integer representing level.
    * @return search result instance.
    */
   public SearchResult searchByNameIdRecursive(
@@ -286,9 +285,9 @@ public class MiddleLayer {
    * Method for searching with numerical id.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param numId target numerical id.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param numId              target numerical id.
    * @return skip node identity.
    */
   public SkipNodeIdentity searchByNumId(
@@ -309,10 +308,10 @@ public class MiddleLayer {
    * Method for trying to acquire the lock.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param req skip node identity.
-   * @param version Integer representing the version.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param req                skip node identity.
+   * @param version            Integer representing the version.
    * @return boolean value representing whether the lock is acquired or not.
    */
   public boolean tryAcquire(
@@ -332,9 +331,9 @@ public class MiddleLayer {
    * Method for unlocking the lock.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param owner owner node.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param owner              owner node.
    * @return boolean value representing if the lock is unlocked or not.
    */
   public boolean unlock(
@@ -354,10 +353,10 @@ public class MiddleLayer {
    * Method for updating the right node.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param snId skip node identity.
-   * @param level Integer representing the level.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param snId               skip node identity.
+   * @param level              Integer representing the level.
    * @return skip node identity.
    */
   public SkipNodeIdentity updateRightNode(
@@ -378,10 +377,10 @@ public class MiddleLayer {
    * Method for updating the left node.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param snId skip node identity.
-   * @param level Integer representing the level.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param snId               skip node identity.
+   * @param level              Integer representing the level.
    * @return skip node identity.
    */
   public SkipNodeIdentity updateLeftNode(
@@ -401,8 +400,8 @@ public class MiddleLayer {
    * Method for getting the identity.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
    * @return skip node identity.
    */
   public SkipNodeIdentity getIdentity(String destinationAddress, int port, int receiverId) {
@@ -424,11 +423,11 @@ public class MiddleLayer {
   /**
    * Method for getting the right node.
    *
-   * @param backoff boolean value for back off.
+   * @param backoff            boolean value for back off.
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param level Integer representing the level
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param level              Integer representing the level
    * @return skip node identity.
    */
   public SkipNodeIdentity getRightNode(
@@ -458,11 +457,11 @@ public class MiddleLayer {
   /**
    * Method for getting the left node.
    *
-   * @param backoff boolean value for back off.
+   * @param backoff            boolean value for back off.
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param level Integer representing the level
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param level              Integer representing the level
    * @return skip node identity.
    */
   public SkipNodeIdentity getLeftNode(
@@ -484,11 +483,11 @@ public class MiddleLayer {
    * Method for finding a ladder.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param level Integer representing the level.
-   * @param direction Integer representing the direction.
-   * @param target String representing the target.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param level              Integer representing the level.
+   * @param direction          Integer representing the direction.
+   * @param target             String representing the target.
    * @return skip node identity.
    */
   public SkipNodeIdentity findLadder(
@@ -514,10 +513,10 @@ public class MiddleLayer {
    * Method for announcing a new neighbour.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param newNeighbor skip node identity of the new neighbour.
-   * @param minLevel Integer representing the minimum level.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param newNeighbor        skip node identity of the new neighbour.
+   * @param minLevel           Integer representing the minimum level.
    */
   public void announceNeighbor(
       String destinationAddress,
@@ -539,8 +538,8 @@ public class MiddleLayer {
    * Method for checking if node is available or not.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
    * @return boolean representing if node is available or not.
    */
   public boolean isAvailable(String destinationAddress, int port, int receiverId) {
@@ -559,10 +558,10 @@ public class MiddleLayer {
    * Method for getting the left ladder.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param level Integer representing the level.
-   * @param nameId String representing the name id of the node.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param level              Integer representing the level.
+   * @param nameId             String representing the name id of the node.
    * @return skip node identity.
    */
   public SkipNodeIdentity getLeftLadder(
@@ -583,10 +582,10 @@ public class MiddleLayer {
    * Method for getting the right ladder.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param level Integer representing the level.
-   * @param nameId String representing the name id of the node.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param level              Integer representing the level.
+   * @param nameId             String representing the name id of the node.
    * @return skip node identity.
    */
   public SkipNodeIdentity getRightLadder(
@@ -607,10 +606,10 @@ public class MiddleLayer {
    * Method for increment.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param snId skip node identity.
-   * @param level Integer representing the level.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param snId               skip node identity.
+   * @param level              Integer representing the level.
    * @return skip node identity.
    */
   public SkipNodeIdentity increment(
@@ -638,9 +637,9 @@ public class MiddleLayer {
    * Method for injection.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port Integer value representing the port.
-   * @param receiverId receiver id.
-   * @param snIds list of skip node identities for injection.
+   * @param port               Integer value representing the port.
+   * @param receiverId         receiver id.
+   * @param snIds              list of skip node identities for injection.
    * @return boolean value representing if injection succeeded or not.
    */
   public boolean inject(
@@ -653,5 +652,15 @@ public class MiddleLayer {
       System.exit(1);
     }
     return ((BooleanResponse) response).answer;
+  }
+
+  /**
+   * Terminates the middlelayer and its underlying network.
+   *
+   * @return true if the middlelayer stopped successfully. False if there is an error stopping it.
+   */
+  public boolean terminate() {
+    this.underlay.terminate();
+    return true;
   }
 }
