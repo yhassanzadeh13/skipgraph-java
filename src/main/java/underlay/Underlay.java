@@ -7,7 +7,9 @@ import underlay.packets.Request;
 import underlay.packets.Response;
 import underlay.tcp.TcpUnderlay;
 
-/** Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication. */
+/**
+ * Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication.
+ */
 public abstract class Underlay {
 
   private MiddleLayer middleLayer;
@@ -15,6 +17,15 @@ public abstract class Underlay {
   private int port;
   private String address;
   private String fullAddress;
+
+  /**
+   * Constructs a new default underlay. Must be initialized and connected to the middle layer.
+   *
+   * @return a new default underlay.
+   */
+  public static Underlay newDefaultUnderlay() {
+    return new TcpUnderlay();
+  }
 
   public void setMiddleLayer(MiddleLayer middleLayer) {
     this.middleLayer = middleLayer;
@@ -49,6 +60,11 @@ public abstract class Underlay {
    * @return true iff the initialization was successful.
    */
   public final boolean initialize(int port) {
+    port = initUnderlay(port);
+    if (port <= 0) {
+      return false;
+    }
+
     this.port = port;
     try {
       address = Inet4Address.getLocalHost().getHostAddress();
@@ -58,22 +74,22 @@ public abstract class Underlay {
       return false;
     }
     fullAddress = address + ":" + port;
-    return initUnderlay(port);
+    return true;
   }
 
   /**
    * Contains the underlay-specific initialization procedures.
    *
    * @param port the port that the underlay should be bound to.
-   * @return true iff the initialization was successful.
+   * @return port number underlay initialized on or -1 if initialization is unsuccessful.
    */
-  protected abstract boolean initUnderlay(int port);
+  protected abstract int initUnderlay(int port);
 
   /**
    * Can be used to send a request to a remote server that runs the same underlay architecture.
    *
    * @param address address of the remote server.
-   * @param port port of the remote server.
+   * @param port    port of the remote server.
    * @param request the request.
    * @return response emitted by the remote server.
    */
@@ -85,14 +101,4 @@ public abstract class Underlay {
    * @return true iff the termination was successful.
    */
   public abstract boolean terminate();
-
-  /**
-   * Constructs a new default underlay. Must be initialized and connected to the middle layer.
-   *
-   * @return a new default underlay.
-   */
-  public static Underlay newDefaultUnderlay() {
-    // By default, we use Java RMI Underlay.
-    return new TcpUnderlay();
-  }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
+import model.NameId;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
 
@@ -19,7 +20,7 @@ public class LocalSkipGraph {
   private final List<SkipNode> skipNodes;
 
   public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin) {
-    this(size, localAddress, startingPort, manualJoin, ((int) (Math.log(size) / Math.log(2))));
+    this(size, localAddress, startingPort, manualJoin, NameId.computeSize(size));
   }
 
   /**
