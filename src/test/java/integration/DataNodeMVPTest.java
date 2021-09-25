@@ -1,9 +1,14 @@
 package integration;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
+import misc.Utils;
 import model.NameId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import skipnode.SearchResult;
@@ -30,7 +35,6 @@ public class DataNodeMVPTest {
     Map<Integer, LookupTable> tableMap;
     List<Integer> numIDs;
     List<String> nameIDs;
-    List<Consumer> testMethodList = new ArrayList<>();
 
 
     /**
@@ -103,6 +107,7 @@ public class DataNodeMVPTest {
      */
     void insertMultipleDataNodesToASingleSkipNode() {
         ArrayList<Thread> threads = new ArrayList<>();
+        CountDownLatch insertionDone = new CountDownLatch(DATANODESPERNODE);
 
         SkipNodeInterface node = skipNodes.get(0);
         for (int i = 0; i < DATANODESPERNODE; i++) {
@@ -113,20 +118,20 @@ public class DataNodeMVPTest {
             tableMap.put(numIDs.get(i), lt);
             threads.add(new Thread(() -> {
                 node.insertDataNode(dNode);
+                insertionDone.countDown();
             }));
         }
         // Initiate the insertions.
         for (Thread t : threads) {
             t.start();
         }
-        // Wait for the insertions to complete.
-        for (Thread t : threads) {
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                System.err.println("Could not join the thread.");
-                e.printStackTrace();
-            }
+
+        try {
+            boolean doneOnTime = insertionDone.await(60, TimeUnit.SECONDS);
+            Assertions.assertTrue(doneOnTime, "could not perform insertion on time");
+        } catch (InterruptedException e) {
+            System.err.println("Could not join the thread.");
+            e.printStackTrace();
         }
     }
 
@@ -135,6 +140,8 @@ public class DataNodeMVPTest {
      */
     void insertMultipleDataNodesToTwoSkipNodes() {
         ArrayList<Thread> threads = new ArrayList<>();
+        CountDownLatch insertionDone = new CountDownLatch(DATANODESPERNODE * 2);
+
         int numDNodes = 0;
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < DATANODESPERNODE; i++) {
@@ -147,6 +154,7 @@ public class DataNodeMVPTest {
                 numDNodes++;
                 threads.add(new Thread(() -> {
                     node.insertDataNode(dNode);
+                    insertionDone.countDown();
                 }));
             }
         }
@@ -155,13 +163,12 @@ public class DataNodeMVPTest {
             t.start();
         }
         // Wait for the insertions to complete.
-        for (Thread t : threads) {
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                System.err.println("Could not join the thread.");
-                e.printStackTrace();
-            }
+        try {
+            boolean doneOnTime = insertionDone.await(60, TimeUnit.SECONDS);
+            Assertions.assertTrue(doneOnTime, "could not perform insertion on time");
+        } catch (InterruptedException e) {
+            System.err.println("Could not join the thread.");
+            e.printStackTrace();
         }
     }
 
@@ -171,6 +178,8 @@ public class DataNodeMVPTest {
     void insertAllDataNodes() {
         int numDNodes = 0;
         ArrayList<Thread> threads = new ArrayList<>();
+        CountDownLatch insertionDone = new CountDownLatch(skipNodes.size() * DATANODESPERNODE);
+
         // Construct the threads.
         for (int j = 0; j < skipNodes.size(); j++) {
             for (int i = 0; i < DATANODESPERNODE; i++) {
@@ -183,6 +192,7 @@ public class DataNodeMVPTest {
                 numDNodes++;
                 threads.add(new Thread(() -> {
                     node.insertDataNode(dNode);
+                    insertionDone.countDown();
                 }));
             }
         }
@@ -191,13 +201,12 @@ public class DataNodeMVPTest {
             t.start();
         }
         // Wait for the insertions to complete.
-        for (Thread t : threads) {
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                System.err.println("Could not join the thread.");
-                e.printStackTrace();
-            }
+        try {
+            boolean doneOnTime = insertionDone.await(60, TimeUnit.SECONDS);
+            Assertions.assertTrue(doneOnTime, "could not perform insertion on time");
+        } catch (InterruptedException e) {
+            System.err.println("Could not join the thread.");
+            e.printStackTrace();
         }
     }
 
@@ -206,33 +215,43 @@ public class DataNodeMVPTest {
      */
     void insertNodes() {
         Thread[] threads = new Thread[NODES - 1];
+        Random random = new Random();
+        CountDownLatch insertionDone = new CountDownLatch(threads.length);
+
         // Construct the threads.
         for (int i = 1; i <= threads.length; i++) {
+
             final SkipNode node = skipNodes.get(i);
-            Random rand = new Random();
-            final SkipNode introducer = skipNodes.get((int) (Math.random() * i));
+            // picks random introducer for a node
+            final SkipNode introducer = (SkipNode) Utils.randomIndex(skipNodes, random, i);
             threads[i - 1] = new Thread(() -> {
                 node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
+                insertionDone.countDown();
             });
         }
+
         // Initiate the insertions.
-        for (Thread t : threads) t.start();
-        // Wait for the insertions to complete.
         for (Thread t : threads) {
-            try {
-                t.join();
-            } catch (InterruptedException e) {
-                System.err.println("Could not join the thread.");
-                e.printStackTrace();
-            }
+            t.start();
+        }
+        // Wait for the insertions to complete.
+        try {
+            boolean doneOnTime = insertionDone.await(60, TimeUnit.SECONDS);
+            Assertions.assertTrue(doneOnTime, "could not perform insertion on time");
+        } catch (InterruptedException e) {
+            System.err.println("Could not join the thread.");
+            e.printStackTrace();
         }
     }
 
     /**
      * Method borrowed from MVPTest
      */
-    void doSearches() {
+    private void doSearches() {
+        AtomicInteger assertionErrorCount = new AtomicInteger();
         Thread[] searchThreads = new Thread[NODES * NODES];
+        CountDownLatch searchDone = new CountDownLatch(searchThreads.length);
+
         for (int i = 0; i < NODES; i++) {
             // Choose the searcher.
             final SkipNode searcher = skipNodes.get(i);
@@ -240,28 +259,31 @@ public class DataNodeMVPTest {
                 // Choose the target.
                 final SkipNode target = skipNodes.get(j);
                 searchThreads[i + NODES * j] = new Thread(() -> {
-                    // Wait for at most 5 seconds to avoid congestion.
-                    try {
-                        Thread.sleep((int) (Math.random() * 5000));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     SearchResult res = searcher.searchByNameId(target.getNameId());
-                    Assertions.assertEquals(target.getNameId(), res.result.getNameId(), "Source: " + searcher.getNumId() + " Target: " + target.getNameId());
+                    try {
+                        Assertions.assertEquals(target.getNameId(), res.result.getNameId(), "Source: " + searcher.getNumId() + " Target: " + target.getNameId());
+                    } catch (AssertionError error) {
+                        assertionErrorCount.getAndIncrement();
+                    } finally {
+                        searchDone.countDown();
+                    }
                 });
             }
         }
+
         // Start the search threads.
         for (Thread t : searchThreads) {
             t.start();
         }
         // Complete the threads.
         try {
-            for (Thread t : searchThreads) t.join();
+            boolean doneOnTime = searchDone.await(60, TimeUnit.SECONDS);
+            Assertions.assertTrue(doneOnTime, "could not perform searches on time");
         } catch (InterruptedException e) {
-            System.err.println("Could not join the thread.");
             e.printStackTrace();
         }
+
+        Assertions.assertEquals(0, assertionErrorCount.get(), "unsuccessful searches results"); // no assertion error should happen in any search thread.
     }
 
     /**
@@ -330,5 +352,14 @@ public class DataNodeMVPTest {
         }
     }
 
+    /**
+     * Terminates all nodes to free up resources.
+     */
+    @AfterAll
+    public static void TearDown(){
+        for(SkipNode skipNode: skipNodes){
+            Assertions.assertTrue(skipNode.terminate());
+        }
+    }
 
 }
