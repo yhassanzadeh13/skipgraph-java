@@ -21,10 +21,10 @@ public class TcpUnderlay extends Underlay {
    * Creates a TCP socket at the given port and starts listening it.
    *
    * @param port the port that the underlay should be bound to.
-   * @return true iff initialization is successful.
+   * @return port number underlay initialized on or -1 if initialization is unsuccessful.
    */
   @Override
-  protected boolean initUnderlay(int port) {
+  protected int initUnderlay(int port) {
     try {
       // Create the TCP socket at the given port.
       serverSocket = new ServerSocket(port);
@@ -32,13 +32,13 @@ public class TcpUnderlay extends Underlay {
     } catch (IOException e) {
       System.err.println("[TCPUnderlay] Could not initialize at the given port.");
       e.printStackTrace();
-      return false;
+      return -1;
     }
     // Create & start the listening thread which will continuously listen for incoming connections
     // and handle the requests as implemented in the `RequestHandler` class.
     listenerThread = new Thread(new TcpListener(serverSocket, this));
     listenerThread.start();
-    return true;
+    return serverSocket.getLocalPort();
   }
 
   /**

@@ -2,6 +2,7 @@ package underlay.javarmi;
 
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.ExportException;
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
@@ -37,20 +38,26 @@ public class JavaRmiUnderlay extends Underlay {
    * Constructs a `JavaRMIHost` instance and binds it to the given port.
    *
    * @param port the port that the underlay should be bound to.
-   * @return true iff the Java RMI initialization was successful.
+   * @return  port number underlay initialized on or -1 if initialization is unsuccessful.
    */
   @Override
-  protected boolean initUnderlay(int port) {
+  protected int initUnderlay(int port) {
     try {
       host = new JavaRmiHost(this);
       // Bind this RMI adapter to the given port.
       LocateRegistry.createRegistry(port).rebind("node", host);
+
+    } catch (ExportException e) {
+      port = (port + 1) % 60000; // tries another port in this range.
+      return initUnderlay(port);
+
     } catch (Exception e) {
       System.err.println("[JavaRMIUnderlay] Error while initializing at port " + port);
       e.printStackTrace();
-      return false;
+      return -1;
     }
-    return true;
+
+    return port;
   }
 
   /**

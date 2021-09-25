@@ -14,4 +14,5 @@ public class NameId {
   public static int computeSize(int nodes) {
     return ((int) (Math.log(nodes) / Math.log(2)));
   }
+
 }
