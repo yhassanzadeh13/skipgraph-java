@@ -24,6 +24,11 @@ public abstract class Underlay {
     return port;
   }
 
+  public void setPort(int port) {
+    this.port = port;
+    this.fullAddress = address + port;
+  }
+
   public String getAddress() {
     return address;
   }

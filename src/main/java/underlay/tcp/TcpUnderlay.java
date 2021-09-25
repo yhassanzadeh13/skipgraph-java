@@ -28,6 +28,7 @@ public class TcpUnderlay extends Underlay {
     try {
       // Create the TCP socket at the given port.
       serverSocket = new ServerSocket(port);
+      setPort(serverSocket.getLocalPort());
     } catch (IOException e) {
       System.err.println("[TCPUnderlay] Could not initialize at the given port.");
       e.printStackTrace();

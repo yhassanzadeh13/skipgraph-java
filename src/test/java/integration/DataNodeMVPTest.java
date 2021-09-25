@@ -44,7 +44,7 @@ public class DataNodeMVPTest {
         underlays = new ArrayList<>(NODES);
         for (int i = 0; i < NODES; i++) {
             Underlay underlay = Underlay.newDefaultUnderlay();
-            underlay.initialize(STARTING_PORT + i);
+            underlay.initialize(0);
             underlays.add(underlay);
         }
 
@@ -63,7 +63,7 @@ public class DataNodeMVPTest {
         // Create the identities.
         List<SkipNodeIdentity> identities = new ArrayList<>(NODES);
         for (int i = 0; i < NODES; i++) {
-            identities.add(new SkipNodeIdentity(nameIDs.get(i), numIDs.get(i), localAddress, STARTING_PORT + i));
+            identities.add(new SkipNodeIdentity(nameIDs.get(i), numIDs.get(i), localAddress, underlays.get(i).getPort()));
         }
         // Construct the lookup tables.
         List<LookupTable> lookupTables = new ArrayList<>(NODES);
