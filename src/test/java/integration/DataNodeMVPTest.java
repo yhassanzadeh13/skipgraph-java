@@ -15,7 +15,10 @@ import middlelayer.MiddleLayer;
 import misc.Utils;
 import model.NameId;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import skipnode.SearchResult;
 import skipnode.SkipNode;
@@ -40,8 +43,8 @@ public class DataNodeMVPTest {
   /**
    * Terminates all nodes to free up resources.
    */
-  @AfterAll
-  public static void TearDown() {
+  @AfterEach
+  public void TearDown() {
     for (SkipNode skipNode : skipNodes) {
       Assertions.assertTrue(skipNode.terminate());
     }
@@ -303,7 +306,7 @@ public class DataNodeMVPTest {
         .collect(Collectors.toList());
   }
 
-  /**
+    /**
    * Test inspired by DataNodeTest, with the following differences:
    * <p>
    * Instead of a LocalSkipGraph we use an actual skip graph similar to mvp test.
@@ -311,37 +314,46 @@ public class DataNodeMVPTest {
    * Instead of just checking for consistency, we search for inserted data nodes concurrently (each search in a thread), and see if the result is correct.
    */
   @Test
-  public void dataNodeMVPTest() throws InterruptedException {
-    for (int i = 0; i < 4; i++) {
-      createSkipGraph();
-      // Create a map of num ids to their corresponding lookup tables.
-      tableMap = skipNodes.stream()
-          .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
-      tableChecks();
+  public void MultipleDataNodesOnMultipleSkipGraphNodes() throws InterruptedException{
+    insertAllDataNodes();
+    tableChecks();
+    doSearches();
+  }
 
-      insertNodes();
+  @Test
+  public void MultipleDataNodesOnTwoSkipGraphNodes() throws InterruptedException{
+    insertMultipleDataNodesToTwoSkipNodes();
+    tableChecks();
+    doSearches();
+  }
 
-      createIDs();
+  @Test
+  public void MultipleDataNodesOnASingleSkipGraphNode() throws InterruptedException{
+    insertMultipleDataNodesToASingleSkipNode();
+    tableChecks();
+    doSearches();
+  }
 
-      switch (i) {
-        case 0:
-          insertASingleDataNode();
-          break;
-        case 1:
-          insertMultipleDataNodesToASingleSkipNode();
-          break;
-        case 2:
-          insertMultipleDataNodesToTwoSkipNodes();
-          break;
-        case 3:
-          insertAllDataNodes();
-          break;
-      }
+  @Test
+  public void SingleDataNodeTest(){
+    insertASingleDataNode();
+    tableChecks();
+    doSearches();
+  }
 
-      tableChecks();
-      doSearches();
-      underlays.forEach(Underlay::terminate);
-    }
+  @BeforeEach
+  public void Setup() throws InterruptedException{
+    createSkipGraph();
+    // Create a map of num ids to their corresponding lookup tables.
+
+    tableMap = skipNodes.stream()
+        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
+
+    tableChecks();
+
+    insertNodes();
+
+    createIDs();
   }
 
 }
