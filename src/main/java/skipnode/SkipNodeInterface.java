@@ -1,19 +1,23 @@
 package skipnode;
 
-import java.util.List;
+
 import middlelayer.MiddleLayer;
 
-/** Skip Node interface. */
+/**
+ * Skip Node interface.
+ */
 public interface SkipNodeInterface {
 
-  /** Set the middle layer which would handle communication with remote nodes. */
+  /**
+   * Set the middle layer which would handle communication with remote nodes.
+   */
   void setMiddleLayer(MiddleLayer middleLayer);
 
   /**
    * Add the SkipNode to the SkipGraph through an introducer.
    *
    * @param introducerAddress the address of the introducer.
-   * @param introducerPort the port of the introducer.
+   * @param introducerPort    the port of the introducer.
    */
   void insert(String introducerAddress, int introducerPort);
 
@@ -46,7 +50,7 @@ public interface SkipNodeInterface {
    * used during concurrent insertion (i.e., ConcurrentBackupTable is being used.).
    *
    * @param newNeighbor the identity of the new neighbor.
-   * @param minLevel the minimum level in which the new neighbor should be connected.
+   * @param minLevel    the minimum level in which the new neighbor should be connected.
    */
   void announceNeighbor(SkipNodeIdentity newNeighbor, int minLevel);
 
@@ -62,12 +66,12 @@ public interface SkipNodeInterface {
    *
    * @param numId The numID to search for
    * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   *     the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
-   *     direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *     NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   *     with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   *     SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
-   *     returned.
+   * the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
+   * direction the search is initiated. For example: Initiating a search for a SkipNode with
+   * NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
+   * with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   * SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
+   * returned.
    */
   SkipNodeIdentity searchByNumId(int numId);
 
@@ -76,8 +80,8 @@ public interface SkipNodeInterface {
    *
    * @param nameId The nameID to search for
    * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist
-   *     returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
-   *     nodes in the SkipGraph. Also contains the piggybacked information.
+   * returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
+   * nodes in the SkipGraph. Also contains the piggybacked information.
    */
   SearchResult searchByNameId(String nameId);
 
@@ -85,7 +89,7 @@ public interface SkipNodeInterface {
    * Used by the `searchByNameID` method. Implements a recursive name ID search algorithm.
    *
    * @param target the target name ID.
-   * @param level the current level.
+   * @param level  the current level.
    * @return the identity of the node with the given name ID, or the node with the closest name ID.
    */
   SearchResult searchByNameIdRecursive(String target, int level);
@@ -93,7 +97,7 @@ public interface SkipNodeInterface {
   /**
    * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity.
    *
-   * @param snId The new SkipNodeIdentity to be placed in the given level
+   * @param snId  The new SkipNodeIdentity to be placed in the given level
    * @param level The level to place the given SkipNodeIdentity
    * @return The SkipNodeIdentity that was replaced (Could be an EMPTY_NODE)
    */
@@ -102,7 +106,7 @@ public interface SkipNodeInterface {
   /**
    * Updates the SkipNode on the right on the given level to the given SkipNodeIdentity.
    *
-   * @param snId The new SkipNodeIdentity to be placed in the given level
+   * @param snId  The new SkipNodeIdentity to be placed in the given level
    * @param level The level to place the given SkipNodeIdentity
    * @return The SkipNodeIdentity that was replaced (Could be an EMPTY_NODE)
    */
@@ -158,7 +162,7 @@ public interface SkipNodeInterface {
    * Method for checking if the lock is locked by that address port combination.
    *
    * @param address String value representing the address.
-   * @param port Integer value representing the port.
+   * @param port    Integer value representing the port.
    * @return Boolean value for whether the lock is locked by that address port combination or not.
    */
   boolean isLockedBy(String address, int port);
