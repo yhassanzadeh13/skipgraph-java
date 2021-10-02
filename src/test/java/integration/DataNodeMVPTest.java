@@ -30,9 +30,8 @@ import static skipnode.SkipNodeTest.tableConsistencyCheck;
 import static skipnode.SkipNodeTest.tableCorrectnessCheck;
 
 public class DataNodeMVPTest {
-  static int STARTING_PORT = 8000;
-  static int NODES = 8;
-  static int DATANODESPERNODE = 3;
+  static int NODES = 20;
+  static int DATANODESPERNODE = 5;
   static ArrayList<SkipNode> skipNodes;
   List<Underlay> underlays;
   int nameIdSize;
@@ -154,8 +153,11 @@ public class DataNodeMVPTest {
     for (int j = 0; j < 2; j++) {
       for (int i = 0; i < DATANODESPERNODE; i++) {
         SkipNodeInterface node = skipNodes.get(j);
-        SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(numDNodes), numIDs.get(numDNodes),
-            node.getIdentity().getAddress(), node.getIdentity().getPort());
+        SkipNodeIdentity dnID = new SkipNodeIdentity(
+            nameIDs.get(numDNodes),
+            numIDs.get(numDNodes),
+            node.getIdentity().getAddress(),
+            node.getIdentity().getPort());
         LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
         tableMap.put(numIDs.get(numDNodes), lt);
@@ -185,11 +187,14 @@ public class DataNodeMVPTest {
     CountDownLatch insertionDone = new CountDownLatch(skipNodes.size() * DATANODESPERNODE);
 
     // Construct the threads.
-    for (int j = 0; j < skipNodes.size(); j++) {
+    for (SkipNode skipNode : skipNodes) {
       for (int i = 0; i < DATANODESPERNODE; i++) {
-        SkipNodeInterface node = skipNodes.get(j);
-        SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(numDNodes), numIDs.get(numDNodes),
-            node.getIdentity().getAddress(), node.getIdentity().getPort());
+        SkipNodeInterface node = skipNode;
+        SkipNodeIdentity dnID = new SkipNodeIdentity(
+            nameIDs.get(numDNodes),
+            numIDs.get(numDNodes),
+            node.getIdentity().getAddress(),
+            node.getIdentity().getPort());
         LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
         tableMap.put(numIDs.get(numDNodes), lt);
@@ -256,9 +261,10 @@ public class DataNodeMVPTest {
         searchThreads[i + NODES * j] = new Thread(() -> {
           SearchResult res = searcher.searchByNameId(target.getNameId());
           try {
-            Assertions.assertEquals(target.getNameId(), res.result.getNameId(), "Source: " + searcher.getNumId() + " Target: " + target.getNameId());
+            Assertions.assertEquals(target.getNameId(), res.result.getNameId());
           } catch (AssertionError error) {
             assertionErrorCount.getAndIncrement();
+            System.err.println("wrong result for search by name id, source: " + searcher.getNumId() + " target: " + target.getNameId());
           } finally {
             searchDone.countDown();
           }
