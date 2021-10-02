@@ -7,7 +7,6 @@ import middlelayer.MiddleLayer;
  * Skip Node interface.
  */
 public interface SkipNodeInterface {
-
   /**
    * Set the middle layer which would handle communication with remote nodes.
    */
@@ -65,13 +64,13 @@ public interface SkipNodeInterface {
    * Search for the given numID.
    *
    * @param numId The numID to search for
-   * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   * the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
-   * direction the search is initiated. For example: Initiating a search for a SkipNode with
-   * NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   * with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   * SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
-   * returned.
+   * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns *
+   *         the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
+   *         direction the search is initiated. For example: Initiating a search for a SkipNode with
+   *         NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
+   *         with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   *         SkipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
+   *         returned.
    */
   SkipNodeIdentity searchByNumId(int numId);
 
@@ -79,9 +78,10 @@ public interface SkipNodeInterface {
    * Search for the given nameID.
    *
    * @param nameId The nameID to search for
-   * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist
-   * returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
-   * nodes in the SkipGraph. Also contains the piggybacked information.
+   * @return The SkipNodeIdentity of the SkipNode with the given nameID.
+   *         If it does not exist returns the SkipNodeIdentity of the
+   *         SkipNode which shares the longest
+   *         prefix among the nodes in the SkipGraph. Also contains the piggybacked information.
    */
   SearchResult searchByNameId(String nameId);
 
