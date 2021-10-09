@@ -12,7 +12,7 @@ public class NameId {
    * @return name ID size
    */
   public static int computeSize(int nodes) {
-    return ((int) (Math.log(nodes) / Math.log(2)));
+    return (int) Math.ceil( Math.log(nodes) / Math.log(2));
   }
 
 }
