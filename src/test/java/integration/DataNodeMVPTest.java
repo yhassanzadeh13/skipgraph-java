@@ -14,10 +14,8 @@ import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import misc.Utils;
 import model.NameId;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import skipnode.SearchResult;
@@ -32,6 +30,7 @@ import static skipnode.SkipNodeTest.tableCorrectnessCheck;
 public class DataNodeMVPTest {
   static int NODES = 20;
   static int DATANODESPERNODE = 5;
+  static int TOTALNODES = NODES * (DATANODESPERNODE + 1);
   static ArrayList<SkipNode> skipNodes;
   List<Underlay> underlays;
   int nameIdSize;
@@ -62,16 +61,17 @@ public class DataNodeMVPTest {
 
     String localAddress = underlays.get(0).getAddress();
 
-    nameIdSize = NameId.computeSize(NODES);
+    nameIdSize = NameId.computeSize(TOTALNODES);
     // Create the numerical IDs.
-    List<Integer> numIDs = new ArrayList<>(NODES);
-    for (int i = 0; i < NODES; i++) numIDs.add(i);
+    numIDs = new ArrayList<>(TOTALNODES);
+    for (int i = 0; i < TOTALNODES; i++) numIDs.add(i);
     // Create the name IDs.
-    List<String> nameIDs = numIDs.stream()
+    nameIDs = numIDs.stream()
         .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
         .collect(Collectors.toList());
     // Randomly assign name IDs.
     Collections.shuffle(nameIDs);
+
     // Create the identities.
     List<SkipNodeIdentity> identities = new ArrayList<>(NODES);
     for (int i = 0; i < NODES; i++) {
@@ -105,11 +105,11 @@ public class DataNodeMVPTest {
    */
   void insertASingleDataNode() {
     SkipNodeInterface node = skipNodes.get(0);
-    SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(0), numIDs.get(0),
+    SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(NODES), numIDs.get(NODES),
         node.getIdentity().getAddress(), node.getIdentity().getPort());
     LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
     SkipNode dNode = new SkipNode(dnID, lt);
-    tableMap.put(numIDs.get(0), lt);
+    tableMap.put(numIDs.get(NODES), lt);
     node.insertDataNode(dNode);
   }
 
@@ -122,11 +122,11 @@ public class DataNodeMVPTest {
 
     SkipNodeInterface node = skipNodes.get(0);
     for (int i = 0; i < DATANODESPERNODE; i++) {
-      SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(i), numIDs.get(i),
+      SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(NODES + i), numIDs.get(NODES + i),
           node.getIdentity().getAddress(), node.getIdentity().getPort());
       LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
       SkipNode dNode = new SkipNode(dnID, lt);
-      tableMap.put(numIDs.get(i), lt);
+      tableMap.put(numIDs.get(NODES + i), lt);
       threads.add(new Thread(() -> {
         node.insertDataNode(dNode);
         insertionDone.countDown();
@@ -154,13 +154,13 @@ public class DataNodeMVPTest {
       for (int i = 0; i < DATANODESPERNODE; i++) {
         SkipNodeInterface node = skipNodes.get(j);
         SkipNodeIdentity dnID = new SkipNodeIdentity(
-            nameIDs.get(numDNodes),
-            numIDs.get(numDNodes),
+            nameIDs.get(NODES + numDNodes),
+            numIDs.get(NODES + numDNodes),
             node.getIdentity().getAddress(),
             node.getIdentity().getPort());
         LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
-        tableMap.put(numIDs.get(numDNodes), lt);
+        tableMap.put(numIDs.get(NODES + numDNodes), lt);
         numDNodes++;
         threads.add(new Thread(() -> {
           node.insertDataNode(dNode);
@@ -191,13 +191,13 @@ public class DataNodeMVPTest {
       for (int i = 0; i < DATANODESPERNODE; i++) {
         SkipNodeInterface node = skipNode;
         SkipNodeIdentity dnID = new SkipNodeIdentity(
-            nameIDs.get(numDNodes),
-            numIDs.get(numDNodes),
+            nameIDs.get(NODES + numDNodes),
+            numIDs.get(NODES + numDNodes),
             node.getIdentity().getAddress(),
             node.getIdentity().getPort());
         LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
-        tableMap.put(numIDs.get(numDNodes), lt);
+        tableMap.put(numIDs.get(NODES + numDNodes), lt);
         numDNodes++;
         threads.add(new Thread(() -> {
           node.insertDataNode(dNode);
@@ -264,7 +264,7 @@ public class DataNodeMVPTest {
             Assertions.assertEquals(target.getNameId(), res.result.getNameId());
           } catch (AssertionError error) {
             assertionErrorCount.getAndIncrement();
-            System.err.println("wrong result for search by name id, source: " + searcher.getNumId() + " target: " + target.getNameId());
+            System.err.println("wrong result for search by name id, source: " + searcher.getNumId() + " target: " + target.getNameId() + " found "  + res.result.getNameId());
           } finally {
             searchDone.countDown();
           }
@@ -295,21 +295,6 @@ public class DataNodeMVPTest {
       tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
-  }
-
-  /**
-   * Helper to create num and nameIDs for dataNodes.
-   */
-  void createIDs() {
-    // Create numIDs
-    numIDs = new ArrayList<>(NODES * DATANODESPERNODE);
-    for (int i = NODES; i < NODES * (DATANODESPERNODE + 1); i++) {
-      numIDs.add(i);
-    }
-    // Create the name IDs.
-    nameIDs = numIDs.stream()
-        .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
-        .collect(Collectors.toList());
   }
 
     /**
@@ -358,8 +343,6 @@ public class DataNodeMVPTest {
     tableChecks();
 
     insertNodes();
-
-    createIDs();
   }
 
 }
