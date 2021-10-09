@@ -28,10 +28,12 @@ import static skipnode.SkipNodeTest.tableConsistencyCheck;
 import static skipnode.SkipNodeTest.tableCorrectnessCheck;
 
 public class DataNodeMVPTest {
-  static int NODES = 20;
-  static int DATANODESPERNODE = 5;
+  static int NODES = 8;
+  static int DATANODESPERNODE = 3;
   static int TOTALNODES = NODES * (DATANODESPERNODE + 1);
   static ArrayList<SkipNode> skipNodes;
+  static ArrayList<SkipNode> dataNodes;
+
   List<Underlay> underlays;
   int nameIdSize;
   Map<Integer, LookupTable> tableMap;
@@ -109,6 +111,7 @@ public class DataNodeMVPTest {
         node.getIdentity().getAddress(), node.getIdentity().getPort());
     LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
     SkipNode dNode = new SkipNode(dnID, lt);
+    dataNodes.add(dNode);
     tableMap.put(numIDs.get(NODES), lt);
     node.insertDataNode(dNode);
   }
@@ -126,6 +129,7 @@ public class DataNodeMVPTest {
           node.getIdentity().getAddress(), node.getIdentity().getPort());
       LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
       SkipNode dNode = new SkipNode(dnID, lt);
+      dataNodes.add(dNode);
       tableMap.put(numIDs.get(NODES + i), lt);
       threads.add(new Thread(() -> {
         node.insertDataNode(dNode);
@@ -160,6 +164,7 @@ public class DataNodeMVPTest {
             node.getIdentity().getPort());
         LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
+        dataNodes.add(dNode);
         tableMap.put(numIDs.get(NODES + numDNodes), lt);
         numDNodes++;
         threads.add(new Thread(() -> {
@@ -197,6 +202,7 @@ public class DataNodeMVPTest {
             node.getIdentity().getPort());
         LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
+        dataNodes.add(dNode);
         tableMap.put(numIDs.get(NODES + numDNodes), lt);
         numDNodes++;
         threads.add(new Thread(() -> {
@@ -246,19 +252,24 @@ public class DataNodeMVPTest {
 
   /**
    * Method borrowed from MVPTest
+   * With the addition of nameid and numid searches to all skip and data nodes
    */
   private void doSearches() {
     AtomicInteger assertionErrorCount = new AtomicInteger();
-    Thread[] searchThreads = new Thread[NODES * NODES];
-    CountDownLatch searchDone = new CountDownLatch(searchThreads.length);
+    ArrayList<Thread> searchThreads = new ArrayList<>();
+    CountDownLatch searchDone = new CountDownLatch(dataNodes.size() + NODES);
 
     for (int i = 0; i < NODES; i++) {
       // Choose the searcher.
       final SkipNode searcher = skipNodes.get(i);
-      for (int j = 0; j < NODES; j++) {
+      for (int j = 0; j < NODES + dataNodes.size(); j++) {
         // Choose the target.
-        final SkipNode target = skipNodes.get(j);
-        searchThreads[i + NODES * j] = new Thread(() -> {
+        final SkipNode target;
+        if (j < NODES)
+          target = skipNodes.get(j);
+        else
+          target = dataNodes.get(j-NODES);
+        searchThreads.add(new Thread(() -> {
           SearchResult res = searcher.searchByNameId(target.getNameId());
           try {
             Assertions.assertEquals(target.getNameId(), res.result.getNameId());
@@ -268,7 +279,18 @@ public class DataNodeMVPTest {
           } finally {
             searchDone.countDown();
           }
-        });
+        }));
+        searchThreads.add(new Thread(() -> {
+          SkipNodeIdentity res = searcher.searchByNumId(target.getNumId());
+          try {
+            Assertions.assertEquals(target.getNumId(), res.getNumId());
+          } catch (AssertionError error) {
+            assertionErrorCount.getAndIncrement();
+            System.err.println("wrong result for search by num id, source: " + searcher.getNumId() + " target: " + target.getNumId() + " found "  + res.getNumId());
+          } finally {
+            searchDone.countDown();
+          }
+        }));
       }
     }
 
@@ -341,6 +363,8 @@ public class DataNodeMVPTest {
         .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
 
     tableChecks();
+
+    dataNodes = new ArrayList<>();
 
     insertNodes();
   }
