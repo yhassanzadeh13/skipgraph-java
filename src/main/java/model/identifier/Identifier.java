@@ -84,7 +84,7 @@ public class Identifier {
   }
 
   /**
-   * Compares this identifier with the other identifier. 
+   * Compares this identifier with the other identifier.
    * @param other represents other identifier to compared to.
    * @return 0 if two identifiers are equal, 1 if this identifier is greater than other, -1 if other identifier
    *         is greater than this.
