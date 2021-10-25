@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import model.NameId;
+import model.identifier.NameId;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
 
