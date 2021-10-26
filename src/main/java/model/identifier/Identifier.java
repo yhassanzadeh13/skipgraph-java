@@ -27,7 +27,7 @@ public class Identifier {
   private final byte[] byteRepresentation;
 
   public Identifier(byte[] identifier) throws IllegalArgumentException{
-    if (identifier.length == SkipGraph.IDENTIFIER_SIZE) {
+    if (identifier.length != SkipGraph.IDENTIFIER_SIZE) {
       throw new IllegalArgumentException("identifier must be exactly the legitimate size " +
           "(" + SkipGraph.IDENTIFIER_SIZE + "): " + identifier.length);
     }
@@ -51,8 +51,8 @@ public class Identifier {
    *
    * @return identifier of the node.
    */
-  public String get() {
-    return this.identifier;
+  public byte[] getBytes() {
+    return this.byteRepresentation;
   }
 
 
