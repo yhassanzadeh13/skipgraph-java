@@ -3,6 +3,7 @@ package model.identifier;
 
 import java.util.Arrays;
 import io.ipfs.multibase.Multibase;
+import model.skipgraph.SkipGraph;
 
 /**
  * Identifier represents the main identifier of a skip graph node, i.e.,

@@ -1,4 +1,4 @@
-package model.identifier;
+package model.skipgraph;
 
 public class SkipGraph {
   /**

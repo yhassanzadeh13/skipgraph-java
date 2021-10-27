@@ -1,6 +1,6 @@
 package model.identifier;
 
-import static model.identifier.SkipGraph.IDENTIFIER_SIZE;
+import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
 /**
  * A class to automatically calculate nameId's size.

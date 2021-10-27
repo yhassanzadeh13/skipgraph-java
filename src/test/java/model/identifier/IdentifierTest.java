@@ -1,6 +1,7 @@
 package model.identifier;
 
 import io.ipfs.multibase.Multibase;
+import model.skipgraph.SkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unittest.Fixtures;
@@ -43,7 +44,7 @@ public class IdentifierTest {
 
   /**
    * Asserts comparison method of identifiers. Generates two identifiers, and compares them using
-   * comparison method. 
+   * comparison method.
    */
   @Test
   void TestIdentifier_Comparison() {
