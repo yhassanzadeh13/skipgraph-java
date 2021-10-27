@@ -13,7 +13,7 @@ import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import misc.Utils;
-import model.identifier.NameId;
+import model.identifier.MembershipVector;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import skipnode.SkipNodeIdentity;
 public class mvpTest {
   private static final int STARTING_PORT = 4444;
   private static final int NODES = 32;
-  private static final int NameIdSize = NameId.computeSize(NODES);
+  private static final int NameIdSize = MembershipVector.computeSize(NODES);
   private static ArrayList<SkipNode> skipNodes;
 
   /**

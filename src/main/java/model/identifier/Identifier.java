@@ -52,7 +52,7 @@ public class Identifier {
   }
 
   /**
-   * Returns identifier of the node.
+   * Returns identifier of the node as byte representation.
    *
    * @return identifier of the node.
    */
@@ -62,9 +62,9 @@ public class Identifier {
 
 
   /**
-   * Returns identifier as a binary string.
+   * Returns string representation of identifier in Base58BTC.
    *
-   * @return binary representation of identifier of the node.
+   * @return string representation of identifier in Base58BTC.
    */
   public String toString() {
     return this.identifier;
