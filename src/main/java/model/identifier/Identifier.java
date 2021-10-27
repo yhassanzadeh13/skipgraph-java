@@ -17,6 +17,10 @@ import io.ipfs.multibase.Multibase;
  */
 public class Identifier {
 
+  public static final int COMPARE_GREATER = 1;
+  public static final int COMPARE_LESS = -1;
+  public static final int COMPARE_EQUAL = 0;
+
   /**
    * Base58BTC representation of identifier.
    */
@@ -73,6 +77,7 @@ public class Identifier {
    * is greater than this.
    */
   public int comparedTo(Identifier other) {
-    return Arrays.compare(this.byteRepresentation, other.byteRepresentation);
+    int result = Arrays.compare(this.byteRepresentation, other.byteRepresentation);
+    return Integer.compare(result, 0);
   }
 }
