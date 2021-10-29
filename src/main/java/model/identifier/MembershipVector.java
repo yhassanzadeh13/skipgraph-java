@@ -1,5 +1,6 @@
 package model.identifier;
 
+import java.util.Arrays;
 import io.ipfs.multibase.Multibase;
 import model.skipgraph.SkipGraph;
 import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
@@ -39,7 +40,7 @@ public class MembershipVector {
    * A class to automatically calculate nameId's size.
    *
    * @param nodes (total/maximum) number of nodes in Skip Graph
-   * @return name ID size
+   * @return membership vector size
    */
   @Deprecated
   public static int computeSize(int nodes) {
@@ -67,32 +68,33 @@ public class MembershipVector {
   }
 
   /**
-   * Returns common prefix length between this name ID and other name ID.
+   * Returns common prefix length between this membership vector and other.
    *
-   * @param other the other name ID.
-   * @return common prefix length between 0 to name ID size;
-   * @throws IllegalArgumentException if other name IDs is null or longer than name ID size.
+   * @param other the other membership vector.
+   * @return common prefix length between 0 to IDENTIFIER_LENGTH;
    */
-  public int commonPrefix(String other) throws IllegalArgumentException {
-    if (this.nameID == null || other == null) {
-      throw new IllegalArgumentException("cannot take common prefix of null name id(s)");
+  public int commonPrefix(MembershipVector other) {
+    int i = 0; // index of first discrepancy
+
+    for(; i < IDENTIFIER_SIZE; i++){
+      if(this.byteRepresentation[i] != other.byteRepresentation[i]) break;
     }
 
-    if (other.length() > IDENTIFIER_SIZE) {
-      throw new
-          IllegalArgumentException("cannot compute common prefix when other name ID is longer than legit size, expected: "
-          + IDENTIFIER_SIZE + " got: " + other.length());
+    if (i == IDENTIFIER_SIZE - 1){
+      return IDENTIFIER_SIZE; // full match
     }
 
-    if (this.nameID.length() != other.length()) {
-      throw new IllegalArgumentException("cannot take common prefix of different size name ids");
+    // scanning bits by bits of the first different byte
+    String iThis = Integer.toBinaryString(this.byteRepresentation[i]);
+    String iOther = Integer.toBinaryString(other.byteRepresentation[i]);
+
+    for(int j = 0; j < iThis.length(); j++){
+      if(iThis.charAt(j) != iOther.charAt(j)){
+        return i + j + 1;
+      }
     }
 
-    int i = 0;
-    while (i < this.nameID.length() && this.nameID.charAt(i) == other.charAt(i)) {
-      i++;
-    }
-    return i;
+    throw new IllegalStateException("failed to find common prefix length for " + this + " and " + other);
   }
 
   /**
