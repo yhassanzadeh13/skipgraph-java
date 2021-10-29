@@ -70,7 +70,7 @@ public class MembershipVector {
    * Returns common prefix length between this membership vector and other.
    *
    * @param other the other membership vector.
-   * @return common prefix length between 0 to IDENTIFIER_LENGTH;
+   * @return common prefix length in bits, i.e., between 0 to 8 * IDENTIFIER_LENGTH;
    */
   public int commonPrefix(MembershipVector other) {
     int i = 0; // index of first discrepancy
@@ -79,8 +79,8 @@ public class MembershipVector {
       if (this.byteRepresentation[i] != other.byteRepresentation[i]) break;
     }
 
-    if (i == IDENTIFIER_SIZE - 1) {
-      return IDENTIFIER_SIZE; // full match
+    if (i == IDENTIFIER_SIZE) {
+      return IDENTIFIER_SIZE * 8; // full match in bits
     }
 
     // scanning bits by bits of the first different byte
@@ -89,7 +89,7 @@ public class MembershipVector {
 
     for (int j = 0; j < iThis.length(); j++) {
       if (iThis.charAt(j) != iOther.charAt(j)) {
-        return i + j + 1;
+        return 8 * (i + 1) + j;
       }
     }
 

@@ -8,6 +8,7 @@ import unittest.Fixtures;
 import static model.identifier.Identifier.COMPARE_EQUAL;
 import static model.identifier.Identifier.COMPARE_GREATER;
 import static model.identifier.Identifier.COMPARE_LESS;
+import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
 public class MembershipVectorTest {
 
@@ -16,7 +17,7 @@ public class MembershipVectorTest {
    */
   @Test
   void TestMembershipVector_Create() {
-    byte[] bytes = Fixtures.ByteArrayFixture(SkipGraph.IDENTIFIER_SIZE);
+    byte[] bytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE);
     MembershipVector mv = new MembershipVector(bytes);
 
     Assertions.assertArrayEquals(bytes, mv.getBytes());
@@ -35,30 +36,29 @@ public class MembershipVectorTest {
    */
   @Test
   void MembershipVector_IllegitimateSize() {
-    byte[] smallerBytes = Fixtures.ByteArrayFixture(SkipGraph.IDENTIFIER_SIZE - 1);
+    byte[] smallerBytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE - 1);
     Assertions.assertThrows(IllegalArgumentException.class, () -> new MembershipVector(smallerBytes));
 
-    byte[] biggerBytes = Fixtures.ByteArrayFixture(SkipGraph.IDENTIFIER_SIZE + 1);
+    byte[] biggerBytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE + 1);
     Assertions.assertThrows(IllegalArgumentException.class, () -> new MembershipVector(biggerBytes));
   }
 
   /**
-   * Asserts comparison method of identifiers. Generates two identifiers, and compares them using
+   * Asserts common prefix method of MembershipVectors. Generates two identifiers, and compares them using
    * comparison method.
    */
   @Test
-  void TestIdentifier_Comparison() {
-    byte[] smallerBytes = Fixtures.ByteArrayFixture(SkipGraph.IDENTIFIER_SIZE);
-    smallerBytes[0] = Byte.MIN_VALUE; // making sure most significant bits are unset;
+  void TestMembershipVector_CommonPrefix() {
+    byte[] biggerBytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE);
+    biggerBytes[0] = Byte.MAX_VALUE; // making sure that it starts with 1
+    MembershipVector thisMV = new MembershipVector(biggerBytes);
+
+    // equality
+    Assertions.assertEquals(IDENTIFIER_SIZE * 8, thisMV.commonPrefix(thisMV));
+
+
+    byte[] smallerBytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE);
+    smallerBytes[0] = Byte.MIN_VALUE; // making sure that it starts with zero
     Identifier smallerId = new Identifier(smallerBytes);
-
-    byte[] biggerBytes = Fixtures.ByteArrayFixture(SkipGraph.IDENTIFIER_SIZE);
-    biggerBytes[0] = Byte.MAX_VALUE;
-    Identifier biggerId = new Identifier(biggerBytes);
-
-    Assertions.assertEquals(COMPARE_LESS, smallerId.comparedTo(biggerId));
-    Assertions.assertEquals(COMPARE_GREATER, biggerId.comparedTo(smallerId));
-    Assertions.assertEquals(COMPARE_EQUAL, smallerId.comparedTo(smallerId));
-    Assertions.assertEquals(COMPARE_EQUAL, biggerId.comparedTo(biggerId));
   }
 }
