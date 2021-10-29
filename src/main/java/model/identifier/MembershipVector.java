@@ -1,6 +1,5 @@
 package model.identifier;
 
-import java.util.Arrays;
 import io.ipfs.multibase.Multibase;
 import model.skipgraph.SkipGraph;
 import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
@@ -8,11 +7,11 @@ import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 /**
  * MembershipVector represents the membership vector of a skip graph node, i.e.,
  * what is known as name ID in literatures:
- *
+ * <p>
  * For more info on membership vector see these:
  * Hassanzadeh-Nazarabadi, Yahya, Alptekin Küpçü, and Öznur Özkasap. "Locality aware skip graph."
  * 2015 IEEE 35th International Conference on Distributed Computing Systems Workshops. IEEE, 2015.
- *
+ * <p>
  * Hassanzadeh-Nazarabadi, Yahya, Alptekin Küpçü, and Öznur Özkasap. "Interlaced: Fully decentralized churn
  * stabilization for skip graph-based dhts." Journal of Parallel and Distributed Computing 149 (2021): 13-28.
  */
@@ -26,7 +25,7 @@ public class MembershipVector {
    */
   private final byte[] byteRepresentation;
 
-  public MembershipVector(byte[] membershipVector) throws IllegalArgumentException{
+  public MembershipVector(byte[] membershipVector) throws IllegalArgumentException {
     if (membershipVector.length != SkipGraph.IDENTIFIER_SIZE) {
       throw new IllegalArgumentException("membership vector must be exactly the legitimate size " +
           "(" + SkipGraph.IDENTIFIER_SIZE + "): " + membershipVector.length);
@@ -76,11 +75,11 @@ public class MembershipVector {
   public int commonPrefix(MembershipVector other) {
     int i = 0; // index of first discrepancy
 
-    for(; i < IDENTIFIER_SIZE; i++){
-      if(this.byteRepresentation[i] != other.byteRepresentation[i]) break;
+    for (; i < IDENTIFIER_SIZE; i++) {
+      if (this.byteRepresentation[i] != other.byteRepresentation[i]) break;
     }
 
-    if (i == IDENTIFIER_SIZE - 1){
+    if (i == IDENTIFIER_SIZE - 1) {
       return IDENTIFIER_SIZE; // full match
     }
 
@@ -88,8 +87,8 @@ public class MembershipVector {
     String iThis = Integer.toBinaryString(this.byteRepresentation[i]);
     String iOther = Integer.toBinaryString(other.byteRepresentation[i]);
 
-    for(int j = 0; j < iThis.length(); j++){
-      if(iThis.charAt(j) != iOther.charAt(j)){
+    for (int j = 0; j < iThis.length(); j++) {
+      if (iThis.charAt(j) != iOther.charAt(j)) {
         return i + j + 1;
       }
     }
