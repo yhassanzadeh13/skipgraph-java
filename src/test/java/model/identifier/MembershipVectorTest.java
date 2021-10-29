@@ -30,16 +30,16 @@ public class MembershipVectorTest {
   }
 
   /**
-   * Asserts Identifier constructor returns an illegal argument exception if input bytes size
+   * Asserts MembershipVector constructor returns an illegal argument exception if input bytes size
    * is not exactly equal to skip graph identifier size.
    */
   @Test
-  void TestIdentifier_IllegitimateSize() {
+  void MembershipVector_IllegitimateSize() {
     byte[] smallerBytes = Fixtures.ByteArrayFixture(SkipGraph.IDENTIFIER_SIZE - 1);
-    Assertions.assertThrows(IllegalArgumentException.class, () -> new Identifier(smallerBytes));
+    Assertions.assertThrows(IllegalArgumentException.class, () -> new MembershipVector(smallerBytes));
 
     byte[] biggerBytes = Fixtures.ByteArrayFixture(SkipGraph.IDENTIFIER_SIZE + 1);
-    Assertions.assertThrows(IllegalArgumentException.class, () -> new Identifier(biggerBytes));
+    Assertions.assertThrows(IllegalArgumentException.class, () -> new MembershipVector(biggerBytes));
   }
 
   /**
