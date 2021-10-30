@@ -108,10 +108,10 @@ public class MembershipVector {
   /**
    * Coverts byte b to 8 bits binary representation.
    * @param b byte.
-   * @return 8-bits binary representation. 
+   * @return 8-bits binary representation.
    */
   private static String toBinaryRepresentation(byte b){
-    return String.format("%8s", Integer.toBinaryString(b & 0xFF));
+    return String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
   }
 
 }

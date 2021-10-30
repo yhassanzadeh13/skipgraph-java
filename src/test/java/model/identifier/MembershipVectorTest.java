@@ -49,18 +49,28 @@ public class MembershipVectorTest {
    */
   @Test
   void TestMembershipVector_CommonPrefix() {
-    byte[] biggerBytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE);
-    biggerBytes[0] = Byte.MAX_VALUE; // making sure that it starts with 1
+    byte[] biggerBytes = Fixtures.MaxByteArrayFixture(IDENTIFIER_SIZE); // all 1s
     MembershipVector thisMV = new MembershipVector(biggerBytes);
 
     // equality
     Assertions.assertEquals(IDENTIFIER_SIZE * 8, thisMV.commonPrefix(thisMV));
 
 
-    byte[] smallerBytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE);
-    smallerBytes[0] = Byte.MIN_VALUE; // making sure that it starts with zero
+    byte[] smallerBytes = Fixtures.MinByteArrayFixture(IDENTIFIER_SIZE); // all zeros
     MembershipVector noCommonPrefixMV = new MembershipVector(smallerBytes);
     // zero bit common prefix
     Assertions.assertEquals(0, thisMV.commonPrefix(noCommonPrefixMV));
+
+    // one bit common prefix
+    byte[] firstBitSet = Fixtures.MinByteArrayFixture(IDENTIFIER_SIZE); // all zeros
+    firstBitSet[0] = 1; // 1....
+    MembershipVector oneBitCommonPrefix = new MembershipVector(firstBitSet);
+    Assertions.assertEquals(1, thisMV.commonPrefix(oneBitCommonPrefix));
+
+    // two bits common prefix
+    byte[] twoBitsSet = Fixtures.MinByteArrayFixture(IDENTIFIER_SIZE); // all zeros
+    twoBitsSet[0] = 64; // 11....
+    MembershipVector twoBitsCommonPrefix = new MembershipVector(twoBitsSet);
+    Assertions.assertEquals(2, thisMV.commonPrefix(twoBitsCommonPrefix));
   }
 }
