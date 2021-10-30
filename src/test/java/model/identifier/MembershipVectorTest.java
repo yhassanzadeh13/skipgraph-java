@@ -59,6 +59,8 @@ public class MembershipVectorTest {
 
     byte[] smallerBytes = Fixtures.ByteArrayFixture(IDENTIFIER_SIZE);
     smallerBytes[0] = Byte.MIN_VALUE; // making sure that it starts with zero
-    Identifier smallerId = new Identifier(smallerBytes);
+    MembershipVector noCommonPrefixMV = new MembershipVector(smallerBytes);
+    // zero bit common prefix
+    Assertions.assertEquals(0, thisMV.commonPrefix(noCommonPrefixMV));
   }
 }
