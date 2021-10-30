@@ -84,12 +84,12 @@ public class MembershipVector {
     }
 
     // scanning bits by bits of the first different byte
-    String iThis = Integer.toBinaryString(this.byteRepresentation[i]);
-    String iOther = Integer.toBinaryString(other.byteRepresentation[i]);
+    String iThis = toBinaryRepresentation(this.byteRepresentation[i]);
+    String iOther = toBinaryRepresentation(other.byteRepresentation[i]);
 
     for (int j = 0; j < iThis.length(); j++) {
       if (iThis.charAt(j) != iOther.charAt(j)) {
-        return 8 * (i + 1) + j;
+        return 8 * i + j;
       }
     }
 
@@ -103,6 +103,15 @@ public class MembershipVector {
    */
   public String toString() {
     return this.membershipVector;
+  }
+
+  /**
+   * Coverts byte b to 8 bits binary representation.
+   * @param b byte.
+   * @return 8-bits binary representation. 
+   */
+  private static String toBinaryRepresentation(byte b){
+    return String.format("%8s", Integer.toBinaryString(b & 0xFF));
   }
 
 }
