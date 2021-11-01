@@ -1,6 +1,8 @@
 package unittest;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -40,6 +42,29 @@ public class Fixtures {
     byte[] arr = new byte[length];
     Arrays.fill(arr, Byte.MAX_VALUE);
     return arr;
+  }
+
+  public static byte[]ByteArrayFixture(String prefix, int length){
+    if(prefix.length() < length){
+      throw new IllegalArgumentException("prefix (" + prefix + ") must be greater than or equal to length ("+ length + ")");
+    }
+
+    byte[] fixtureByte = new byte[length];
+
+    // converting prefix to byte
+    int index = 0;
+    List<String> prefixSplit = Utils.splitEqually(prefix, 8);
+    for(String str: prefixSplit){
+      short strB = Short.parseShort(str, 2);
+      fixtureByte[index] = ByteBuffer.allocate(1).putShort(strB).get(0);
+      index++;
+    }
+
+    int remainSize = length - index;
+    byte[] remainBytes = ByteArrayFixture(remainSize);
+    System.arraycopy(remainBytes, 0, fixtureByte, index, remainSize);
+
+    return fixtureByte;
   }
 
 }
