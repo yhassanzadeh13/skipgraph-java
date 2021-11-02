@@ -1,6 +1,8 @@
 package misc;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -31,5 +33,25 @@ public class Utils {
       return list.get(0);
     }
     return list.get((Math.abs(random.nextInt()) % limit));
+  }
+
+  /**
+   * Coverts byte b to 8 bits binary representation.
+   * @param b byte.
+   * @return 8-bits binary representation.
+   */
+  public static String toBinaryRepresentation(byte b){
+    return String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+  }
+
+  public static List<String> splitEqually(String text, int size) {
+    // Give the list the right capacity to start with. You could use an array
+    // instead if you wanted.
+    List<String> ret = new ArrayList<String>((text.length() + size - 1) / size);
+
+    for (int start = 0; start < text.length(); start += size) {
+      ret.add(text.substring(start, Math.min(text.length(), start + size)));
+    }
+    return ret;
   }
 }

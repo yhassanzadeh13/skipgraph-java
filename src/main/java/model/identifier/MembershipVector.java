@@ -1,6 +1,7 @@
 package model.identifier;
 
 import io.ipfs.multibase.Multibase;
+import misc.Utils;
 import model.skipgraph.SkipGraph;
 import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
@@ -84,8 +85,8 @@ public class MembershipVector {
     }
 
     // scanning bits by bits of the first different byte
-    String iThis = toBinaryRepresentation(this.byteRepresentation[i]);
-    String iOther = toBinaryRepresentation(other.byteRepresentation[i]);
+    String iThis = Utils.toBinaryRepresentation(this.byteRepresentation[i]);
+    String iOther = Utils.toBinaryRepresentation(other.byteRepresentation[i]);
 
     for (int j = 0; j < iThis.length(); j++) {
       if (iThis.charAt(j) != iOther.charAt(j)) {
@@ -103,15 +104,6 @@ public class MembershipVector {
    */
   public String toString() {
     return this.membershipVector;
-  }
-
-  /**
-   * Coverts byte b to 8 bits binary representation.
-   * @param b byte.
-   * @return 8-bits binary representation.
-   */
-  private static String toBinaryRepresentation(byte b){
-    return String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
   }
 
 }
