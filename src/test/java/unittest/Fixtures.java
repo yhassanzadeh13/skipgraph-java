@@ -80,12 +80,20 @@ public class Fixtures {
    */
   public static byte ByteFixtureWithZeroPrefix(String prefix){
     if(prefix.length() > SkipGraph.BYTE_SIZE - 1){
-      throw new IllegalArgumentException("prefix (" + prefix + ") must be at most 7 bits");
+      throw new IllegalArgumentException("prefix (" + prefix + ") must be at most 8 bits");
+    }
+    if(prefix.startsWith("1")){
+      if(prefix.chars().filter(c -> c == '1').count() > 1){
+        // we can't go beyond -128 in bytes.
+        throw new IllegalArgumentException("prefixes starting with 1 should not have any more subsequent ones");
+      } else {
+        return Byte.parseByte("10000000", 2);
+      }
     }
 
-    StringBuilder bStr = new StringBuilder("0" + prefix); // byte always starts with zero
+    StringBuilder bStr = new StringBuilder(prefix); // byte always starts with zero
     // converting prefix to byte
-    for(int i = 0; i < (SkipGraph.BYTE_SIZE - 1) - prefix.length(); i++){
+    for(int i = 0; i < (SkipGraph.BYTE_SIZE) - prefix.length(); i++){
       if(random.nextBoolean()){
         bStr.append("1");
       } else {
