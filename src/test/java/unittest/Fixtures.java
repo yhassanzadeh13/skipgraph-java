@@ -89,7 +89,8 @@ public class Fixtures {
         // we can't go beyond -128 in bytes.
         throw new IllegalArgumentException("prefixes starting with 1 should not have any more subsequent ones");
       } else {
-        return Byte.parseByte("10000000", 2);
+        // only byte value starting with 1 is 10000000 which is the byte min value
+        return Byte.MIN_VALUE;
       }
     }
 
