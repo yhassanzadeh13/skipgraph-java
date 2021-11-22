@@ -2,17 +2,18 @@ package model.identifier;
 
 
 import java.util.Arrays;
+
 import io.ipfs.multibase.Multibase;
 import model.skipgraph.SkipGraph;
 
 /**
  * Identifier represents the main identifier of a skip graph node, i.e.,
  * what is known as numerical ID in literatures:
- *
+ * <p>
  * For more info on numerical ID (i.e., identifier) see these:
  * Hassanzadeh-Nazarabadi, Yahya, Alptekin Küpçü, and Öznur Özkasap. "Locality aware skip graph."
  * 2015 IEEE 35th International Conference on Distributed Computing Systems Workshops. IEEE, 2015.
- *
+ * <p>
  * Hassanzadeh-Nazarabadi, Yahya, Alptekin Küpçü, and Öznur Özkasap. "Interlaced: Fully decentralized churn
  * stabilization for skip graph-based dhts." Journal of Parallel and Distributed Computing 149 (2021): 13-28.
  */
@@ -31,7 +32,7 @@ public class Identifier {
    */
   private final byte[] byteRepresentation;
 
-  public Identifier(byte[] identifier) throws IllegalArgumentException{
+  public Identifier(byte[] identifier) throws IllegalArgumentException {
     if (identifier.length != SkipGraph.IDENTIFIER_SIZE) {
       throw new IllegalArgumentException("identifier must be exactly the legitimate size " +
           "(" + SkipGraph.IDENTIFIER_SIZE + "): " + identifier.length);

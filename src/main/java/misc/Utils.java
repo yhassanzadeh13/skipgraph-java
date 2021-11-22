@@ -12,7 +12,7 @@ public class Utils {
   /**
    * Returns object of a random index in range of [0, limit] from the abstract list.
    *
-   * @param list input list.
+   * @param list   input list.
    * @param random random generator.
    * @return element of a random index from the list.
    */
@@ -23,9 +23,9 @@ public class Utils {
   /**
    * Returns object of a random index from the abstract list.
    *
-   * @param list input list.
+   * @param list   input list.
    * @param random random generator.
-   * @param limit maximum index can be returned exclusive.
+   * @param limit  maximum index can be returned exclusive.
    * @return element of a random index in range of [0, limit] from the list.
    */
   public static Object randomIndex(AbstractList list, Random random, int limit) {
@@ -37,13 +37,21 @@ public class Utils {
 
   /**
    * Coverts byte b to 8 bits binary representation.
+   *
    * @param b byte.
    * @return 8-bits binary representation.
    */
-  public static String toBinaryRepresentation(byte b){
+  public static String toBinaryRepresentation(byte b) {
     return String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
   }
 
+  /**
+   * Splits string into equal string chunks of size.
+   *
+   * @param text input string.
+   * @param size chunk sizes.
+   * @return list of chunks.
+   */
   public static List<String> splitEqually(String text, int size) {
     // Give the list the right capacity to start with. You could use an array
     // instead if you wanted.

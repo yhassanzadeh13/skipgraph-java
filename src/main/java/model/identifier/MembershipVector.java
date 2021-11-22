@@ -18,7 +18,7 @@ import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
  */
 public class MembershipVector {
   /**
-   * Base58BTC representation of membership vector
+   * Base58BTC representation of membership vector.
    */
   private final String membershipVector;
   /**
@@ -26,10 +26,17 @@ public class MembershipVector {
    */
   private final byte[] byteRepresentation;
 
+  /**
+   * Initializes the membership vector with the byte array.
+   *
+   * @param membershipVector the byte array membership vector.
+   * @throws IllegalArgumentException if size of input byte array is not identical to the identifier
+   *                                  size of skip graph.
+   */
   public MembershipVector(byte[] membershipVector) throws IllegalArgumentException {
     if (membershipVector.length != SkipGraph.IDENTIFIER_SIZE) {
-      throw new IllegalArgumentException("membership vector must be exactly the legitimate size " +
-          "(" + SkipGraph.IDENTIFIER_SIZE + "): " + membershipVector.length);
+      throw new IllegalArgumentException("membership vector must be exactly the legitimate size "
+          + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + membershipVector.length);
     }
 
     this.byteRepresentation = membershipVector;
@@ -47,8 +54,9 @@ public class MembershipVector {
     return ((int) (Math.log(nodes) / Math.log(2)));
   }
 
-  /***
+  /**
    * Converts MembershipVector from its byte representation to Base58BTC.
+   *
    * @param membershipVector input membership vector in byte representation.
    * @return Base58BTC representation of membershipVector.
    */
@@ -77,7 +85,9 @@ public class MembershipVector {
     int i = 0; // index of first discrepancy
 
     for (; i < IDENTIFIER_SIZE; i++) {
-      if (this.byteRepresentation[i] != other.byteRepresentation[i]) break;
+      if (this.byteRepresentation[i] != other.byteRepresentation[i]) {
+        break;
+      }
     }
 
     if (i == IDENTIFIER_SIZE) {
@@ -85,16 +95,16 @@ public class MembershipVector {
     }
 
     // scanning bits by bits of the first different byte
-    String iThis = Utils.toBinaryRepresentation(this.byteRepresentation[i]);
-    String iOther = Utils.toBinaryRepresentation(other.byteRepresentation[i]);
+    String ithis = Utils.toBinaryRepresentation(this.byteRepresentation[i]);
+    String iother = Utils.toBinaryRepresentation(other.byteRepresentation[i]);
 
-    for (int j = 0; j < iThis.length(); j++) {
-      if (iThis.charAt(j) != iOther.charAt(j)) {
+    for (int j = 0; j < ithis.length(); j++) {
+      if (ithis.charAt(j) != iother.charAt(j)) {
         return 8 * i + j;
       }
     }
 
-    throw new IllegalStateException("failed to find common prefix length for " + this + " and " + other);
+    throw new IllegalStateException("failed to find common prefix: " + this + " and " + other);
   }
 
   /**
