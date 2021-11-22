@@ -1,13 +1,9 @@
 package model.identifier;
 
 import io.ipfs.multibase.Multibase;
-import model.skipgraph.SkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unittest.Fixtures;
-import static model.identifier.Identifier.COMPARE_EQUAL;
-import static model.identifier.Identifier.COMPARE_GREATER;
-import static model.identifier.Identifier.COMPARE_LESS;
 import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
 public class MembershipVectorTest {
@@ -52,25 +48,37 @@ public class MembershipVectorTest {
     byte[] biggerBytes = Fixtures.MaxByteArrayFixture(IDENTIFIER_SIZE); // all 1s
     MembershipVector thisMV = new MembershipVector(biggerBytes);
 
-    // equality
+    // equality: common prefix with itself
     Assertions.assertEquals(IDENTIFIER_SIZE * 8, thisMV.commonPrefix(thisMV));
 
-
+    // zero bit common prefix
     byte[] smallerBytes = Fixtures.MinByteArrayFixture(IDENTIFIER_SIZE); // all zeros
     MembershipVector noCommonPrefixMV = new MembershipVector(smallerBytes);
-    // zero bit common prefix
     Assertions.assertEquals(0, thisMV.commonPrefix(noCommonPrefixMV));
 
     // one bit common prefix
     byte[] firstBitSet = Fixtures.MinByteArrayFixture(IDENTIFIER_SIZE); // all zeros
-    firstBitSet[0] = 1; // 1....
+    firstBitSet[0] = -128; // -128 = 1000 0000 in 2's complement
     MembershipVector oneBitCommonPrefix = new MembershipVector(firstBitSet);
     Assertions.assertEquals(1, thisMV.commonPrefix(oneBitCommonPrefix));
 
     // two bits common prefix
     byte[] twoBitsSet = Fixtures.MinByteArrayFixture(IDENTIFIER_SIZE); // all zeros
-    twoBitsSet[0] = 64; // 11....
+    twoBitsSet[0] = -64; // 1100 0000 in 2's complement is equal to -64
     MembershipVector twoBitsCommonPrefix = new MembershipVector(twoBitsSet);
     Assertions.assertEquals(2, thisMV.commonPrefix(twoBitsCommonPrefix));
+
+
+    // one byte common prefix
+    byte[] secondByteUnset = Fixtures.MaxByteArrayFixture(IDENTIFIER_SIZE); // all ones
+    secondByteUnset[1] = 0; // second byte all zeros
+    MembershipVector oneByteCommonPrefix = new MembershipVector(secondByteUnset);
+    Assertions.assertEquals(8, thisMV.commonPrefix(oneByteCommonPrefix));
+
+    // 9 bits common prefix (one byte + one bit)
+    byte[] secondByteFirstBitSet = Fixtures.MaxByteArrayFixture(IDENTIFIER_SIZE); // all ones
+    secondByteFirstBitSet[1] = -128; // second byte all zeros
+    MembershipVector nineBitsCommonPrefix = new MembershipVector(secondByteFirstBitSet);
+    Assertions.assertEquals(9, thisMV.commonPrefix(nineBitsCommonPrefix));
   }
 }

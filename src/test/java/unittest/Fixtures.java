@@ -30,7 +30,8 @@ public class Fixtures {
    */
   public static byte[] MinByteArrayFixture(int length){
     byte[] arr = new byte[length];
-    Arrays.fill(arr, Byte.MIN_VALUE);
+    byte zero = 0;
+    Arrays.fill(arr, zero);
     return arr;
   }
 
@@ -41,7 +42,8 @@ public class Fixtures {
    */
   public static byte[] MaxByteArrayFixture(int length){
     byte[] arr = new byte[length];
-    Arrays.fill(arr, Byte.MAX_VALUE);
+    byte minusOne = -1;
+    Arrays.fill(arr, minusOne);
     return arr;
   }
 
