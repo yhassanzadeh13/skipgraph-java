@@ -12,9 +12,6 @@ import org.apache.logging.log4j.LogManager;
  * Basic skipnode.SkipNodeIdentity class
  */
 public class SkipNodeIdentity implements Serializable {
-
-  private static final Log4jLogger logger =
-      new Log4jLogger(LogManager.getLogger(SkipNodeIdentity.class));
   private final MembershipVector membershipVector; // aka name Id
   private final Identifier identifier; // aka numerical id
   private final String address;
