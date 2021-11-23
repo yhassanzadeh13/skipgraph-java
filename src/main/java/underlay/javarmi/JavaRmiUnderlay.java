@@ -3,11 +3,14 @@ package underlay.javarmi;
 import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.ExportException;
+
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
 
-/** Java RMI connection underlay implementation. */
+/**
+ * Java RMI connection underlay implementation.
+ */
 public class JavaRmiUnderlay extends Underlay {
 
   // Java RMI instance running at the host machine.
@@ -38,7 +41,7 @@ public class JavaRmiUnderlay extends Underlay {
    * Constructs a `JavaRMIHost` instance and binds it to the given port.
    *
    * @param port the port that the underlay should be bound to.
-   * @return  port number underlay initialized on or -1 if initialization is unsuccessful.
+   * @return port number underlay initialized on or -1 if initialization is unsuccessful.
    */
   @Override
   protected int initUnderlay(int port) {
@@ -64,7 +67,7 @@ public class JavaRmiUnderlay extends Underlay {
    * Invokes the appropriate RMI method on the server with the given address.
    *
    * @param address address of the remote server.
-   * @param port port of the remote server.
+   * @param port    port of the remote server.
    * @param request request to send.
    * @return response received from the server.
    */
@@ -91,7 +94,9 @@ public class JavaRmiUnderlay extends Underlay {
     }
   }
 
-  /** Terminates the Java RMI underlay service. */
+  /**
+   * Terminates the Java RMI underlay service.
+   */
   @Override
   public boolean terminate() {
     try {

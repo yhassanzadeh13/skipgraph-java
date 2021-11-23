@@ -7,11 +7,14 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
 
-/** UDP Underlay implementation. */
+/**
+ * UDP Underlay implementation.
+ */
 public class UdpUnderlay extends Underlay {
 
   /**
@@ -19,15 +22,14 @@ public class UdpUnderlay extends Underlay {
    * transferred. This parameter defines the maximum size of a packet in bytes.
    */
   public static final int MAX_PACKET_SIZE = 512;
-
+  // This object will be used to transfer the responses from the listener thread
+  // to the thread that the `sendMessage` was called from.
+  private final UdpResponseLock responseLock = new UdpResponseLock();
   // The thread that continuously listens for incoming connection in the background.
   // As opposed to TCP, both requests and responses will be received by this thread.
   private Thread listenerThread;
   // The local UDP socket that can accept incoming UDP connections.
   private DatagramSocket udpSocket;
-  // This object will be used to transfer the responses from the listener thread
-  // to the thread that the `sendMessage` was called from.
-  private final UdpResponseLock responseLock = new UdpResponseLock();
 
   /**
    * Creates a UDP socket at the given port and starts listening it.
@@ -56,7 +58,7 @@ public class UdpUnderlay extends Underlay {
    * defined in `UDPUtils.MAX_PACKET_SIZE`.
    *
    * @param address address of the remote server.
-   * @param port port of the remote server.
+   * @param port    port of the remote server.
    * @param request request to send.
    * @return the response emitted by the server.
    */

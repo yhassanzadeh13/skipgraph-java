@@ -1,6 +1,7 @@
 package skipnode;
 
 import java.util.concurrent.Semaphore;
+
 import log.Log4jLogger;
 import org.apache.logging.log4j.LogManager;
 
@@ -12,26 +13,17 @@ public class InsertionLock {
 
   // Represents an acquired lock from a neighbor.
 
-  /** neighbour instance. */
-  public static class NeighborInstance {
-
-    public final SkipNodeIdentity node;
-    public final int minLevel;
-
-    public NeighborInstance(SkipNodeIdentity node, int minLevel) {
-      this.node = node;
-      this.minLevel = minLevel;
-    }
-  }
-
-  /** Represents the holder node of this insertion lock. */
-  public SkipNodeIdentity holder = null;
-  /** Represents the node that owns this insertion lock. */
-  public SkipNodeIdentity owner;
-
-  private final Semaphore locked = new Semaphore(1, true);
   private static final Log4jLogger logger =
       new Log4jLogger(LogManager.getLogger(InsertionLock.class));
+  private final Semaphore locked = new Semaphore(1, true);
+  /**
+   * Represents the holder node of this insertion lock.
+   */
+  public SkipNodeIdentity holder = null;
+  /**
+   * Represents the node that owns this insertion lock.
+   */
+  public SkipNodeIdentity owner;
 
   public InsertionLock(SkipNodeIdentity owner) {
     this.owner = owner;
@@ -51,7 +43,9 @@ public class InsertionLock {
     return acquired;
   }
 
-  /** releases the lock if no node holds this insertion lock. */
+  /**
+   * releases the lock if no node holds this insertion lock.
+   */
   public void endInsertion() {
     logger.debug().addInt("owner_num_id", this.owner.getNumId()).addMsg("ending insertion");
     if (holder == null) {
@@ -86,9 +80,9 @@ public class InsertionLock {
    * Method for checking if the lock holder of this lock has specified address and port.
    *
    * @param address represents a node address
-   * @param port represents a node port
+   * @param port    represents a node port
    * @return {@code true} if the lock holder of this lock has specified address and port {@code
-   *     false} otherwise
+   * false} otherwise
    */
   public boolean isLockedBy(String address, int port) {
     return isLocked()
@@ -110,5 +104,19 @@ public class InsertionLock {
     this.holder = null;
     locked.release();
     return true;
+  }
+
+  /**
+   * neighbour instance.
+   */
+  public static class NeighborInstance {
+
+    public final SkipNodeIdentity node;
+    public final int minLevel;
+
+    public NeighborInstance(SkipNodeIdentity node, int minLevel) {
+      this.node = node;
+      this.minLevel = minLevel;
+    }
   }
 }

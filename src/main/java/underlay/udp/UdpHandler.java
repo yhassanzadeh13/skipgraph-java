@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+
 import underlay.packets.Request;
 import underlay.packets.Response;
 
-/** Represents a thread that handles a UDP request and emits a response. */
+/**
+ * Represents a thread that handles a UDP request and emits a response.
+ */
 public class UdpHandler implements Runnable {
 
   // The UDP socket that the response will be sent through.
@@ -24,11 +27,11 @@ public class UdpHandler implements Runnable {
   /**
    * Constructor for UdpHandler.
    *
-   * @param udpSocket UDP socket instance.
-   * @param request Request that s going to be handled.
+   * @param udpSocket     UDP socket instance.
+   * @param request       Request that s going to be handled.
    * @param clientAddress Client address.
-   * @param clientPort Integer representing client port.
-   * @param underlay UDP underlay instance.
+   * @param clientPort    Integer representing client port.
+   * @param underlay      UDP underlay instance.
    */
   public UdpHandler(
       DatagramSocket udpSocket,
