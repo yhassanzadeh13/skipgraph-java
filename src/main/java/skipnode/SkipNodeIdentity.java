@@ -4,41 +4,35 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import log.Log4jLogger;
+import model.identifier.Identifier;
+import model.identifier.MembershipVector;
 import org.apache.logging.log4j.LogManager;
 
 /**
  * Basic skipnode.SkipNodeIdentity class
  */
-public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdentity> {
+public class SkipNodeIdentity implements Serializable {
 
   private static final Log4jLogger logger =
       new Log4jLogger(LogManager.getLogger(SkipNodeIdentity.class));
-  private final String membershipVector;
-  private final int identifier;
+  private final MembershipVector membershipVector; // aka name Id
+  private final Identifier identifier; // aka numerical id
   private final String address;
   private final int port;
-  // Denotes the lookup table version.
-  public int version;
 
   /**
    * Constructor for SkipNodeIdentity.
    *
-   * @param nameId  name id of the node.
-   * @param numId   numerical id of the node.
+   * @param identifier identifier of the node (aka numerical ID).
+   * @param membershipVector membership vector of the node (aka name ID).
    * @param address String representing the address of the node.
    * @param port    Integer representing the port of the node.
-   * @param version Integer representing the vversion.
    */
-  public SkipNodeIdentity(String nameId, int numId, String address, int port, int version) {
-    this.membershipVector = nameId;
-    this.identifier = numId;
+  public SkipNodeIdentity(Identifier identifier, MembershipVector membershipVector, String address, int port) {
+    this.membershipVector = membershipVector;
+    this.identifier = identifier;
     this.address = address;
     this.port = port;
-    this.version = version;
-  }
-
-  public SkipNodeIdentity(String nameId, int numId, String address, int port) {
-    this(nameId, numId, address, port, 0);
   }
 
   /**
@@ -62,11 +56,11 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     return i;
   }
 
-  public String getMembershipVector() {
+  public MembershipVector getMembershipVector() {
     return membershipVector;
   }
 
-  public int getIdentifier() {
+  public Identifier getIdentifier() {
     return identifier;
   }
 
@@ -100,23 +94,13 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
   @Override
   public String toString() {
-    return "Name ID: "
-        + membershipVector
-        + "\tNum ID: "
-        + identifier
-        + "\tAddress: "
+    return "identifier: "
+        + identifier.toString()
+        + "\tmembership vector: "
+        + membershipVector.toString()
+        + "\taddress: "
         + address
-        + "\tPort: "
+        + "\tport: "
         + port;
-  }
-
-  @Override
-  public int compareTo(SkipNodeIdentity o) {
-    logger
-        .debug()
-        .addInt("num_id", this.identifier)
-        .addInt("compared_num_id", o.getIdentifier())
-        .addMsg("currently comparing");
-    return Integer.compare(identifier, o.identifier);
   }
 }
