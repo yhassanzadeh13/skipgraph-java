@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
+
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import org.apache.logging.log4j.LogManager;
@@ -559,7 +560,7 @@ public class SkipNode implements SkipNodeInterface {
    * @param targetNameId the target name ID.
    * @param level        the current level.
    * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix
-   *          length larger than `level`.
+   *         length larger than `level`.
    */
   @Override
   public SearchResult searchByNameIdRecursive(String targetNameId, int level) {

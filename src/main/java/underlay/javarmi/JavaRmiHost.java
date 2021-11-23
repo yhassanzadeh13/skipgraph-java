@@ -2,10 +2,13 @@ package underlay.javarmi;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
 import underlay.packets.Request;
 import underlay.packets.Response;
 
-/** Represents the Java RMI Service implementation. */
+/**
+ * Represents the Java RMI Service implementation.
+ */
 public class JavaRmiHost extends UnicastRemoteObject implements JavaRmiService {
 
   private final JavaRmiUnderlay underlay;

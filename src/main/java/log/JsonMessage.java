@@ -1,12 +1,15 @@
 package log;
 
 import java.util.HashMap;
+
 import org.apache.logging.log4j.message.ObjectMessage;
 
-/** Used for logging in json format instead of pure string. */
+/**
+ * Used for logging in json format instead of pure string.
+ */
 public class JsonMessage {
 
-  private HashMap<String, Object> data;
+  private final HashMap<String, Object> data;
 
   public JsonMessage() {
     this.data = new HashMap<>();

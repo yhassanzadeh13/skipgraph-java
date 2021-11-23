@@ -1,20 +1,20 @@
 package model.identifier;
 
+import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
+
 import io.ipfs.multibase.Multibase;
 import misc.Utils;
 import model.skipgraph.SkipGraph;
-import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
 /**
  * MembershipVector represents the membership vector of a skip graph node, i.e.,
  * what is known as name ID in literatures:
- * <p>
  * For more info on membership vector see these:
  * Hassanzadeh-Nazarabadi, Yahya, Alptekin Küpçü, and Öznur Özkasap. "Locality aware skip graph."
  * 2015 IEEE 35th International Conference on Distributed Computing Systems Workshops. IEEE, 2015.
- * <p>
- * Hassanzadeh-Nazarabadi, Yahya, Alptekin Küpçü, and Öznur Özkasap. "Interlaced: Fully decentralized churn
- * stabilization for skip graph-based dhts." Journal of Parallel and Distributed Computing 149 (2021): 13-28.
+ * Hassanzadeh-Nazarabadi, Yahya, Alptekin Küpçü, and Öznur Özkasap.
+ * "Interlaced: Fully decentralized churn stabilization for skip graph-based dhts."
+ * Journal of Parallel and Distributed Computing 149 (2021): 13-28.
  */
 public class MembershipVector {
   /**

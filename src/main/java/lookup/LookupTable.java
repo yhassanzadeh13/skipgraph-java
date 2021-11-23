@@ -1,9 +1,10 @@
 package lookup;
 
-import java.util.List;
 import skipnode.SkipNodeIdentity;
 
-/** Lookup Table interface. */
+/**
+ * Lookup Table interface.
+ */
 public interface LookupTable {
 
   SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity("EMPTY", -1, "EMPTY", -1);
@@ -12,7 +13,7 @@ public interface LookupTable {
   /**
    * Updates the left neighbor on the given level to be the node.
    *
-   * @param node Node to be put on the lookup table
+   * @param node  Node to be put on the lookup table
    * @param level The level on which to insert the node
    * @return Replaced node
    */
@@ -21,7 +22,7 @@ public interface LookupTable {
   /**
    * Updates the right neighbor on the given level to be the node.
    *
-   * @param node Node to be put on the lookup table
+   * @param node  Node to be put on the lookup table
    * @param level The level on which to insert the node
    * @return Replaced node
    */
@@ -48,7 +49,7 @@ public interface LookupTable {
    * Returns whether the given left neighbor exists in this lookup table at the given level.
    *
    * @param neighbor the neighbor to check existence of.
-   * @param level the level of the neighbor.
+   * @param level    the level of the neighbor.
    * @return true iff the neighbor is a left neighbor at the given level.
    */
   boolean isLeftNeighbor(SkipNodeIdentity neighbor, int level);
@@ -57,7 +58,7 @@ public interface LookupTable {
    * Returns whether the given right neighbor exists in this lookup table at the given level.
    *
    * @param neighbor the neighbor to check existence of.
-   * @param level the level of the neighbor.
+   * @param level    the level of the neighbor.
    * @return true iff the neighbor is a right neighbor at the given level.
    */
   boolean isRightNeighbor(SkipNodeIdentity neighbor, int level);

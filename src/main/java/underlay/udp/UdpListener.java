@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+
 import underlay.packets.Request;
 import underlay.packets.Response;
 
@@ -26,7 +27,7 @@ public class UdpListener implements Runnable {
    * Constructor for UdpListener.
    *
    * @param listenSocket listener socket.
-   * @param underlay UDP underlay instance.
+   * @param underlay     UDP underlay instance.
    * @param responseLock response lock.
    */
   public UdpListener(
@@ -51,8 +52,8 @@ public class UdpListener implements Runnable {
         if (packetObject instanceof Request) {
           Request request = (Request) packetObject;
           new Thread(
-                  new UdpHandler(
-                      listenSocket, request, packet.getAddress(), packet.getPort(), underlay))
+              new UdpHandler(
+                  listenSocket, request, packet.getAddress(), packet.getPort(), underlay))
               .start();
         } else if (packetObject instanceof Response) {
           // If the packet is a response, dispatch the response to the main thread.
