@@ -142,7 +142,7 @@ public class mvpTest {
         searchThreads[i + NODES * j] = new Thread(() -> {
           SearchResult res = searcher.searchByNameId(target.getNameId());
           try {
-            Assertions.assertEquals(target.getNameId(), res.result.getNameId(), "Source: " + searcher.getNumId() + " Target: " + target.getNameId());
+            Assertions.assertEquals(target.getNameId(), res.result.getMembershipVector(), "Source: " + searcher.getNumId() + " Target: " + target.getNameId());
           } catch (AssertionError error) {
             assertionErrorCount.getAndIncrement();
           } finally {

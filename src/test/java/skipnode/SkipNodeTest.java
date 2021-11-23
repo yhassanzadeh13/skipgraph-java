@@ -84,13 +84,13 @@ class SkipNodeTest {
       SkipNodeIdentity right = table.getRight(i);
 
       if (!left.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(left.getNumId() < numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(left.getNameId(), nameID) >= i);
+        Assertions.assertTrue(left.getIdentifier() < numID);
+        Assertions.assertTrue(SkipNodeIdentity.commonBits(left.getMembershipVector(), nameID) >= i);
       }
 
       if (!right.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(right.getNumId() > numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(right.getNameId(), nameID) >= i);
+        Assertions.assertTrue(right.getIdentifier() > numID);
+        Assertions.assertTrue(SkipNodeIdentity.commonBits(right.getMembershipVector(), nameID) >= i);
       }
     }
   }
@@ -104,12 +104,12 @@ class SkipNodeTest {
       SkipNodeIdentity right = table.getRight(i);
 
       if (!left.equals(LookupTable.EMPTY_NODE)) {
-        LookupTable neighborMap = tableMap.get(left.getNumId());
+        LookupTable neighborMap = tableMap.get(left.getIdentifier());
         Assertions.assertTrue(neighborMap.isRightNeighbor(node.getIdentity(), i));
       }
 
       if (!right.equals(LookupTable.EMPTY_NODE)) {
-        LookupTable neighborMap = tableMap.get(right.getNumId());
+        LookupTable neighborMap = tableMap.get(right.getIdentifier());
         Assertions.assertTrue(neighborMap.isLeftNeighbor(node.getIdentity(), i));
       }
     }
@@ -201,7 +201,7 @@ class SkipNodeTest {
             e.printStackTrace();
           }
           SearchResult res = initiator.searchByNameId(target.getNameId());
-          Assertions.assertEquals(target.getNameId(), res.result.getNameId(),
+          Assertions.assertEquals(target.getNameId(), res.result.getMembershipVector(),
               "Source: " + initiator.getNumId() + " Target: " + target.getNameId() + " " + excp
                   + "\n" + fnl);
         });

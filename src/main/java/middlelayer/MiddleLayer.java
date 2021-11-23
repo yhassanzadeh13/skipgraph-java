@@ -215,7 +215,7 @@ public class MiddleLayer {
 
   private SkipNodeInterface getById(int id) {
     for (SkipNodeInterface overlay : this.overlays) {
-      if (overlay.getIdentity().getNumId() == id) {
+      if (overlay.getIdentity().getIdentifier() == id) {
         return overlay;
       }
     }

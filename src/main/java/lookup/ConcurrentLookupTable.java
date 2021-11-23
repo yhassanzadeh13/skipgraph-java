@@ -60,8 +60,8 @@ public class ConcurrentLookupTable implements LookupTable {
 
     logger
         .debug()
-        .addInt("owner_num_id", owner.getNumId())
-        .addInt("neighbor_num_id", node.getNumId())
+        .addInt("owner_num_id", owner.getIdentifier())
+        .addInt("neighbor_num_id", node.getIdentifier())
         .addInt("level", level)
         .addMsg("updated left neighbor in lookup table");
     return prev;
@@ -82,8 +82,8 @@ public class ConcurrentLookupTable implements LookupTable {
 
     logger
         .debug()
-        .addInt("owner_num_id", owner.getNumId())
-        .addInt("neighbor_num_id", node.getNumId())
+        .addInt("owner_num_id", owner.getIdentifier())
+        .addInt("neighbor_num_id", node.getIdentifier())
         .addInt("level", level)
         .addMsg("updated right in lookup table");
     return prev;

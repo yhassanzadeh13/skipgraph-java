@@ -40,15 +40,15 @@ class LocalSkipGraphTest {
         if (neighbor.equals(LookupTable.EMPTY_NODE)) {
           continue;
         }
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(neighbor.getNameId(), nameID) >= i);
+        Assertions.assertTrue(SkipNodeIdentity.commonBits(neighbor.getMembershipVector(), nameID) >= i);
       }
       SkipNodeIdentity leftNeighbor = table.getLeft(i);
       SkipNodeIdentity rightNeighbor = table.getRight(i);
       if (!leftNeighbor.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(leftNeighbor.getNumId() < numID);
+        Assertions.assertTrue(leftNeighbor.getIdentifier() < numID);
       }
       if (!rightNeighbor.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(rightNeighbor.getNumId() > numID);
+        Assertions.assertTrue(rightNeighbor.getIdentifier() > numID);
       }
     }
   }
