@@ -57,7 +57,7 @@ public class FixtureTest {
     // last step it considers it positive (128), which is beyond bytes range [-128, 127].
     // Hence, we pass a 7 bits string starting with 1, i.e., 1000000x, and the fixture will
     // return the complete byte.
-    byte[] onePrefix = Fixtures.ByteArrayFixture("10000000", 10);
+    byte[] onePrefix = Fixtures.ByteArrayFixture("1000000", 10);
     Assertions.assertEquals(10, onePrefix.length);
     Assertions.assertTrue(Utils.toBinaryRepresentation(onePrefix[0]).startsWith("10000000"));
 
