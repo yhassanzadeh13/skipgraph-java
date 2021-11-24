@@ -19,13 +19,9 @@ public class SkipNode implements SkipNodeInterface {
   // The identity to be returned in case the node is currently unreachable (i.e., being inserted.)
   private static final SkipNodeIdentity unavailableIdentity = LookupTable.EMPTY_NODE;
   private static final Logger logger = LogManager.getLogger(SkipNode.class);
-  /**
-   * Attributes.
-   */
-  private final String address;
-  private final int port;
-  private final int numId;
-  private final String nameId;
+
+  private final SkipNodeIdentity identity;
+
   private final LookupTable lookupTable;
   private final InsertionLock insertionLock;
   private final LinkedBlockingDeque<InsertionLock.NeighborInstance> ownedLocks =
@@ -38,25 +34,14 @@ public class SkipNode implements SkipNodeInterface {
   /**
    * Constructor for SkipNode.
    *
-   * @param snId        Skip node identity instance.
-   * @param lookupTable Lookup table instance.
+   * @param identity    Skip Graph identity of the node.
+   * @param lookupTable Lookup table instance of the node.
    */
-  public SkipNode(SkipNodeIdentity snId, LookupTable lookupTable) {
-    this.address = snId.getAddress();
-    this.port = snId.getPort();
-    this.numId = snId.getIdentifier();
-    this.nameId = snId.getMembershipVector();
+  public SkipNode(SkipNodeIdentity identity, LookupTable lookupTable) {
+    this.identity = identity;
     this.lookupTable = lookupTable;
-    this.insertionLock = new InsertionLock(snId);
+    this.insertionLock = new InsertionLock(identity);
     insertionLock.startInsertion();
-  }
-
-  public int getNumId() {
-    return numId;
-  }
-
-  public String getNameId() {
-    return nameId;
   }
 
   public LookupTable getLookupTable() {
@@ -64,7 +49,7 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   public SkipNodeIdentity getIdentity() {
-    return new SkipNodeIdentity(nameId, numId, address, port, version);
+    return this.identity;
   }
 
   @Override
@@ -86,40 +71,41 @@ public class SkipNode implements SkipNodeInterface {
     }
     // Trivially insert the first node of the skip graph.
     if (introducerAddress == null) {
-      logger.debug("num_id: " + getNumId() + " was inserted");
       inserted = true;
       insertionLock.endInsertion();
       return;
     }
     // Try to acquire the locks from all of my neighbors.
     while (true) {
-      SkipNodeIdentity left = null;
-      SkipNodeIdentity right = null;
-      logger.debug("num_id: " + getNumId() + " is searching for its 0-level neighbors");
+      SkipNodeIdentity left;
+      SkipNodeIdentity right;
+
       // First, find my 0-level neighbor by making a num-id search through the introducer.
       SkipNodeIdentity searchResult =
-          middleLayer.searchByNumId(introducerAddress, introducerPort, numId);
+          middleLayer.searchByIdentifier(this.identity.getIdentifier(), introducerAddress, introducerPort);
       // Get my 0-level left and right neighbors.
-      if (getNumId() < searchResult.getIdentifier()) {
+      if (this.identity.getIdentifier().comparedTo(searchResult.getIdentifier()) < 0) {
         right = searchResult;
-        left = middleLayer.getLeftNode(right.getAddress(), right.getPort(), right.getIdentifier(), 0);
+        left = middleLayer.getLeftNeighborOf(right.getAddress(), right.getPort(), right.getIdentifier(), 0);
       } else {
         left = searchResult;
-        right = middleLayer.getRightNode(left.getAddress(), left.getPort(), left.getIdentifier(), 0);
+        right = middleLayer.getRightNeighborOf(left.getAddress(), left.getPort(), left.getIdentifier(), 0);
       }
       logger.debug(
-          "num_id: "
-              + getNumId()
+          "identifier: "
+              + this.identity.getIdentifier().toString()
               + " has found its 0-level neighbors: "
-              + " neighbor_left_num_id: "
+              + " neighbor_left_identifier: "
               + left.getIdentifier()
-              + " neighbor_right_num_id: "
+              + " neighbor_right_identifier: "
               + right.getIdentifier());
       if (acquireNeighborLocks(left, right)) {
         break;
       }
       // When we fail, backoff for a random interval before trying again.
-      logger.debug("num_id: " + getNumId() + " could not acquire the locks, backing off");
+      logger.debug("identifier: "
+          + this.getIdentity().getIdentifier().toString()
+          + " could not acquire the locks, backing off");
       int sleepTime = (int) (Math.random() * 2000);
       try {
         Thread.sleep(sleepTime);
@@ -128,8 +114,8 @@ public class SkipNode implements SkipNodeInterface {
       }
     }
     logger.debug(
-        "num_id: "
-            + getNumId()
+        "identifier: "
+            + this.getIdentity().getIdentifier().toString()
             + " has acquired all the locks: "
             + ownedLocks.stream()
             .map(n -> String.valueOf(n.node.getIdentifier()))
@@ -143,7 +129,7 @@ public class SkipNode implements SkipNodeInterface {
       middleLayer.announceNeighbor(
           n.node.getAddress(), n.node.getPort(), n.node.getIdentifier(), getIdentity(), n.minLevel);
     }
-    // Now, we release all of the locks.
+    // Now, we release all the locks.
     List<InsertionLock.NeighborInstance> toRelease = new ArrayList<>();
     ownedLocks.drainTo(toRelease);
     // Release the locks.
@@ -154,7 +140,7 @@ public class SkipNode implements SkipNodeInterface {
         });
     // Complete the insertion.
     inserted = true;
-    logger.debug("num_id: " + getNumId() + " was inserted");
+    logger.debug("identifier: " + this.identity.getIdentifier() + " was inserted");
     insertionLock.endInsertion();
   }
 
@@ -193,19 +179,13 @@ public class SkipNode implements SkipNodeInterface {
       }
       if (newLeftNeighbor && !leftNeighbor.equals(LookupTable.EMPTY_NODE)) {
         // Try to acquire the lock for the left neighbor.
-        logger.debug(
-            "num_id: "
-                + getNumId()
-                + " is trying to acquire a lock from "
-                + "neighbor_left_num_id "
-                + leftNeighbor.getIdentifier());
+
         boolean acquired =
             middleLayer.tryAcquire(
                 leftNeighbor.getAddress(),
                 leftNeighbor.getPort(),
                 leftNeighbor.getIdentifier(),
-                getIdentity(),
-                leftNeighbor.version);
+                getIdentity());
         if (!acquired) {
           allAcquired = false;
           break;
@@ -215,8 +195,8 @@ public class SkipNode implements SkipNodeInterface {
       }
       if (newRightNeighbor && !rightNeighbor.equals(LookupTable.EMPTY_NODE)) {
         logger.debug(
-            "num_id: "
-                + getNumId()
+            "identifier: "
+                + this.identity.getIdentifier()
                 + " is trying to acquire a lock from "
                 + "neighbor_right_num_id "
                 + rightNeighbor.getIdentifier());
@@ -226,8 +206,7 @@ public class SkipNode implements SkipNodeInterface {
                 rightNeighbor.getAddress(),
                 rightNeighbor.getPort(),
                 rightNeighbor.getIdentifier(),
-                getIdentity(),
-                rightNeighbor.version);
+                getIdentity());
         if (!acquired) {
           allAcquired = false;
           break;
@@ -235,16 +214,11 @@ public class SkipNode implements SkipNodeInterface {
         // Add the new lock to our list of locks.
         ownedLocks.add(new InsertionLock.NeighborInstance(rightNeighbor, level));
       }
-      logger.debug("num_id: " + getNumId() + " is climbing up");
+
       // Acquire the ladders (i.e., the neighbors at the upper level) and
       // check if they are new neighbors or not. If they are not,
       // we won't need to request a lock from them.
-      logger.debug(
-          "num_id: "
-              + getNumId()
-              + " is sending findLadder request to "
-              + "neighbor_left_num_id "
-              + leftNeighbor.getIdentifier());
+      // TODO: these must be encapsulated as functions.
       SkipNodeIdentity leftLadder =
           (leftNeighbor.equals(LookupTable.EMPTY_NODE))
               ? LookupTable.EMPTY_NODE
@@ -253,15 +227,10 @@ public class SkipNode implements SkipNodeInterface {
               leftNeighbor.getPort(),
               leftNeighbor.getIdentifier(),
               level,
-              0,
-              getNameId());
+              0, // TODO: left or right must be defined as constants.
+              this.identity.getMembershipVector());
       newLeftNeighbor = !leftLadder.equals(leftNeighbor);
-      logger.debug(
-          "num_id: "
-              + getNumId()
-              + " is sending findLadder request to "
-              + "neighbor_right_num_id "
-              + rightNeighbor.getIdentifier());
+
       SkipNodeIdentity rightLadder =
           (rightNeighbor.equals(LookupTable.EMPTY_NODE))
               ? LookupTable.EMPTY_NODE
@@ -271,7 +240,8 @@ public class SkipNode implements SkipNodeInterface {
               rightNeighbor.getIdentifier(),
               level,
               1,
-              getNameId());
+              this.identity.getMembershipVector());
+
       newRightNeighbor = !rightLadder.equals(rightNeighbor);
       leftNeighbor = leftLadder;
       rightNeighbor = rightLadder;
@@ -283,9 +253,9 @@ public class SkipNode implements SkipNodeInterface {
         allAcquired = false;
         break;
       }
-      logger.debug("num_id: " + getNumId() + " has climbed up");
+      logger.debug("identifier: " + this.identity.getIdentifier() + " has climbed up");
     }
-    logger.debug("num_id: " + getNumId() + " has completed proposal phase");
+    logger.debug("identifier: " + this.identity.getIdentifier() + " has completed proposal phase");
     // If we were not able to acquire all the locks, then release the locks that were acquired.
     if (!allAcquired) {
       List<NeighborInstance> toRelease = new ArrayList<>();
@@ -305,13 +275,13 @@ public class SkipNode implements SkipNodeInterface {
     // Naively try to acquire the lock.
     if (!insertionLock.tryAcquire(requester)) {
       logger.debug(
-          "num_id: "
-              + getNumId()
+          "identifier: "
+              + this.identity.getIdentifier()
               + " did not hand over the lock to "
               + requester.getIdentifier()
               + " because it is already given to "
               + ((insertionLock.holder == null)
-              ? this.getNumId()
+              ? this.getIdentity()
               : insertionLock.holder.getIdentifier()));
       return false;
     }
@@ -322,8 +292,8 @@ public class SkipNode implements SkipNodeInterface {
       return false;
     }
     logger.debug(
-        "num_id: "
-            + getNumId()
+        "identifier: "
+            + this.identity.getIdentifier()
             + " is being locked by "
             + requester.getIdentifier()
             + " with provided version "
@@ -335,8 +305,8 @@ public class SkipNode implements SkipNodeInterface {
   public boolean unlock(SkipNodeIdentity owner) {
     boolean unlocked = insertionLock.unlockOwned(owner);
     logger.debug(
-        "num_id: "
-            + getNumId()
+        "identifier: "
+            + this.identity.getIdentifier()
             + " has released the lock from "
             + owner.getIdentifier()
             + ": "
@@ -379,7 +349,7 @@ public class SkipNode implements SkipNodeInterface {
     }
     // If the current node and the inserted node have common bits more than the current level,
     // then this node is the neighbor so we return it
-    if (SkipNodeIdentity.commonBits(target, getNameId()) > level) {
+    if (SkipNodeIdentity(target, getNameId()) > level) {
       logger.debug("num_id: " + getNumId() + " is returning a findLadder response");
       return getIdentity();
     }
@@ -396,9 +366,9 @@ public class SkipNode implements SkipNodeInterface {
       // Try to find a new neighbor, but immediately return if the neighbor is locked.
       curr =
           (direction == 0)
-              ? middleLayer.getLeftNode(
+              ? middleLayer.getLeftNeighborOf(
               false, curr.getAddress(), curr.getPort(), curr.getIdentifier(), level)
-              : middleLayer.getRightNode(
+              : middleLayer.getRightNeighborOf(
               false, curr.getAddress(), curr.getPort(), curr.getIdentifier(), level);
       // If the potential neighbor is locked, we will get an invalid identity.
       // We should directly return it in that case.
@@ -486,7 +456,7 @@ public class SkipNode implements SkipNodeInterface {
       }
       // Else, delegate the search to that node on the right
       SkipNodeIdentity delegateNode = lookupTable.getRight(level);
-      return middleLayer.searchByNumId(
+      return middleLayer.searchByIdentifier(
           delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), numId);
     } else {
       // Start from the top, while there is no right neighbor,
@@ -506,7 +476,7 @@ public class SkipNode implements SkipNodeInterface {
       }
       // Else, delegate the search to that node on the right
       SkipNodeIdentity delegateNode = lookupTable.getLeft(level);
-      return middleLayer.searchByNumId(
+      return middleLayer.searchByIdentifier(
           delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), numId);
     }
   }
