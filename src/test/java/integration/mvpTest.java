@@ -17,7 +17,7 @@ import model.identifier.MembershipVector;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import underlay.Underlay;
+import network.Underlay;
 import static misc.LocalSkipGraph.prependToLength;
 import skipnode.SearchResult;
 import skipnode.SkipNode;

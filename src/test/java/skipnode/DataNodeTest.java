@@ -5,7 +5,7 @@ import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
-import underlay.Underlay;
+import network.Underlay;
 
 import java.util.ArrayList;
 import java.util.List;

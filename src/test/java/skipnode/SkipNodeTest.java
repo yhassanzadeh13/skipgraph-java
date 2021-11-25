@@ -9,7 +9,7 @@ import middlelayer.MiddleLayer;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import underlay.Underlay;
+import network.Underlay;
 
 /**
  * Contains the skip-node tests.
