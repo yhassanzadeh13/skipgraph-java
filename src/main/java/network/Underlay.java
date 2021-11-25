@@ -4,9 +4,9 @@ import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
 import middlelayer.MiddleLayer;
-import network.packets.Request;
-import network.packets.Response;
-import network.tcp.TcpUnderlay;
+import network.underlay.packets.Request;
+import network.underlay.packets.Response;
+import network.underlay.tcp.TcpUnderlay;
 
 /**
  * Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication.

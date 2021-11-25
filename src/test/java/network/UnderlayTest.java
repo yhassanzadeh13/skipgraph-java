@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
-import network.packets.requests.*;
+import network.underlay.packets.requests.*;
 
 /**
  * This test creates two underlays on the machine at different ports and checks the connectivity
