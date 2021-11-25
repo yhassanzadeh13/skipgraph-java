@@ -2,7 +2,7 @@ package skipnode;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
+import network.MiddleLayer;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
 import network.Underlay;

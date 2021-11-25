@@ -2,7 +2,6 @@ package network;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import skipnode.SkipNode;

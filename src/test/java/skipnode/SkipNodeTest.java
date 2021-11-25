@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
+import network.MiddleLayer;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

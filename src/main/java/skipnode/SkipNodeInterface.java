@@ -1,6 +1,6 @@
 package skipnode;
 
-import middlelayer.MiddleLayer;
+import network.MiddleLayer;
 
 /**
  * Skip Node interface.

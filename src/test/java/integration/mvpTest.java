@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
+import network.MiddleLayer;
 import misc.Utils;
 import model.identifier.MembershipVector;
 import org.junit.jupiter.api.AfterAll;

@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
+import network.MiddleLayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import skipnode.InsertionLock.NeighborInstance;

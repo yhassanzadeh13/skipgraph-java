@@ -3,7 +3,6 @@ package network;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
-import middlelayer.MiddleLayer;
 import network.underlay.packets.Request;
 import network.underlay.packets.Response;
 import network.underlay.tcp.TcpUnderlay;
