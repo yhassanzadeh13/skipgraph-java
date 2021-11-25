@@ -1,6 +1,6 @@
 package skipnode;
 
-import network.MiddleLayer;
+import network.Network;
 
 /**
  * Skip Node interface.
@@ -10,7 +10,7 @@ public interface SkipNodeInterface {
   /**
    * Set the middle layer which would handle communication with remote nodes.
    */
-  void setMiddleLayer(MiddleLayer middleLayer);
+  void setMiddleLayer(Network network);
 
   /**
    * Add the SkipNode to the SkipGraph through an introducer.

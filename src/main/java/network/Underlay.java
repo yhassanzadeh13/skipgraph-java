@@ -12,7 +12,7 @@ import network.underlay.tcp.TcpUnderlay;
  */
 public abstract class Underlay {
 
-  private MiddleLayer middleLayer;
+  private Network network;
 
   private int port;
   private String address;
@@ -27,8 +27,8 @@ public abstract class Underlay {
     return new TcpUnderlay();
   }
 
-  public void setMiddleLayer(MiddleLayer middleLayer) {
-    this.middleLayer = middleLayer;
+  public void setMiddleLayer(Network network) {
+    this.network = network;
   }
 
   public int getPort() {
@@ -50,7 +50,7 @@ public abstract class Underlay {
    * @return emitted response.
    */
   public Response dispatchRequest(Request request) {
-    return middleLayer.receive(request);
+    return network.receive(request);
   }
 
   /**

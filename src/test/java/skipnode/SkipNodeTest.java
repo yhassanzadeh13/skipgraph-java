@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lookup.LookupTable;
-import network.MiddleLayer;
+import network.Network;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -129,10 +129,10 @@ class SkipNodeTest {
         STARTING_PORT + NODES, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // Insert the first node.
     g.getNodes().get(0).insert(null, -1);
@@ -236,10 +236,10 @@ class SkipNodeTest {
         STARTING_PORT + NODES * 2, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // Insert the first node.
     g.getNodes().get(0).insert(null, -1);
@@ -290,10 +290,10 @@ class SkipNodeTest {
         STARTING_PORT + NODES * 3, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // Now, insert every node in a randomized order.
     g.insertAllRandomized();
@@ -322,10 +322,10 @@ class SkipNodeTest {
         STARTING_PORT + NODES * 4, true);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // We will now perform name ID searches for every node from each node in the skip graph.
     for (int i = 0; i < NODES; i++) {
@@ -356,10 +356,10 @@ class SkipNodeTest {
         STARTING_PORT - NODES, true);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
 
     // We will now perform name ID searches for every node from each node in the skip graph.

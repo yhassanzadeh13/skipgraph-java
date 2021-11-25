@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import network.MiddleLayer;
+import network.Network;
 import misc.Utils;
 import model.identifier.MembershipVector;
 import org.junit.jupiter.api.AfterAll;
@@ -80,10 +80,10 @@ public class mvpTest {
 
     // Create the middlelayers and wires in the underlays to the nodes
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNodes.get(i));
+      Network network = new Network(underlays.get(i), skipNodes.get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      skipNodes.get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      skipNodes.get(i).setMiddleLayer(network);
     }
 
     // first node inserts itself

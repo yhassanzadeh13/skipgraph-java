@@ -39,7 +39,7 @@ import network.underlay.packets.responses.SearchResultResponse;
  * underlay. The requests coming from the overlay are either directed to the underlay or to another
  * local overlay, and the emitted response is returned to the overlay.
  */
-public class MiddleLayer {
+public class Network {
 
   private final Underlay underlay;
   private final SkipNodeInterface masterOverlay;
@@ -51,7 +51,7 @@ public class MiddleLayer {
    * @param underlay underlay instance.
    * @param overlay  Skip node implementation which represents the overlay.
    */
-  public MiddleLayer(Underlay underlay, SkipNodeInterface overlay) {
+  public Network(Underlay underlay, SkipNodeInterface overlay) {
     this.underlay = underlay;
     this.masterOverlay = overlay;
     this.overlays = new ArrayList<>();

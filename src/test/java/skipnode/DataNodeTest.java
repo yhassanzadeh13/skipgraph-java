@@ -2,7 +2,7 @@ package skipnode;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import network.MiddleLayer;
+import network.Network;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
 import network.Underlay;
@@ -39,11 +39,11 @@ public class DataNodeTest {
 
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
 
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
 
     // Now, insert every node in a randomized order.
