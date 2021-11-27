@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import log.Log4jLogger;
+import model.Address;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -15,8 +16,7 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
       new Log4jLogger(LogManager.getLogger(SkipNodeIdentity.class));
   private final String nameId;
   private final int numId;
-  private final String address;
-  private final int port;
+  private final Address address;
   // Denotes the lookup table version.
   public int version;
 
@@ -25,20 +25,18 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
    *
    * @param nameId  name id of the node.
    * @param numId   numerical id of the node.
-   * @param address String representing the address of the node.
-   * @param port    Integer representing the port of the node.
-   * @param version Integer representing the vversion.
+   * @param address representing the address of the node.
+   * @param version Integer representing the version.
    */
-  public SkipNodeIdentity(String nameId, int numId, String address, int port, int version) {
+  public SkipNodeIdentity(String nameId, int numId, Address address, int version) {
     this.nameId = nameId;
     this.numId = numId;
     this.address = address;
-    this.port = port;
     this.version = version;
   }
 
-  public SkipNodeIdentity(String nameId, int numId, String address, int port) {
-    this(nameId, numId, address, port, 0);
+  public SkipNodeIdentity(String nameId, int numId, Address address) {
+    this(nameId, numId, address, 0);
   }
 
   /**
@@ -70,12 +68,8 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     return numId;
   }
 
-  public String getAddress() {
+  public Address getAddress() {
     return address;
-  }
-
-  public int getPort() {
-    return port;
   }
 
   @Override
@@ -89,13 +83,12 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     SkipNodeIdentity that = (SkipNodeIdentity) o;
     return getNumId() == that.getNumId()
         && getNameId().equals(that.getNameId())
-        && getAddress().equals(that.getAddress())
-        && getPort() == that.getPort();
+        && getAddress().equals(that.getAddress());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getNameId(), getNumId(), getAddress(), getPort());
+    return Objects.hash(getNameId(), getNumId(), getAddress());
   }
 
   @Override
@@ -105,9 +98,7 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
         + "\tNum ID: "
         + numId
         + "\tAddress: "
-        + address
-        + "\tPort: "
-        + port;
+        + address;
   }
 
   @Override
