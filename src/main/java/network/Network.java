@@ -4,33 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lookup.LookupTable;
-import skipnode.SearchResult;
-import skipnode.SkipNodeIdentity;
-import skipnode.SkipNodeInterface;
-import network.Underlay;
+import model.Address;
 import network.underlay.packets.Request;
 import network.underlay.packets.Response;
-import network.underlay.packets.requests.AcquireLockRequest;
-import network.underlay.packets.requests.AnnounceNeighborRequest;
-import network.underlay.packets.requests.FindLadderRequest;
-import network.underlay.packets.requests.GetIdentityRequest;
-import network.underlay.packets.requests.GetLeftLadderRequest;
-import network.underlay.packets.requests.GetLeftNodeRequest;
-import network.underlay.packets.requests.GetRightLadderRequest;
-import network.underlay.packets.requests.GetRightNodeRequest;
-import network.underlay.packets.requests.IncrementRequest;
-import network.underlay.packets.requests.InjectionRequest;
-import network.underlay.packets.requests.IsAvailableRequest;
-import network.underlay.packets.requests.ReleaseLockRequest;
-import network.underlay.packets.requests.SearchByNameIdRecursiveRequest;
-import network.underlay.packets.requests.SearchByNameIdRequest;
-import network.underlay.packets.requests.SearchByNumIdRequest;
-import network.underlay.packets.requests.UpdateLeftNodeRequest;
-import network.underlay.packets.requests.UpdateRightNodeRequest;
+import network.underlay.packets.requests.*;
 import network.underlay.packets.responses.AckResponse;
 import network.underlay.packets.responses.BooleanResponse;
 import network.underlay.packets.responses.IdentityResponse;
 import network.underlay.packets.responses.SearchResultResponse;
+import skipnode.SearchResult;
+import skipnode.SkipNodeIdentity;
+import skipnode.SkipNodeInterface;
 
 
 /**
@@ -62,14 +46,13 @@ public class Network {
    * Called by the overlay to send requests to the underlay.
    *
    * @param destinationAddress destination address.
-   * @param port               destination port.
    * @param request            the request.
    * @return the response emitted by the remote client.
    */
-  protected Response send(String destinationAddress, int port, Request request) {
+  protected Response send(Address destinationAddress, Request request) {
     // Fill out the request's sender information to be used by the remote middle layer.
-    request.senderAddress = underlay.getAddress();
-    request.senderPort = underlay.getPort();
+    request.originAddress = underlay.getAddress();
+
     Response response = null;
     int trial = 0;
     do {
@@ -85,12 +68,12 @@ public class Network {
         }
       }
       // Check if the destination address == address of this node.
-      if (destinationAddress.equals(underlay.getAddress()) && port == underlay.getPort()) {
+      if (destinationAddress.equals(underlay.getAddress())) {
         // Bounce the request up.
         response = receive(request);
       } else {
         // Or receive it from the remote client.
-        response = underlay.sendMessage(destinationAddress, port, request);
+        response = underlay.sendMessage(destinationAddress.getIp(), destinationAddress.getPort(), request);
       }
     } while (request.backoff && response.locked);
 
@@ -254,8 +237,7 @@ public class Network {
     return ((SearchResultResponse) response).result;
   }
 
-  public SearchResult searchByNameIdRecursive(
-      String destinationAddress, int port, String target, int level) {
+  public SearchResult searchByNameIdRecursive(Address address, String target, int level) {
     return searchByNameIdRecursive(destinationAddress, port, -1, target, level);
   }
 
@@ -269,17 +251,16 @@ public class Network {
    * @param level              Integer representing level.
    * @return search result instance.
    */
-  public SearchResult searchByNameIdRecursive(
-      String destinationAddress, int port, int receiverId, String target, int level) {
+  public SearchResult searchByNameIdRecursive(Address address, int receiverId, String target, int level) {
     Request request = new SearchByNameIdRecursiveRequest(target, level);
     request.receiverId = receiverId;
     // Send the request through the underlay.
-    Response response = this.send(destinationAddress, port, request);
+    Response response = this.send(address, request);
     return ((SearchResultResponse) response).result;
   }
 
-  public SkipNodeIdentity searchByNumId(String destinationAddress, int port, int numId) {
-    return searchByNumId(destinationAddress, port, -1, numId);
+  public SkipNodeIdentity searchByNumId(Address destinationAddress, int numId) {
+    return searchByNumId(destinationAddress, -1, numId);
   }
 
   /**
@@ -291,8 +272,7 @@ public class Network {
    * @param numId              target numerical id.
    * @return skip node identity.
    */
-  public SkipNodeIdentity searchByNumId(
-      String destinationAddress, int port, int receiverId, int numId) {
+  public SkipNodeIdentity searchByNumId(Address address, int receiverId, int numId) {
     Request request = new SearchByNumIdRequest(numId);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -300,8 +280,7 @@ public class Network {
     return ((IdentityResponse) response).identity;
   }
 
-  public boolean tryAcquire(
-      String destinationAddress, int port, SkipNodeIdentity req, int version) {
+  public boolean tryAcquire(Address address, SkipNodeIdentity req, int version) {
     return tryAcquire(destinationAddress, port, -1, req, version);
   }
 
@@ -315,8 +294,7 @@ public class Network {
    * @param version            Integer representing the version.
    * @return boolean value representing whether the lock is acquired or not.
    */
-  public boolean tryAcquire(
-      String destinationAddress, int port, int receiverId, SkipNodeIdentity req, int version) {
+  public boolean tryAcquire(Address address, int receiverId, SkipNodeIdentity req, int version) {
     Request request = new AcquireLockRequest(req, version);
     request.receiverId = receiverId;
 
@@ -324,7 +302,7 @@ public class Network {
     return ((BooleanResponse) response).answer;
   }
 
-  public boolean unlock(String destinationAddress, int port, SkipNodeIdentity owner) {
+  public boolean unlock(Address address, int port, SkipNodeIdentity owner) {
     return unlock(destinationAddress, port, -1, owner);
   }
 
@@ -384,8 +362,7 @@ public class Network {
    * @param level              Integer representing the level.
    * @return skip node identity.
    */
-  public SkipNodeIdentity updateLeftNode(
-      String destinationAddress, int port, int receiverId, SkipNodeIdentity snId, int level) {
+  public SkipNodeIdentity updateLeftNode(Address address, int receiverId, SkipNodeIdentity snId, int level) {
     Request request = new UpdateLeftNodeRequest(level, snId);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -393,7 +370,7 @@ public class Network {
     return ((IdentityResponse) response).identity;
   }
 
-  public SkipNodeIdentity getIdentity(String destinationAddress, int port) {
+  public SkipNodeIdentity getIdentity(Address address, int port) {
     return getIdentity(destinationAddress, port, -1);
   }
 
@@ -412,13 +389,12 @@ public class Network {
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getRightNode(String destinationAddress, int port, int level) {
-    return getRightNode(true, destinationAddress, port, -1, level);
+  public SkipNodeIdentity getRightNode(Address destinationAddress, int level) {
+    return getRightNode(destinationAddress, port, -1, level, true);
   }
 
-  public SkipNodeIdentity getRightNode(
-      String destinationAddress, int port, int receiverId, int level) {
-    return getRightNode(true, destinationAddress, port, receiverId, level);
+  public SkipNodeIdentity getRightNode(Address destinationAddress, int receiverId, int level) {
+    return getRightNode(destinationAddress, receiverId, level, true);
   }
 
   /**
@@ -431,8 +407,7 @@ public class Network {
    * @param level              Integer representing the level
    * @return skip node identity.
    */
-  public SkipNodeIdentity getRightNode(
-      boolean backoff, String destinationAddress, int port, int receiverId, int level) {
+  public SkipNodeIdentity getRightNode(Address address, int receiverId, int level, boolean backoff) {
     // Send the request through the underlay
     GetRightNodeRequest req = new GetRightNodeRequest(level);
     req.backoff = backoff;
@@ -446,12 +421,11 @@ public class Network {
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getLeftNode(String destinationAddress, int port, int level) {
+  public SkipNodeIdentity getLeftNode(Address destinationAddress, int level) {
     return getLeftNode(true, destinationAddress, port, -1, level);
   }
 
-  public SkipNodeIdentity getLeftNode(
-      String destinationAddress, int port, int receiverId, int level) {
+  public SkipNodeIdentity getLeftNode(Address destinationAddress, int receiverId, int level) {
     return getLeftNode(true, destinationAddress, port, receiverId, level);
   }
 
@@ -465,8 +439,7 @@ public class Network {
    * @param level              Integer representing the level
    * @return skip node identity.
    */
-  public SkipNodeIdentity getLeftNode(
-      boolean backoff, String destinationAddress, int port, int receiverId, int level) {
+  public SkipNodeIdentity getLeftNode(boolean backoff, Address address, int receiverId, int level) {
     // Send the request through the underlay
     GetLeftNodeRequest req = new GetLeftNodeRequest(level);
     req.backoff = backoff;
@@ -484,7 +457,6 @@ public class Network {
    * Method for finding a ladder.
    *
    * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
    * @param receiverId         receiver id.
    * @param level              Integer representing the level.
    * @param direction          Integer representing the direction.
@@ -492,8 +464,7 @@ public class Network {
    * @return skip node identity.
    */
   public SkipNodeIdentity findLadder(
-      String destinationAddress,
-      int port,
+      Address destinationAddress,
       int receiverId,
       int level,
       int direction,
@@ -505,8 +476,7 @@ public class Network {
     return ((IdentityResponse) r).identity;
   }
 
-  public void announceNeighbor(
-      String destinationAddress, int port, SkipNodeIdentity newNeighbor, int minLevel) {
+  public void announceNeighbor(Address address, SkipNodeIdentity newNeighbor, int minLevel) {
     announceNeighbor(destinationAddress, port, -1, newNeighbor, minLevel);
   }
 
@@ -520,8 +490,7 @@ public class Network {
    * @param minLevel           Integer representing the minimum level.
    */
   public void announceNeighbor(
-      String destinationAddress,
-      int port,
+      Address address,
       int receiverId,
       SkipNodeIdentity newNeighbor,
       int minLevel) {
