@@ -3,6 +3,7 @@ package network;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
+import model.Address;
 import network.underlay.packets.Request;
 import network.underlay.packets.Response;
 import network.underlay.tcp.TcpUnderlay;
@@ -13,10 +14,8 @@ import network.underlay.tcp.TcpUnderlay;
 public abstract class Underlay {
 
   private Network network;
+  private Address address;
 
-  private int port;
-  private String address;
-  private String fullAddress;
 
   /**
    * Constructs a new default underlay. Must be initialized and connected to the middle layer.
@@ -31,16 +30,8 @@ public abstract class Underlay {
     this.network = network;
   }
 
-  public int getPort() {
-    return port;
-  }
-
-  public String getAddress() {
+  public Address getAddress() {
     return address;
-  }
-
-  public String getFullAddress() {
-    return fullAddress;
   }
 
   /**
@@ -60,20 +51,22 @@ public abstract class Underlay {
    * @return true iff the initialization was successful.
    */
   public final boolean initialize(int port) {
+    String ip;
+
     port = initUnderlay(port);
     if (port <= 0) {
       return false;
     }
 
-    this.port = port;
     try {
-      address = Inet4Address.getLocalHost().getHostAddress();
+      ip = Inet4Address.getLocalHost().getHostAddress();
+      this.address = new Address(ip, port);
     } catch (UnknownHostException e) {
       System.err.println("[Underlay] Could not acquire the local host name during initialization.");
       e.printStackTrace();
       return false;
     }
-    fullAddress = address + ":" + port;
+
     return true;
   }
 
