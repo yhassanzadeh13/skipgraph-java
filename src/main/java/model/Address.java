@@ -23,6 +23,11 @@ public class Address {
   }
 
   @Override
+  public String toString() {
+    return this.ip + ":" + this.port;
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (!(o instanceof Address)) return false;
