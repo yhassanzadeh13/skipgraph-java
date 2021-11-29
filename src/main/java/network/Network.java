@@ -131,7 +131,7 @@ public class Network {
         return new BooleanResponse(overlay.unlock(((ReleaseLockRequest) request).owner));
       case UpdateLeftNode:
         // Can only be invoked when unlocked or by the lock owner.
-        if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
+        if (overlay.isLocked() && !overlay.isLockedBy(request.getOriginAddress())) {
           return new Response(true);
         }
         identity =
@@ -140,7 +140,7 @@ public class Network {
         return new IdentityResponse(identity);
       case UpdateRightNode:
         // Can only be invoked when unlocked or by the lock owner.
-        if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
+        if (overlay.isLocked() && !overlay.isLockedBy(request.getOriginAddress())) {
           return new Response(true);
         }
         identity =
@@ -149,21 +149,21 @@ public class Network {
         return new IdentityResponse(identity);
       case GetRightNode:
         // Can only be invoked when unlocked or by the lock owner.
-        if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
+        if (overlay.isLocked() && !overlay.isLockedBy(request.getOriginAddress())) {
           return new Response(true);
         }
         identity = overlay.getRightNode(((GetRightNodeRequest) request).level);
         return new IdentityResponse(identity);
       case GetLeftNode:
         // Can only be invoked when unlocked or by the lock owner.
-        if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
+        if (overlay.isLocked() && !overlay.isLockedBy(request.getOriginAddress())) {
           return new Response(true);
         }
         identity = overlay.getLeftNode(((GetLeftNodeRequest) request).level);
         return new IdentityResponse(identity);
       case FindLadder:
         // Can only be invoked when unlocked or by the lock owner.
-        if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
+        if (overlay.isLocked() && !overlay.isLockedBy(request.getOriginAddress())) {
           return new Response(true);
         }
         identity =
@@ -193,7 +193,7 @@ public class Network {
   public void insertDataNode(SkipNodeInterface node) {
     overlays.add(node);
     node.setMiddleLayer(this);
-    node.insert(node.getIdentity().getAddress(), node.getIdentity().getPort());
+    node.insert(node.getIdentity().getAddress());
   }
 
   private SkipNodeInterface getById(int id) {
@@ -215,182 +215,170 @@ public class Network {
   allowing for it to be used as if it was simply available locally.
    */
 
-  public SearchResult searchByNameId(String destinationAddress, int port, String nameId) {
-    return searchByNameId(destinationAddress, port, -1, nameId);
+  public SearchResult searchByNameId(Address destinationAddress, String nameId) {
+    return searchByNameId(destinationAddress, -1, nameId);
   }
 
   /**
    * Method for searching by the name id.
    *
-   * @param destinationAddress String representing the destination address.
-   * @param port               Integer representing the port.
-   * @param receiverId         ID of the receiver.
-   * @param nameId             name id to be searched.
+   * @param dst        the destination address.
+   * @param receiverId ID of the receiver.
+   * @param nameId     name id to be searched.
    * @return Search results from the search.
    */
-  public SearchResult searchByNameId(
-      String destinationAddress, int port, int receiverId, String nameId) {
+  public SearchResult searchByNameId(Address dst, int receiverId, String nameId) {
     Request request = new SearchByNameIdRequest(nameId);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response response = this.send(destinationAddress, port, request);
+    Response response = this.send(dst, request);
     return ((SearchResultResponse) response).result;
   }
 
-  public SearchResult searchByNameIdRecursive(Address address, String target, int level) {
-    return searchByNameIdRecursive(destinationAddress, port, -1, target, level);
+  public SearchResult searchByNameIdRecursive(Address dst, String target, int level) {
+    return searchByNameIdRecursive(dst, -1, target, level);
   }
 
   /**
    * Method for searching by name id recursively.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param target             String value representing the target.
-   * @param level              Integer representing level.
+   * @param dst        the destination address.
+   * @param receiverId receiver id.
+   * @param target     String value representing the target.
+   * @param level      Integer representing level.
    * @return search result instance.
    */
-  public SearchResult searchByNameIdRecursive(Address address, int receiverId, String target, int level) {
+  public SearchResult searchByNameIdRecursive(Address dst, int receiverId, String target, int level) {
     Request request = new SearchByNameIdRecursiveRequest(target, level);
     request.receiverId = receiverId;
     // Send the request through the underlay.
-    Response response = this.send(address, request);
+    Response response = this.send(dst, request);
     return ((SearchResultResponse) response).result;
   }
 
-  public SkipNodeIdentity searchByNumId(Address destinationAddress, int numId) {
-    return searchByNumId(destinationAddress, -1, numId);
+  public SkipNodeIdentity searchByNumId(Address dst, int numId) {
+    return searchByNumId(dst, -1, numId);
   }
 
   /**
    * Method for searching with numerical id.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param numId              target numerical id.
+   * @param dst        String value representing the destination address.
+   * @param receiverId receiver id.
+   * @param numId      target numerical id.
    * @return skip node identity.
    */
-  public SkipNodeIdentity searchByNumId(Address address, int receiverId, int numId) {
+  public SkipNodeIdentity searchByNumId(Address dst, int receiverId, int numId) {
     Request request = new SearchByNumIdRequest(numId);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response response = this.send(destinationAddress, port, request);
+    Response response = this.send(dst, request);
     return ((IdentityResponse) response).identity;
   }
 
-  public boolean tryAcquire(Address address, SkipNodeIdentity req, int version) {
-    return tryAcquire(destinationAddress, port, -1, req, version);
+  public boolean tryAcquire(Address dst, SkipNodeIdentity req, int version) {
+    return tryAcquire(dst, -1, req, version);
   }
 
   /**
    * Method for trying to acquire the lock.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param req                skip node identity.
-   * @param version            Integer representing the version.
+   * @param dst        String value representing the destination address.
+   * @param receiverId receiver id.
+   * @param req        skip node identity.
+   * @param version    Integer representing the version.
    * @return boolean value representing whether the lock is acquired or not.
    */
-  public boolean tryAcquire(Address address, int receiverId, SkipNodeIdentity req, int version) {
+  public boolean tryAcquire(Address dst, int receiverId, SkipNodeIdentity req, int version) {
     Request request = new AcquireLockRequest(req, version);
     request.receiverId = receiverId;
 
-    Response response = this.send(destinationAddress, port, request);
+    Response response = this.send(dst, request);
     return ((BooleanResponse) response).answer;
   }
 
-  public boolean unlock(Address address, int port, SkipNodeIdentity owner) {
-    return unlock(destinationAddress, port, -1, owner);
+  public boolean unlock(Address dst, SkipNodeIdentity owner) {
+    return unlock(dst, -1, owner);
   }
 
   /**
    * Method for unlocking the lock.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param owner              owner node.
+   * @param dst        the destination address.
+   * @param receiverId receiver id.
+   * @param owner      owner node.
    * @return boolean value representing if the lock is unlocked or not.
    */
-  public boolean unlock(
-      String destinationAddress, int port, int receiverId, SkipNodeIdentity owner) {
+  public boolean unlock(Address dst, int receiverId, SkipNodeIdentity owner) {
     Request request = new ReleaseLockRequest(owner);
     request.receiverId = receiverId;
-    Response response = this.send(destinationAddress, port, request);
+    Response response = this.send(dst, request);
     return ((BooleanResponse) response).answer;
   }
 
-  public SkipNodeIdentity updateRightNode(
-      String destinationAddress, int port, SkipNodeIdentity snId, int level) {
-    return updateRightNode(destinationAddress, port, -1, snId, level);
+  public SkipNodeIdentity updateRightNode(Address dst, SkipNodeIdentity snId, int level) {
+    return updateRightNode(dst, -1, snId, level);
   }
 
   /**
    * Method for updating the right node.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
+   * @param dst String value representing the destination address.
    * @param receiverId         receiver id.
    * @param snId               skip node identity.
    * @param level              Integer representing the level.
    * @return skip node identity.
    */
-  public SkipNodeIdentity updateRightNode(
-      String destinationAddress, int port, int receiverId, SkipNodeIdentity snId, int level) {
+  public SkipNodeIdentity updateRightNode(Address dst, int receiverId, SkipNodeIdentity snId, int level) {
     Request request = new UpdateRightNodeRequest(level, snId);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response response = this.send(destinationAddress, port, request);
+    Response response = this.send(dst, request);
     return ((IdentityResponse) response).identity;
   }
 
-  public SkipNodeIdentity updateLeftNode(
-      String destinationAddress, int port, SkipNodeIdentity snId, int level) {
-    return updateLeftNode(destinationAddress, port, -1, snId, level);
+  public SkipNodeIdentity updateLeftNode(Address dst, SkipNodeIdentity snId, int level) {
+    return updateLeftNode(dst, -1, snId, level);
   }
 
   /**
    * Method for updating the left node.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
+   * @param dst String value representing the destination address.
    * @param receiverId         receiver id.
    * @param snId               skip node identity.
    * @param level              Integer representing the level.
    * @return skip node identity.
    */
-  public SkipNodeIdentity updateLeftNode(Address address, int receiverId, SkipNodeIdentity snId, int level) {
+  public SkipNodeIdentity updateLeftNode(Address dst, int receiverId, SkipNodeIdentity snId, int level) {
     Request request = new UpdateLeftNodeRequest(level, snId);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response response = this.send(destinationAddress, port, request);
+    Response response = this.send(dst, request);
     return ((IdentityResponse) response).identity;
   }
 
-  public SkipNodeIdentity getIdentity(Address address, int port) {
-    return getIdentity(destinationAddress, port, -1);
+  public SkipNodeIdentity getIdentity(Address dst, int port) {
+    return getIdentity(dst, -1);
   }
 
   /**
    * Method for getting the identity.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
+   * @param dst        String value representing the destination address.
+   * @param port       Integer value representing the port.
+   * @param receiverId receiver id.
    * @return skip node identity.
    */
-  public SkipNodeIdentity getIdentity(String destinationAddress, int port, int receiverId) {
+  public SkipNodeIdentity getIdentity(Address dst, int port, int receiverId) {
     Request request = new GetIdentityRequest();
     request.receiverId = receiverId;
-    Response r = send(destinationAddress, port, new GetIdentityRequest());
+    Response r = send(dst, new GetIdentityRequest());
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getRightNode(Address destinationAddress, int level) {
-    return getRightNode(destinationAddress, port, -1, level, true);
+  public SkipNodeIdentity getRightNode(Address dst, int level) {
+    return getRightNode(dst, -1, level, true);
   }
 
   public SkipNodeIdentity getRightNode(Address destinationAddress, int receiverId, int level) {
@@ -400,19 +388,18 @@ public class Network {
   /**
    * Method for getting the right node.
    *
-   * @param backoff            boolean value for back off.
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param level              Integer representing the level
+   * @param backoff    boolean value for back off.
+   * @param dst        String value representing the destination address.
+   * @param receiverId receiver id.
+   * @param level      Integer representing the level
    * @return skip node identity.
    */
-  public SkipNodeIdentity getRightNode(Address address, int receiverId, int level, boolean backoff) {
+  public SkipNodeIdentity getRightNode(Address dst, int receiverId, int level, boolean backoff) {
     // Send the request through the underlay
     GetRightNodeRequest req = new GetRightNodeRequest(level);
     req.backoff = backoff;
     req.receiverId = receiverId;
-    Response r = send(destinationAddress, port, req);
+    Response r = send(dst, req);
     // If the client has returned a locked response (i.e., has indicated that we should try again),
     // return an invalid skip node identity.
     if (r.locked) {
@@ -421,12 +408,12 @@ public class Network {
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getLeftNode(Address destinationAddress, int level) {
-    return getLeftNode(true, destinationAddress, port, -1, level);
+  public SkipNodeIdentity getLeftNode(Address dst, int level) {
+    return getLeftNode(true, dst, -1, level);
   }
 
-  public SkipNodeIdentity getLeftNode(Address destinationAddress, int receiverId, int level) {
-    return getLeftNode(true, destinationAddress, port, receiverId, level);
+  public SkipNodeIdentity getLeftNode(Address dst, int receiverId, int level) {
+    return getLeftNode(true, dst, receiverId, level);
   }
 
   /**
