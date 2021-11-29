@@ -100,7 +100,7 @@ public class JavaRmiUnderlay extends Underlay {
   @Override
   public boolean terminate() {
     try {
-      Naming.unbind("//" + getFullAddress() + "/node");
+      Naming.unbind("//" + this.getAddress().toString() + "/node");
     } catch (Exception e) {
       System.err.println("[JavaRMIUnderlay] Could not terminate.");
       e.printStackTrace();
