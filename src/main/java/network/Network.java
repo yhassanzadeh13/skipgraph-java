@@ -323,10 +323,10 @@ public class Network {
   /**
    * Method for updating the right node.
    *
-   * @param dst String value representing the destination address.
-   * @param receiverId         receiver id.
-   * @param snId               skip node identity.
-   * @param level              Integer representing the level.
+   * @param dst        String value representing the destination address.
+   * @param receiverId receiver id.
+   * @param snId       skip node identity.
+   * @param level      Integer representing the level.
    * @return skip node identity.
    */
   public SkipNodeIdentity updateRightNode(Address dst, int receiverId, SkipNodeIdentity snId, int level) {
@@ -344,10 +344,10 @@ public class Network {
   /**
    * Method for updating the left node.
    *
-   * @param dst String value representing the destination address.
-   * @param receiverId         receiver id.
-   * @param snId               skip node identity.
-   * @param level              Integer representing the level.
+   * @param dst        String value representing the destination address.
+   * @param receiverId receiver id.
+   * @param snId       skip node identity.
+   * @param level      Integer representing the level.
    * @return skip node identity.
    */
   public SkipNodeIdentity updateLeftNode(Address dst, int receiverId, SkipNodeIdentity snId, int level) {
@@ -419,19 +419,18 @@ public class Network {
   /**
    * Method for getting the left node.
    *
-   * @param backoff            boolean value for back off.
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param level              Integer representing the level
+   * @param backoff    boolean value for back off.
+   * @param dst        the destination address.
+   * @param receiverId receiver id.
+   * @param level      Integer representing the level
    * @return skip node identity.
    */
-  public SkipNodeIdentity getLeftNode(boolean backoff, Address address, int receiverId, int level) {
+  public SkipNodeIdentity getLeftNode(boolean backoff, Address dst, int receiverId, int level) {
     // Send the request through the underlay
     GetLeftNodeRequest req = new GetLeftNodeRequest(level);
     req.backoff = backoff;
     req.receiverId = receiverId;
-    Response r = send(destinationAddress, port, req);
+    Response r = send(dst, req);
     // If the client has returned a locked response (i.e., has indicated that we should try again),
     // return an invalid skip node identity.
     if (r.locked) {
@@ -443,15 +442,15 @@ public class Network {
   /**
    * Method for finding a ladder.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param receiverId         receiver id.
-   * @param level              Integer representing the level.
-   * @param direction          Integer representing the direction.
-   * @param target             String representing the target.
+   * @param dst        the destination address.
+   * @param receiverId receiver id.
+   * @param level      Integer representing the level.
+   * @param direction  Integer representing the direction.
+   * @param target     String representing the target.
    * @return skip node identity.
    */
   public SkipNodeIdentity findLadder(
-      Address destinationAddress,
+      Address dst,
       int receiverId,
       int level,
       int direction,
@@ -459,118 +458,107 @@ public class Network {
     Request request = new FindLadderRequest(level, direction, target);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response r = send(destinationAddress, port, request);
+    Response r = send(dst, request);
     return ((IdentityResponse) r).identity;
   }
 
-  public void announceNeighbor(Address address, SkipNodeIdentity newNeighbor, int minLevel) {
-    announceNeighbor(destinationAddress, port, -1, newNeighbor, minLevel);
+  public void announceNeighbor(Address dst, SkipNodeIdentity newNeighbor, int minLevel) {
+    announceNeighbor(dst, -1, newNeighbor, minLevel);
   }
 
   /**
    * Method for announcing a new neighbour.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param newNeighbor        skip node identity of the new neighbour.
-   * @param minLevel           Integer representing the minimum level.
+   * @param dst         the destination address.
+   * @param receiverId  receiver id.
+   * @param newNeighbor skip node identity of the new neighbour.
+   * @param minLevel    Integer representing the minimum level.
    */
   public void announceNeighbor(
-      Address address,
+      Address dst,
       int receiverId,
       SkipNodeIdentity newNeighbor,
       int minLevel) {
     Request request = new AnnounceNeighborRequest(newNeighbor, minLevel);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    send(destinationAddress, port, request);
+    send(dst, request);
   }
 
-  public boolean isAvailable(String destinationAddress, int port) {
-    return isAvailable(destinationAddress, port, -1);
+  public boolean isAvailable(Address dst) {
+    return isAvailable(dst, -1);
   }
 
   /**
    * Method for checking if node is available or not.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
+   * @param dst        the destination address.
+   * @param receiverId receiver id.
    * @return boolean representing if node is available or not.
    */
-  public boolean isAvailable(String destinationAddress, int port, int receiverId) {
+  public boolean isAvailable(Address dst, int receiverId) {
     Request request = new IsAvailableRequest();
     request.receiverId = receiverId;
-    Response r = send(destinationAddress, port, request);
+    Response r = send(dst, request);
     return ((BooleanResponse) r).answer;
   }
 
-  public SkipNodeIdentity getLeftLadder(
-      String destinationAddress, int port, int level, String nameId) {
-    return getLeftLadder(destinationAddress, port, -1, level, nameId);
+  public SkipNodeIdentity getLeftLadder(Address dst, int level, String nameId) {
+    return getLeftLadder(dst, -1, level, nameId);
   }
 
   /**
    * Method for getting the left ladder.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param level              Integer representing the level.
-   * @param nameId             String representing the name id of the node.
+   * @param dst        the destination address.
+   * @param receiverId receiver id.
+   * @param level      Integer representing the level.
+   * @param nameId     String representing the name id of the node.
    * @return skip node identity.
    */
-  public SkipNodeIdentity getLeftLadder(
-      String destinationAddress, int port, int receiverId, int level, String nameId) {
+  public SkipNodeIdentity getLeftLadder(Address dst, int receiverId, int level, String nameId) {
     Request request = new GetLeftLadderRequest(level, nameId);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response r = send(destinationAddress, port, request);
+    Response r = send(dst, request);
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getRightLadder(
-      String destinationAddress, int port, int level, String nameId) {
-    return getRightLadder(destinationAddress, port, -1, level, nameId);
+  public SkipNodeIdentity getRightLadder(Address dst, int level, String nameId) {
+    return getRightLadder(dst, -1, level, nameId);
   }
 
   /**
    * Method for getting the right ladder.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param level              Integer representing the level.
-   * @param nameId             String representing the name id of the node.
+   * @param dst        String value representing the destination address.
+   * @param receiverId receiver id.
+   * @param level      Integer representing the level.
+   * @param nameId     String representing the name id of the node.
    * @return skip node identity.
    */
-  public SkipNodeIdentity getRightLadder(
-      String destinationAddress, int port, int receiverId, int level, String nameId) {
+  public SkipNodeIdentity getRightLadder(Address dst, int receiverId, int level, String nameId) {
     Request request = new GetRightLadderRequest(level, nameId);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response r = send(destinationAddress, port, request);
+    Response r = send(dst, request);
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity increment(
-      String destinationAddress, int port, SkipNodeIdentity snId, int level) {
-    return increment(destinationAddress, port, -1, snId, level);
+  public SkipNodeIdentity increment(Address dst, SkipNodeIdentity snId, int level) {
+    return increment(dst, -1, snId, level);
   }
 
   /**
    * Method for increment.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param snId               skip node identity.
-   * @param level              Integer representing the level.
+   * @param dst        the destination address.
+   * @param receiverId receiver id.
+   * @param snId       skip node identity.
+   * @param level      Integer representing the level.
    * @return skip node identity.
    */
-  public SkipNodeIdentity increment(
-      String destinationAddress, int port, int receiverId, SkipNodeIdentity snId, int level) {
+  public SkipNodeIdentity increment(Address dst, int receiverId, SkipNodeIdentity snId, int level) {
     Request request = new IncrementRequest(level, snId);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -579,32 +567,30 @@ public class Network {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Response response = send(destinationAddress, port, request);
+    Response response = send(dst, request);
     if (response == null) {
       System.exit(1);
     }
     return ((IdentityResponse) response).identity;
   }
 
-  public boolean inject(String destinationAddress, int port, List<SkipNodeIdentity> snIds) {
-    return inject(destinationAddress, port, -1, snIds);
+  public boolean inject(Address dst, List<SkipNodeIdentity> snIds) {
+    return inject(dst, -1, snIds);
   }
 
   /**
    * Method for injection.
    *
-   * @param destinationAddress String value representing the destination address.
-   * @param port               Integer value representing the port.
+   * @param dst String value representing the destination address.
    * @param receiverId         receiver id.
    * @param snIds              list of skip node identities for injection.
    * @return boolean value representing if injection succeeded or not.
    */
-  public boolean inject(
-      String destinationAddress, int port, int receiverId, List<SkipNodeIdentity> snIds) {
+  public boolean inject(Address dst, int receiverId, List<SkipNodeIdentity> snIds) {
     Request request = new InjectionRequest(snIds);
     request.receiverId = receiverId;
     // Send the request through the underlay
-    Response response = send(destinationAddress, port, request);
+    Response response = send(dst, request);
     if (response == null) {
       System.exit(1);
     }
