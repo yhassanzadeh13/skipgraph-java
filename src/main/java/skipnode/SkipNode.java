@@ -75,10 +75,9 @@ public class SkipNode implements SkipNodeInterface {
    * Inserts this SkipNode to the skip graph of the introducer.
    *
    * @param introducerAddress the address of the introducer.
-   * @param introducerPort    the port of the introducer.
    */
   @Override
-  public void insert(Address introducerAddress, int introducerPort) {
+  public void insert(Address introducerAddress) {
     // Do not reinsert an already inserted node.
     if (inserted) {
       return;
@@ -96,7 +95,7 @@ public class SkipNode implements SkipNodeInterface {
       SkipNodeIdentity right = null;
       logger.debug("num_id: " + getNumId() + " is searching for its 0-level neighbors");
       // First, find my 0-level neighbor by making a num-id search through the introducer.
-      SkipNodeIdentity searchResult = network.searchByNumId(introducerAddress, introducerPort, numId);
+      SkipNodeIdentity searchResult = network.searchByNumId(introducerAddress, numId);
       // Get my 0-level left and right neighbors.
       if (getNumId() < searchResult.getNumId()) {
         right = searchResult;
