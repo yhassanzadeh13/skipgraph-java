@@ -51,7 +51,7 @@ public class Network {
    */
   protected Response send(Address destinationAddress, Request request) {
     // Fill out the request's sender information to be used by the remote middle layer.
-    request.originAddress = underlay.getAddress();
+    request.setOriginAddress(underlay.getAddress());
 
     Response response = null;
     int trial = 0;
