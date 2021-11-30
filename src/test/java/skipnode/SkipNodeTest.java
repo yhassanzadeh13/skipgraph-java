@@ -135,7 +135,7 @@ class SkipNodeTest {
       g.getNodes().get(i).setMiddleLayer(network);
     }
     // Insert the first node.
-    g.getNodes().get(0).insert(null, -1);
+    g.getNodes().get(0).insert(null);
     // Construct the threads.
     Thread[] insertionThreads = new Thread[NODES - 1];
     for (int i = 1; i <= insertionThreads.length; i++) {
@@ -143,7 +143,7 @@ class SkipNodeTest {
       final SkipNode introducer = g.getNodes().get(i - 1);
       final SkipNode node = g.getNodes().get(i);
       insertionThreads[i - 1] = new Thread(() -> {
-        node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
+        node.insert(introducer.getIdentity().getAddress());
       });
     }
 
@@ -242,7 +242,7 @@ class SkipNodeTest {
       g.getNodes().get(i).setMiddleLayer(network);
     }
     // Insert the first node.
-    g.getNodes().get(0).insert(null, -1);
+    g.getNodes().get(0).insert(null);
     Thread[] threads = new Thread[NODES - 1];
     // Construct the threads.
     for (int i = 1; i <= threads.length; i++) {
@@ -250,7 +250,7 @@ class SkipNodeTest {
       final SkipNode introducer = g.getNodes().get((int) (Math.random() * i));
       final SkipNode node = g.getNodes().get(i);
       threads[i - 1] = new Thread(() -> {
-        node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
+        node.insert(introducer.getIdentity().getAddress());
       });
     }
     // Initiate the insertions.
