@@ -62,8 +62,7 @@ public class mvpTest {
       identities.add(
           new SkipNodeIdentity(nameIDs.get(i),
               numIDs.get(i),
-              underlays.get(i).getAddress(),
-              underlays.get(i).getPort()));
+              underlays.get(i).getAddress()));
     }
 
     // Constructs the lookup tables.
@@ -87,7 +86,7 @@ public class mvpTest {
     }
 
     // first node inserts itself
-    skipNodes.get(0).insert(null, -1);
+    skipNodes.get(0).insert(null);
   }
 
   /**
@@ -105,7 +104,7 @@ public class mvpTest {
       // picks random introducer for a node
       final SkipNode introducer = (SkipNode) Utils.randomIndex(skipNodes, random, i);
       threads[i - 1] = new Thread(() -> {
-        node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
+        node.insert(introducer.getIdentity().getAddress());
         insertionDone.countDown();
       });
     }
