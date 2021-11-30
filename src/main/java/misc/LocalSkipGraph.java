@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
+import model.Address;
 import model.identifier.MembershipVector;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
@@ -52,8 +53,8 @@ public class LocalSkipGraph {
     // Create the identities.
     List<SkipNodeIdentity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      identities.add(
-          new SkipNodeIdentity(nameIds.get(i), numIds.get(i), localAddress, startingPort + i));
+      Address address = new Address(localAddress, startingPort + i);
+      identities.add(new SkipNodeIdentity(nameIds.get(i), numIds.get(i), address));
     }
     // Construct the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(size);
@@ -92,7 +93,7 @@ public class LocalSkipGraph {
       SkipNode skipNode = new SkipNode(identities.get(i), lookupTables.get(i));
       // Mark as inserted if lookup table was created manually.
       if (manualJoin) {
-        skipNode.insert(null, -1);
+        skipNode.insert(null);
       }
       skipNodes.add(skipNode);
     }
@@ -129,13 +130,13 @@ public class LocalSkipGraph {
    * was constructed with `manualJoin` flag set.
    */
   public void insertAll() {
-    getNodes().get(0).insert(null, -1);
+    getNodes().get(0).insert(null);
     // Insert the remaining nodes.
     for (int i = 1; i < getNodes().size(); i++) {
       SkipNode initiator = getNodes().get(i - 1);
       getNodes()
           .get(i)
-          .insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
+          .insert(initiator.getIdentity().getAddress());
     }
   }
 
@@ -148,11 +149,11 @@ public class LocalSkipGraph {
     List<SkipNode> list = new ArrayList<>(getNodes());
     // Randomize the insertion order.
     Collections.shuffle(list);
-    list.get(0).insert(null, -1);
+    list.get(0).insert(null);
     // Insert the remaining nodes.
     for (int i = 1; i < list.size(); i++) {
       SkipNode initiator = list.get(i - 1);
-      list.get(i).insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
+      list.get(i).insert(initiator.getIdentity().getAddress());
     }
   }
 }
