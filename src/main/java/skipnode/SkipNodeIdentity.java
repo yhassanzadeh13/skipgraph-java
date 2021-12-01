@@ -80,10 +80,22 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
+
     SkipNodeIdentity that = (SkipNodeIdentity) o;
-    return getNumId() == that.getNumId()
-        && getNameId().equals(that.getNameId())
-        && getAddress().equals(that.getAddress());
+
+    if (getNumId() == that.getNumId() && getNameId().equals(that.getNameId())) {
+      // mis-matching identifiers
+      return false;
+    }
+    if (this.getAddress() == null && that.getAddress() == null) {
+      return true;
+    }
+
+    if (this.getAddress() == null && that.getAddress() != null) {
+      return false;
+    }
+
+    return getAddress().equals(that.getAddress());
   }
 
   @Override

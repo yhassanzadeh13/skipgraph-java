@@ -179,11 +179,10 @@ public class SkipNode implements SkipNodeInterface {
     boolean newRightNeighbor = true;
     // Climb up the levels and acquire the left and right neighbor locks.
     for (int level = 0; level < lookupTable.getNumLevels(); level++) {
-      if (leftNeighbor.equals(LookupTable.EMPTY_NODE)
-          && rightNeighbor.equals(LookupTable.EMPTY_NODE)) {
+      if (leftNeighbor.getAddress() == null && rightNeighbor.getAddress() == null) {
         break;
       }
-      if (newLeftNeighbor && !leftNeighbor.equals(LookupTable.EMPTY_NODE)) {
+      if (newLeftNeighbor && leftNeighbor.getAddress() != null) {
         // Try to acquire the lock for the left neighbor.
         logger.debug(
             "num_id: "
@@ -204,7 +203,7 @@ public class SkipNode implements SkipNodeInterface {
         // Add the new lock to our list of locks.
         ownedLocks.add(new InsertionLock.NeighborInstance(leftNeighbor, level));
       }
-      if (newRightNeighbor && !rightNeighbor.equals(LookupTable.EMPTY_NODE)) {
+      if (newRightNeighbor && rightNeighbor.getAddress() != null) {
         logger.debug(
             "num_id: "
                 + getNumId()
