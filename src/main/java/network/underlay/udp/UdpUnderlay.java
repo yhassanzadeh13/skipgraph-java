@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import model.Address;
 import network.Underlay;
 import network.underlay.packets.Request;
 import network.underlay.packets.Response;
@@ -57,19 +58,18 @@ public class UdpUnderlay extends Underlay {
    * Sends an UDP request the given address. The size of the request in bytes cannot exceed the size
    * defined in `UDPUtils.MAX_PACKET_SIZE`.
    *
-   * @param address address of the remote server.
-   * @param port    port of the remote server.
+   * @param dst address of the remote server.
    * @param request request to send.
    * @return the response emitted by the server.
    */
   @Override
-  public Response sendMessage(String address, int port, Request request) {
+  public Response sendMessage(Address dst, Request request) {
     // Convert a string address to an actual address to be used for UDP.
-    InetAddress destAddress;
+    InetAddress dstIP4;
     try {
-      destAddress = Inet4Address.getByName(address);
+      dstIP4 = Inet4Address.getByName(dst.getIp());
     } catch (UnknownHostException e) {
-      System.err.println("[UDPUnderlay] Could not find the host with the address " + address);
+      System.err.println("[UDPUnderlay] Could not find the host with the address " + dst);
       e.printStackTrace();
       return null;
     }
@@ -81,7 +81,7 @@ public class UdpUnderlay extends Underlay {
     }
     // Then, send the request.
     DatagramPacket requestPacket =
-        new DatagramPacket(requestBytes, requestBytes.length, destAddress, port);
+        new DatagramPacket(requestBytes, requestBytes.length, dstIP4, dst.getPort());
     try {
       udpSocket.send(requestPacket);
     } catch (IOException e) {
