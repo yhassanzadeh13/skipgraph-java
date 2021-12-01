@@ -125,8 +125,7 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES, false);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
       Network network = new Network(underlays.get(i), g.getNodes().get(i));
@@ -232,8 +231,7 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES * 2, false);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES * 2, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
       Network network = new Network(underlays.get(i), g.getNodes().get(i));
@@ -286,8 +284,7 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES * 3, false);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES * 3, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
       Network network = new Network(underlays.get(i), g.getNodes().get(i));
@@ -318,8 +315,7 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES * 4, true);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES * 4, true);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
       Network network = new Network(underlays.get(i), g.getNodes().get(i));
@@ -352,8 +348,7 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT - NODES, true);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT - NODES, true);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
       Network network = new Network(underlays.get(i), g.getNodes().get(i));

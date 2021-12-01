@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Represents the network address of a skip graph node.
  */
-public class Address {
+public class Address implements Serializable {
   private final String ip;
   private final int port;
 

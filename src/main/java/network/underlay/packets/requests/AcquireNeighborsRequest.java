@@ -1,10 +1,12 @@
 package network.underlay.packets.requests;
 
-import skipnode.SkipNodeIdentity;
 import network.underlay.packets.Request;
 import network.underlay.packets.RequestType;
+import skipnode.SkipNodeIdentity;
 
-/** Request for acquiring neighbour. */
+/**
+ * Request for acquiring neighbour.
+ */
 public class AcquireNeighborsRequest extends Request {
 
   public final SkipNodeIdentity newNode;
@@ -14,7 +16,7 @@ public class AcquireNeighborsRequest extends Request {
    * Constructor for AcquireNeighborsRequest.
    *
    * @param newNode node that wants to acquire the neighbour.
-   * @param level Integer representing the level.
+   * @param level   Integer representing the level.
    */
   public AcquireNeighborsRequest(SkipNodeIdentity newNode, int level) {
     super(RequestType.AcquireNeighbors);

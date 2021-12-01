@@ -1,9 +1,11 @@
 package network.underlay.packets.responses;
 
-import skipnode.SearchResult;
 import network.underlay.packets.Response;
+import skipnode.SearchResult;
 
-/** Response for search result. */
+/**
+ * Response for search result.
+ */
 public class SearchResultResponse extends Response {
 
   public final SearchResult result;

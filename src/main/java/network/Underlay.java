@@ -81,12 +81,12 @@ public abstract class Underlay {
   /**
    * Can be used to send a request to a remote server that runs the same underlay architecture.
    *
-   * @param address address of the remote server.
+   * @param dst address of the remote server.
    * @param port    port of the remote server.
    * @param request the request.
    * @return response emitted by the remote server.
    */
-  public abstract Response sendMessage(String address, int port, Request request);
+  public abstract Response sendMessage(Address dst, Request request);
 
   /**
    * Terminates the underlay.

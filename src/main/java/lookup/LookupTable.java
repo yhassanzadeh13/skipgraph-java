@@ -7,8 +7,8 @@ import skipnode.SkipNodeIdentity;
  */
 public interface LookupTable {
 
-  SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity("EMPTY", -1, "EMPTY", -1);
-  SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity("INVALID", -1, "INVALID", -1);
+  SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity("EMPTY", -1, null, -1);
+  SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity("INVALID", -1, null, -1);
 
   /**
    * Updates the left neighbor on the given level to be the node.

@@ -2,9 +2,9 @@ package network.underlay.packets.requests;
 
 import java.util.List;
 
-import skipnode.SkipNodeIdentity;
 import network.underlay.packets.Request;
 import network.underlay.packets.RequestType;
+import skipnode.SkipNodeIdentity;
 
 /**
  * Request for injection.

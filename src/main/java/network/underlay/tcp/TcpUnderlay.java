@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import model.Address;
 import network.Underlay;
 import network.underlay.packets.Request;
 import network.underlay.packets.Response;
@@ -46,21 +47,20 @@ public class TcpUnderlay extends Underlay {
   /**
    * Method for sending a message.
    *
-   * @param address address of the remote server.
-   * @param port    port of the remote serve.r
+   * @param dst address of the remote server.
    * @param request the request to send.
    * @return the response emitted by the remote server.
    */
   @Override
-  public Response sendMessage(String address, int port, Request request) {
+  public Response sendMessage(Address dst, Request request) {
     Socket remote;
     ObjectOutputStream requestStream;
     ObjectInputStream responseStream;
     // Connect to the remote TCP server.
     try {
-      remote = new Socket(address, port);
+      remote = new Socket(dst.getIp(), dst.getPort());
     } catch (IOException e) {
-      System.err.println("[TCPUnderlay] Could not connect to the address: " + address + ":" + port);
+      System.err.println("[TCPUnderlay] Could not connect to the address: " + dst);
       e.printStackTrace();
       return null;
     }

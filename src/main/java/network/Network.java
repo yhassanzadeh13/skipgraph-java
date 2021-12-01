@@ -73,7 +73,7 @@ public class Network {
         response = receive(request);
       } else {
         // Or receive it from the remote client.
-        response = underlay.sendMessage(destinationAddress.getIp(), destinationAddress.getPort(), request);
+        response = underlay.sendMessage(destinationAddress, request);
       }
     } while (request.backoff && response.locked);
 

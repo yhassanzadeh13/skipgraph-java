@@ -17,9 +17,8 @@ public interface SkipNodeInterface {
    * Add the SkipNode to the SkipGraph through an introducer.
    *
    * @param introducerAddress the address of the introducer.
-   * @param introducerPort    the port of the introducer.
    */
-  void insert(Address introducerAddress, int introducerPort);
+  void insert(Address introducerAddress);
 
   /**
    * Adds a data node to the list of overlays of the middle layer Inserts the node into the Skip

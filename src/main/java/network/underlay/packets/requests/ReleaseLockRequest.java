@@ -1,10 +1,12 @@
 package network.underlay.packets.requests;
 
-import skipnode.SkipNodeIdentity;
 import network.underlay.packets.Request;
 import network.underlay.packets.RequestType;
+import skipnode.SkipNodeIdentity;
 
-/** Request for releasing lock. */
+/**
+ * Request for releasing lock.
+ */
 public class ReleaseLockRequest extends Request {
 
   public final SkipNodeIdentity owner;
