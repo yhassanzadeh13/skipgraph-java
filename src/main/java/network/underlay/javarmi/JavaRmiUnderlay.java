@@ -4,6 +4,7 @@ import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.ExportException;
 
+import model.Address;
 import network.Underlay;
 import network.underlay.packets.Request;
 import network.underlay.packets.Response;
@@ -66,22 +67,21 @@ public class JavaRmiUnderlay extends Underlay {
   /**
    * Invokes the appropriate RMI method on the server with the given address.
    *
-   * @param address address of the remote server.
-   * @param port    port of the remote server.
+   * @param dst address of the remote server.
    * @param request request to send.
    * @return response received from the server.
    */
   @Override
-  public Response sendMessage(String address, int port, Request request) {
+  public Response sendMessage(Address dst, Request request) {
     if (host == null) {
       System.err.println("[JavaRMIUnderlay] Host does not exist.");
       return null;
     }
     // Connect to the remote adapter.
-    JavaRmiService remote = remote(address + ":" + port);
+    JavaRmiService remote = remote(dst.toString());
     if (remote == null) {
       System.err.println(
-          "[JavaRMIUnderlay] Could not connect to the address: " + address + ":" + port);
+          "[JavaRMIUnderlay] Could not connect to the address: " + dst);
       return null;
     }
     // Use the remote handler to dispatch the request.
