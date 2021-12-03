@@ -41,7 +41,7 @@ public class mvpTest {
 
     for (int i = 0; i < NODES; i++) {
       Underlay underlay = Underlay.newDefaultUnderlay();
-      underlay.initialize(STARTING_PORT + i);
+      underlay.initialize(0);
       underlays.add(underlay);
     }
 
