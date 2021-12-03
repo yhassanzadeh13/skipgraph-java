@@ -83,7 +83,7 @@ public class SkipNodeIdentity implements Serializable, Comparable<SkipNodeIdenti
 
     SkipNodeIdentity that = (SkipNodeIdentity) o;
 
-    if (getNumId() == that.getNumId() && getNameId().equals(that.getNameId())) {
+    if (getNumId() != that.getNumId() || !getNameId().equals(that.getNameId())) {
       // mis-matching identifiers
       return false;
     }

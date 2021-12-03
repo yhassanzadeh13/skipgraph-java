@@ -358,7 +358,7 @@ public class Network {
     return ((IdentityResponse) response).identity;
   }
 
-  public SkipNodeIdentity getIdentity(Address dst, int port) {
+  public SkipNodeIdentity getIdentity(Address dst) {
     return getIdentity(dst, -1);
   }
 
@@ -366,11 +366,10 @@ public class Network {
    * Method for getting the identity.
    *
    * @param dst        String value representing the destination address.
-   * @param port       Integer value representing the port.
    * @param receiverId receiver id.
    * @return skip node identity.
    */
-  public SkipNodeIdentity getIdentity(Address dst, int port, int receiverId) {
+  public SkipNodeIdentity getIdentity(Address dst, int receiverId) {
     Request request = new GetIdentityRequest();
     request.receiverId = receiverId;
     Response r = send(dst, new GetIdentityRequest());
