@@ -28,7 +28,6 @@ import skipnode.SkipNodeIdentity;
  * i.e., each node should be able to query every other node by both name and numerical IDs and get the correct response.
  */
 public class mvpTest {
-  private static final int STARTING_PORT = 4444;
   private static final int NODES = 32;
   private static final int NameIdSize = MembershipVector.computeSize(NODES);
   private static ArrayList<SkipNode> skipNodes;
@@ -164,7 +163,7 @@ public class mvpTest {
       e.printStackTrace();
     }
 
-    Assertions.assertEquals(0, assertionErrorCount.get(), "unsuccessful searches results"); // no assertion error should happen in any search thread.
+    Assertions.assertEquals(0, assertionErrorCount.get(), "unsuccessful searches results"); // no assertion error should happen in any search thread
   }
 
   /**

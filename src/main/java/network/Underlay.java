@@ -82,7 +82,6 @@ public abstract class Underlay {
    * Can be used to send a request to a remote server that runs the same underlay architecture.
    *
    * @param dst address of the remote server.
-   * @param port    port of the remote server.
    * @param request the request.
    * @return response emitted by the remote server.
    */

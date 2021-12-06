@@ -65,9 +65,9 @@ public class UdpUnderlay extends Underlay {
   @Override
   public Response sendMessage(Address dst, Request request) {
     // Convert a string address to an actual address to be used for UDP.
-    InetAddress dstIP4;
+    InetAddress dstIp4;
     try {
-      dstIP4 = Inet4Address.getByName(dst.getIp());
+      dstIp4 = Inet4Address.getByName(dst.getIp());
     } catch (UnknownHostException e) {
       System.err.println("[UDPUnderlay] Could not find the host with the address " + dst);
       e.printStackTrace();
@@ -81,7 +81,7 @@ public class UdpUnderlay extends Underlay {
     }
     // Then, send the request.
     DatagramPacket requestPacket =
-        new DatagramPacket(requestBytes, requestBytes.length, dstIP4, dst.getPort());
+        new DatagramPacket(requestBytes, requestBytes.length, dstIp4, dst.getPort());
     try {
       udpSocket.send(requestPacket);
     } catch (IOException e) {

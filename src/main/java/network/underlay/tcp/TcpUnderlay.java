@@ -47,7 +47,7 @@ public class TcpUnderlay extends Underlay {
   /**
    * Method for sending a message.
    *
-   * @param dst address of the remote server.
+   * @param dst     address of the remote server.
    * @param request the request to send.
    * @return the response emitted by the remote server.
    */

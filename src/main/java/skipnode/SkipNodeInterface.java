@@ -158,10 +158,9 @@ public interface SkipNodeInterface {
   boolean isLocked();
 
   /**
-   * Method for checking if the lock is locked by that address port combination.
+   * Method for checking if the lock is locked by that address.
    *
    * @param address String value representing the address.
-   * @param port    Integer value representing the port.
    * @return Boolean value for whether the lock is locked by that address port combination or not.
    */
   // todo: must be checked for locked by identifier not address.

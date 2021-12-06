@@ -143,7 +143,9 @@ public class SkipNode implements SkipNodeInterface {
     List<InsertionLock.NeighborInstance> toRelease = new ArrayList<>();
     ownedLocks.drainTo(toRelease);
     // Release the locks.
-    toRelease.forEach(n -> {network.unlock(n.node.getAddress(), n.node.getNumId(), getIdentity());});
+    toRelease.forEach(n -> {
+      network.unlock(n.node.getAddress(), n.node.getNumId(), getIdentity());
+    });
     // Complete the insertion.
     inserted = true;
     logger.debug("num_id: " + getNumId() + " was inserted");
@@ -278,7 +280,9 @@ public class SkipNode implements SkipNodeInterface {
       List<NeighborInstance> toRelease = new ArrayList<>();
       ownedLocks.drainTo(toRelease);
       // Release the locks.
-      toRelease.forEach(n -> {network.unlock(n.node.getAddress(), n.node.getNumId(), getIdentity());});
+      toRelease.forEach(n -> {
+        network.unlock(n.node.getAddress(), n.node.getNumId(), getIdentity());
+      });
     }
     return allAcquired;
   }
@@ -433,12 +437,12 @@ public class SkipNode implements SkipNodeInterface {
    *
    * @param numId The numID to search for
    * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   *         the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
-   *         direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *         NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   *         with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   *         SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
-   *         returned.
+   * the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
+   * direction the search is initiated. For example: Initiating a search for a SkipNode with
+   * NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
+   * with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   * SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
+   * returned.
    */
   @Override
   public SkipNodeIdentity searchByNumId(int numId) {
@@ -529,7 +533,7 @@ public class SkipNode implements SkipNodeInterface {
     if (level < 0) {
       return new SearchResult(getIdentity());
     }
-    // Initiate the search.
+    // Initiate the searches
     return network.searchByNameIdRecursive(address, numId, nameId, level);
   }
 
@@ -539,7 +543,7 @@ public class SkipNode implements SkipNodeInterface {
    * @param targetNameId the target name ID.
    * @param level        the current level.
    * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix
-   *         length larger than `level`.
+   * length larger than `level`.
    */
   @Override
   public SearchResult searchByNameIdRecursive(String targetNameId, int level) {
