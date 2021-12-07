@@ -6,7 +6,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
+import model.Address;
+import network.Network;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import skipnode.InsertionLock.NeighborInstance;
@@ -22,15 +23,14 @@ public class SkipNode implements SkipNodeInterface {
   /**
    * Attributes.
    */
-  private final String address;
-  private final int port;
+  private final Address address;
   private final int numId;
   private final String nameId;
   private final LookupTable lookupTable;
   private final InsertionLock insertionLock;
   private final LinkedBlockingDeque<InsertionLock.NeighborInstance> ownedLocks =
       new LinkedBlockingDeque<>();
-  private MiddleLayer middleLayer;
+  private Network network;
   private boolean inserted = false;
   // Incremented after each lookup table update.
   private int version = 0;
@@ -43,7 +43,6 @@ public class SkipNode implements SkipNodeInterface {
    */
   public SkipNode(SkipNodeIdentity snId, LookupTable lookupTable) {
     this.address = snId.getAddress();
-    this.port = snId.getPort();
     this.numId = snId.getNumId();
     this.nameId = snId.getNameId();
     this.lookupTable = lookupTable;
@@ -64,22 +63,21 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   public SkipNodeIdentity getIdentity() {
-    return new SkipNodeIdentity(nameId, numId, address, port, version);
+    return new SkipNodeIdentity(nameId, numId, address, version);
   }
 
   @Override
-  public void setMiddleLayer(MiddleLayer middleLayer) {
-    this.middleLayer = middleLayer;
+  public void setMiddleLayer(Network network) {
+    this.network = network;
   }
 
   /**
    * Inserts this SkipNode to the skip graph of the introducer.
    *
    * @param introducerAddress the address of the introducer.
-   * @param introducerPort    the port of the introducer.
    */
   @Override
-  public void insert(String introducerAddress, int introducerPort) {
+  public void insert(Address introducerAddress) {
     // Do not reinsert an already inserted node.
     if (inserted) {
       return;
@@ -97,15 +95,14 @@ public class SkipNode implements SkipNodeInterface {
       SkipNodeIdentity right = null;
       logger.debug("num_id: " + getNumId() + " is searching for its 0-level neighbors");
       // First, find my 0-level neighbor by making a num-id search through the introducer.
-      SkipNodeIdentity searchResult =
-          middleLayer.searchByNumId(introducerAddress, introducerPort, numId);
+      SkipNodeIdentity searchResult = network.searchByNumId(introducerAddress, numId);
       // Get my 0-level left and right neighbors.
       if (getNumId() < searchResult.getNumId()) {
         right = searchResult;
-        left = middleLayer.getLeftNode(right.getAddress(), right.getPort(), right.getNumId(), 0);
+        left = network.getLeftNode(right.getAddress(), right.getNumId(), 0);
       } else {
         left = searchResult;
-        right = middleLayer.getRightNode(left.getAddress(), left.getPort(), left.getNumId(), 0);
+        right = network.getRightNode(left.getAddress(), left.getNumId(), 0);
       }
       logger.debug(
           "num_id: "
@@ -140,18 +137,15 @@ public class SkipNode implements SkipNodeInterface {
       // Insert the neighbor into my own table.
       insertIntoTable(n.node, n.minLevel);
       // Let the neighbor insert me in its table.
-      middleLayer.announceNeighbor(
-          n.node.getAddress(), n.node.getPort(), n.node.getNumId(), getIdentity(), n.minLevel);
+      network.announceNeighbor(n.node.getAddress(), n.node.getNumId(), getIdentity(), n.minLevel);
     }
     // Now, we release all of the locks.
     List<InsertionLock.NeighborInstance> toRelease = new ArrayList<>();
     ownedLocks.drainTo(toRelease);
     // Release the locks.
-    toRelease.forEach(
-        n -> {
-          middleLayer.unlock(
-              n.node.getAddress(), n.node.getPort(), n.node.getNumId(), getIdentity());
-        });
+    toRelease.forEach(n -> {
+      network.unlock(n.node.getAddress(), n.node.getNumId(), getIdentity());
+    });
     // Complete the insertion.
     inserted = true;
     logger.debug("num_id: " + getNumId() + " was inserted");
@@ -165,7 +159,7 @@ public class SkipNode implements SkipNodeInterface {
    * @param node Skip node instance.
    */
   public void insertDataNode(SkipNodeInterface node) {
-    middleLayer.insertDataNode(node);
+    network.insertDataNode(node);
   }
 
   /**
@@ -187,8 +181,7 @@ public class SkipNode implements SkipNodeInterface {
     boolean newRightNeighbor = true;
     // Climb up the levels and acquire the left and right neighbor locks.
     for (int level = 0; level < lookupTable.getNumLevels(); level++) {
-      if (leftNeighbor.equals(LookupTable.EMPTY_NODE)
-          && rightNeighbor.equals(LookupTable.EMPTY_NODE)) {
+      if (leftNeighbor.equals(LookupTable.EMPTY_NODE) && rightNeighbor.equals(LookupTable.EMPTY_NODE)) {
         break;
       }
       if (newLeftNeighbor && !leftNeighbor.equals(LookupTable.EMPTY_NODE)) {
@@ -200,9 +193,8 @@ public class SkipNode implements SkipNodeInterface {
                 + "neighbor_left_num_id "
                 + leftNeighbor.getNumId());
         boolean acquired =
-            middleLayer.tryAcquire(
+            network.tryAcquire(
                 leftNeighbor.getAddress(),
-                leftNeighbor.getPort(),
                 leftNeighbor.getNumId(),
                 getIdentity(),
                 leftNeighbor.version);
@@ -222,9 +214,8 @@ public class SkipNode implements SkipNodeInterface {
                 + rightNeighbor.getNumId());
         // Try to acquire the lock for the right neighbor.
         boolean acquired =
-            middleLayer.tryAcquire(
+            network.tryAcquire(
                 rightNeighbor.getAddress(),
-                rightNeighbor.getPort(),
                 rightNeighbor.getNumId(),
                 getIdentity(),
                 rightNeighbor.version);
@@ -248,9 +239,8 @@ public class SkipNode implements SkipNodeInterface {
       SkipNodeIdentity leftLadder =
           (leftNeighbor.equals(LookupTable.EMPTY_NODE))
               ? LookupTable.EMPTY_NODE
-              : middleLayer.findLadder(
+              : network.findLadder(
               leftNeighbor.getAddress(),
-              leftNeighbor.getPort(),
               leftNeighbor.getNumId(),
               level,
               0,
@@ -265,9 +255,8 @@ public class SkipNode implements SkipNodeInterface {
       SkipNodeIdentity rightLadder =
           (rightNeighbor.equals(LookupTable.EMPTY_NODE))
               ? LookupTable.EMPTY_NODE
-              : middleLayer.findLadder(
+              : network.findLadder(
               rightNeighbor.getAddress(),
-              rightNeighbor.getPort(),
               rightNeighbor.getNumId(),
               level,
               1,
@@ -291,11 +280,9 @@ public class SkipNode implements SkipNodeInterface {
       List<NeighborInstance> toRelease = new ArrayList<>();
       ownedLocks.drainTo(toRelease);
       // Release the locks.
-      toRelease.forEach(
-          n -> {
-            middleLayer.unlock(
-                n.node.getAddress(), n.node.getPort(), n.node.getNumId(), getIdentity());
-          });
+      toRelease.forEach(n -> {
+        network.unlock(n.node.getAddress(), n.node.getNumId(), getIdentity());
+      });
     }
     return allAcquired;
   }
@@ -396,10 +383,8 @@ public class SkipNode implements SkipNodeInterface {
       // Try to find a new neighbor, but immediately return if the neighbor is locked.
       curr =
           (direction == 0)
-              ? middleLayer.getLeftNode(
-              false, curr.getAddress(), curr.getPort(), curr.getNumId(), level)
-              : middleLayer.getRightNode(
-              false, curr.getAddress(), curr.getPort(), curr.getNumId(), level);
+              ? network.getLeftNode(false, curr.getAddress(), curr.getNumId(), level)
+              : network.getRightNode(curr.getAddress(), curr.getNumId(), level, false);
       // If the potential neighbor is locked, we will get an invalid identity.
       // We should directly return it in that case.
       if (curr.equals(LookupTable.INVALID_NODE)) {
@@ -452,12 +437,12 @@ public class SkipNode implements SkipNodeInterface {
    *
    * @param numId The numID to search for
    * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   *         the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
-   *         direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *         NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   *         with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   *         SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
-   *         returned.
+   * the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
+   * direction the search is initiated. For example: Initiating a search for a SkipNode with
+   * NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
+   * with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   * SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
+   * returned.
    */
   @Override
   public SkipNodeIdentity searchByNumId(int numId) {
@@ -486,8 +471,7 @@ public class SkipNode implements SkipNodeInterface {
       }
       // Else, delegate the search to that node on the right
       SkipNodeIdentity delegateNode = lookupTable.getRight(level);
-      return middleLayer.searchByNumId(
-          delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getNumId(), numId);
+      return network.searchByNumId(delegateNode.getAddress(), delegateNode.getNumId(), numId);
     } else {
       // Start from the top, while there is no right neighbor,
       // or the right neighbor's num ID is greater than what we are searching for keep going down
@@ -506,8 +490,7 @@ public class SkipNode implements SkipNodeInterface {
       }
       // Else, delegate the search to that node on the right
       SkipNodeIdentity delegateNode = lookupTable.getLeft(level);
-      return middleLayer.searchByNumId(
-          delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getNumId(), numId);
+      return network.searchByNumId(delegateNode.getAddress(), delegateNode.getNumId(), numId);
     }
   }
 
@@ -517,13 +500,13 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   @Override
-  public boolean isLockedBy(String address, int port) {
-    return insertionLock.isLockedBy(address, port);
+  public boolean isLockedBy(Address address) {
+    return insertionLock.isLockedBy(address);
   }
 
   @Override
   public boolean terminate() {
-    this.middleLayer.terminate();
+    this.network.terminate();
     return true;
   }
 
@@ -550,8 +533,8 @@ public class SkipNode implements SkipNodeInterface {
     if (level < 0) {
       return new SearchResult(getIdentity());
     }
-    // Initiate the search.
-    return middleLayer.searchByNameIdRecursive(address, port, numId, nameId, level);
+    // Initiate the searches
+    return network.searchByNameIdRecursive(address, numId, nameId, level);
   }
 
   /**
@@ -560,7 +543,7 @@ public class SkipNode implements SkipNodeInterface {
    * @param targetNameId the target name ID.
    * @param level        the current level.
    * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix
-   *         length larger than `level`.
+   * length larger than `level`.
    */
   @Override
   public SearchResult searchByNameIdRecursive(String targetNameId, int level) {
@@ -590,9 +573,8 @@ public class SkipNode implements SkipNodeInterface {
       if (!potentialLeftLadder.equals(LookupTable.EMPTY_NODE)) {
         buffer = potentialLeftLadder;
         potentialLeftLadder =
-            middleLayer.findLadder(
+            network.findLadder(
                 potentialLeftLadder.getAddress(),
-                potentialLeftLadder.getPort(),
                 potentialLeftLadder.getNumId(),
                 level,
                 0,
@@ -601,9 +583,8 @@ public class SkipNode implements SkipNodeInterface {
       if (!potentialRightLadder.equals(LookupTable.EMPTY_NODE)) {
         buffer = potentialRightLadder;
         potentialRightLadder =
-            middleLayer.findLadder(
+            network.findLadder(
                 potentialRightLadder.getAddress(),
-                potentialRightLadder.getPort(),
                 potentialRightLadder.getNumId(),
                 level,
                 1,
@@ -612,18 +593,16 @@ public class SkipNode implements SkipNodeInterface {
       // Try to climb up on the either ladder.
       if (SkipNodeIdentity.commonBits(targetNameId, potentialRightLadder.getNameId()) > level) {
         level = SkipNodeIdentity.commonBits(targetNameId, potentialRightLadder.getNameId());
-        return middleLayer.searchByNameIdRecursive(
+        return network.searchByNameIdRecursive(
             potentialRightLadder.getAddress(),
-            potentialRightLadder.getPort(),
             potentialRightLadder.getNumId(),
             targetNameId,
             level);
       } else if (SkipNodeIdentity.commonBits(targetNameId, potentialLeftLadder.getNameId())
           > level) {
         level = SkipNodeIdentity.commonBits(targetNameId, potentialLeftLadder.getNameId());
-        return middleLayer.searchByNameIdRecursive(
+        return network.searchByNameIdRecursive(
             potentialLeftLadder.getAddress(),
-            potentialLeftLadder.getPort(),
             potentialLeftLadder.getNumId(),
             targetNameId,
             level);
@@ -672,7 +651,7 @@ public class SkipNode implements SkipNodeInterface {
     SkipNodeIdentity r =
         (right.equals(LookupTable.EMPTY_NODE))
             ? right
-            : middleLayer.getIdentity(right.getAddress(), right.getPort(), right.getNumId());
+            : network.getIdentity(right.getAddress(), right.getNumId());
     logger.debug("num_id: " + getNumId() + " is returning a getRightNode response");
     return r;
   }
@@ -685,7 +664,7 @@ public class SkipNode implements SkipNodeInterface {
     SkipNodeIdentity r =
         (left.equals(LookupTable.EMPTY_NODE))
             ? left
-            : middleLayer.getIdentity(left.getAddress(), left.getPort(), left.getNumId());
+            : network.getIdentity(left.getAddress(), left.getNumId());
     logger.debug("num_id: " + getNumId() + " is returning a getLeftNode response");
     return r;
   }

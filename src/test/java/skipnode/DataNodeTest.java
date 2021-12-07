@@ -2,10 +2,10 @@ package skipnode;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
+import network.Network;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
-import underlay.Underlay;
+import network.Underlay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +34,15 @@ public class DataNodeTest {
 
     // Then, construct the local skip graph without manually constructing the lookup tables.
     int nameIdSize = ((int) (Math.log(NODES * (DATANODESPERNODE + 1)) / Math.log(2)));
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(), STARTING_PORT,
-        false, nameIdSize);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT, false, nameIdSize);
 
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
 
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
 
     // Now, insert every node in a randomized order.
@@ -73,8 +72,7 @@ public class DataNodeTest {
     int numDNodes = 0;
     for (SkipNodeInterface node : g.getNodes()) {
       for (int i = 0; i < DATANODESPERNODE; i++) {
-        SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(numDNodes), numIDs.get(numDNodes),
-            node.getIdentity().getAddress(), node.getIdentity().getPort());
+        SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(numDNodes), numIDs.get(numDNodes), node.getIdentity().getAddress());
         LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lt);
         tableMap.put(numIDs.get(numDNodes), lt);

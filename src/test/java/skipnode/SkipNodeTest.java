@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
+import network.Network;
 import misc.LocalSkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import underlay.Underlay;
+import network.Underlay;
 
 /**
  * Contains the skip-node tests.
@@ -125,17 +125,16 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES, false);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // Insert the first node.
-    g.getNodes().get(0).insert(null, -1);
+    g.getNodes().get(0).insert(null);
     // Construct the threads.
     Thread[] insertionThreads = new Thread[NODES - 1];
     for (int i = 1; i <= insertionThreads.length; i++) {
@@ -143,7 +142,7 @@ class SkipNodeTest {
       final SkipNode introducer = g.getNodes().get(i - 1);
       final SkipNode node = g.getNodes().get(i);
       insertionThreads[i - 1] = new Thread(() -> {
-        node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
+        node.insert(introducer.getIdentity().getAddress());
       });
     }
 
@@ -232,17 +231,16 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES * 2, false);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES * 2, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // Insert the first node.
-    g.getNodes().get(0).insert(null, -1);
+    g.getNodes().get(0).insert(null);
     Thread[] threads = new Thread[NODES - 1];
     // Construct the threads.
     for (int i = 1; i <= threads.length; i++) {
@@ -250,7 +248,7 @@ class SkipNodeTest {
       final SkipNode introducer = g.getNodes().get((int) (Math.random() * i));
       final SkipNode node = g.getNodes().get(i);
       threads[i - 1] = new Thread(() -> {
-        node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
+        node.insert(introducer.getIdentity().getAddress());
       });
     }
     // Initiate the insertions.
@@ -286,14 +284,13 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES * 3, false);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES * 3, false);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // Now, insert every node in a randomized order.
     g.insertAllRandomized();
@@ -318,14 +315,13 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT + NODES * 4, true);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT + NODES * 4, true);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
     // We will now perform name ID searches for every node from each node in the skip graph.
     for (int i = 0; i < NODES; i++) {
@@ -352,14 +348,13 @@ class SkipNodeTest {
       underlays.add(underlay);
     }
     // Then, construct the local skip graph.
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-        STARTING_PORT - NODES, true);
+    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress().getIp(), STARTING_PORT - NODES, true);
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
+      Network network = new Network(underlays.get(i), g.getNodes().get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(middleLayer);
-      g.getNodes().get(i).setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(network);
+      g.getNodes().get(i).setMiddleLayer(network);
     }
 
     // We will now perform name ID searches for every node from each node in the skip graph.
