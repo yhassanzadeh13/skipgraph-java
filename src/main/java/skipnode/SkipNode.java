@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
+import model.identifier.MembershipVector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import skipnode.InsertionLock.NeighborInstance;
@@ -81,8 +82,7 @@ public class SkipNode implements SkipNodeInterface {
       SkipNodeIdentity right;
 
       // First, find my 0-level neighbor by making a num-id search through the introducer.
-      SkipNodeIdentity searchResult =
-          middleLayer.searchByIdentifier(this.identity.getIdentifier(), introducerAddress, introducerPort);
+      SkipNodeIdentity searchResult = middleLayer.searchByIdentifier(this.identity.getIdentifier(), introducerAddress, introducerPort);
       // Get my 0-level left and right neighbors.
       if (this.identity.getIdentifier().comparedTo(searchResult.getIdentifier()) < 0) {
         right = searchResult;
@@ -332,7 +332,7 @@ public class SkipNode implements SkipNodeInterface {
    *
    * @return the `ladder` node information.
    */
-  public SkipNodeIdentity findLadder(int level, int direction, String target) {
+  public SkipNodeIdentity findLadder(int level, int direction, MembershipVector target) {
     logger.debug(
         "num_id: "
             + getNumId()
@@ -456,8 +456,7 @@ public class SkipNode implements SkipNodeInterface {
       }
       // Else, delegate the search to that node on the right
       SkipNodeIdentity delegateNode = lookupTable.getRight(level);
-      return middleLayer.searchByIdentifier(
-          delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), numId);
+      return middleLayer.searchByIdentifier(delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), numId);
     } else {
       // Start from the top, while there is no right neighbor,
       // or the right neighbor's num ID is greater than what we are searching for keep going down

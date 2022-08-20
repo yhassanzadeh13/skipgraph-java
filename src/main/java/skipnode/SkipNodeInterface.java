@@ -1,6 +1,8 @@
 package skipnode;
 
 import middlelayer.MiddleLayer;
+import model.identifier.Identifier;
+import model.identifier.MembershipVector;
 
 /**
  * Skip Node interface.
@@ -42,7 +44,7 @@ public interface SkipNodeInterface {
    *
    * @return the ladder's node information.
    */
-  SkipNodeIdentity findLadder(int level, int direction, String target);
+  SkipNodeIdentity findLadder(int level, int direction, MembershipVector target);
 
   /**
    * Adds the given neighbor to the appropriate lookup table entries of this node. Should only be
@@ -72,7 +74,7 @@ public interface SkipNodeInterface {
    *         SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
    *         returned.
    */
-  SkipNodeIdentity searchByNumId(int numId);
+  SkipNodeIdentity searchByNumId(Identifier numId);
 
   /**
    * Search for the given nameID.
@@ -148,7 +150,7 @@ public interface SkipNodeInterface {
    * @param requester Skip node that requested the lock.
    * @return boolean value for whether the lock is acquired or not.
    */
-  boolean tryAcquire(SkipNodeIdentity requester, int version);
+  boolean tryAcquire(SkipNodeIdentity requester);
 
   /**
    * Method for checking whether is lock is locked or not.
