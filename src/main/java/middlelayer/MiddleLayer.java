@@ -253,7 +253,7 @@ public class MiddleLayer {
    * @param level              Integer representing level.
    * @return search result instance.
    */
-  public SearchResult searchByNameIdRecursive(String destinationAddress, int port, Identifier receiverId, String target, int level) {
+  public SearchResult searchByNameIdRecursive(String destinationAddress, int port, Identifier receiverId, MembershipVector target, int level) {
     Request request = new SearchByNameIdRecursiveRequest(target, level);
     request.receiverId = receiverId;
     // Send the request through the underlay.

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
+import model.identifier.Identifier;
 import model.identifier.MembershipVector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -271,7 +272,7 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   @Override
-  public boolean tryAcquire(SkipNodeIdentity requester, int version) {
+  public boolean tryAcquire(SkipNodeIdentity requester) {
     // Naively try to acquire the lock.
     if (!insertionLock.tryAcquire(requester)) {
       logger.debug(
@@ -335,7 +336,7 @@ public class SkipNode implements SkipNodeInterface {
   public SkipNodeIdentity findLadder(int level, int direction, MembershipVector target) {
     logger.debug(
         "num_id: "
-            + getNumId()
+            + getIdentity().getIdentifier()
             + " has received a findLadder request with"
             + " level: "
             + level
@@ -344,21 +345,21 @@ public class SkipNode implements SkipNodeInterface {
             + " target: "
             + target);
     if (level >= lookupTable.getNumLevels() || level < 0) {
-      logger.debug("num_id: " + getNumId() + " is returning a findLadder response");
+      logger.debug("num_id: " + getIdentity().getIdentifier() + " is returning a findLadder response");
       return LookupTable.EMPTY_NODE;
     }
     // If the current node and the inserted node have common bits more than the current level,
     // then this node is the neighbor so we return it
-    if (SkipNodeIdentity(target, getNameId()) > level) {
-      logger.debug("num_id: " + getNumId() + " is returning a findLadder response");
+    if (target.commonPrefix(getIdentity().getMembershipVector()) > level) {
+      logger.debug("num_id: " + getIdentity().getIdentifier() + " is returning a findLadder response");
       return getIdentity();
     }
     SkipNodeIdentity curr = (direction == 0) ? getLeftNode(level) : getRightNode(level);
     while (!curr.equals(LookupTable.EMPTY_NODE)
-        && SkipNodeIdentity.commonBits(target, curr.getMembershipVector()) <= level) {
+        && target.commonPrefix(curr.getMembershipVector()) <= level) {
       logger.debug(
           "num_id: "
-              + getNumId()
+              + getIdentity().getIdentifier()
               + " is in findLadder loop at level "
               + level
               + " with "
@@ -376,7 +377,7 @@ public class SkipNode implements SkipNodeInterface {
         return curr;
       }
     }
-    logger.debug("num_id: " + getNumId() + " is returning a findLadder response");
+    logger.debug("num_id: " + getIdentity().getIdentifier() + " is returning a findLadder response");
     return curr;
   }
 
@@ -398,10 +399,17 @@ public class SkipNode implements SkipNodeInterface {
    * @param node the node to insert.
    */
   private void insertIntoTable(SkipNodeIdentity node, int minLevel) {
-    logger.debug("num_id: " + getNumId() + " has updated its table");
+    logger.debug("num_id: " + getIdentity().getIdentifier() + " has updated its table");
     version++;
-    int direction = (node.getIdentifier() < getNumId()) ? 0 : 1;
-    int maxLevel = SkipNodeIdentity.commonBits(getNameId(), node.getMembershipVector());
+    int direction;
+
+    if (node.getIdentifier().comparedTo(this.getIdentity().getIdentifier()) == Identifier.COMPARE_LESS) {
+      direction = 0;
+    } else {
+      direction = 1;
+    }
+
+    int maxLevel = getIdentity().getMembershipVector().commonPrefix(node.getMembershipVector());
     for (int i = minLevel; i <= maxLevel; i++) {
       if (direction == 0) {
         updateLeftNode(node, i);
@@ -422,28 +430,28 @@ public class SkipNode implements SkipNodeInterface {
    *
    * @param numId The numID to search for
    * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   *         the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
-   *         direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *         NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   *         with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   *         SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
-   *         returned.
+   * the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
+   * direction the search is initiated. For example: Initiating a search for a SkipNode with
+   * NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
+   * with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   * SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
+   * returned.
    */
   @Override
-  public SkipNodeIdentity searchByNumId(int numId) {
+  public SkipNodeIdentity searchByNumId(Identifier numId) {
     // If this is the node the search request is looking for, return its identity
-    if (numId == this.numId) {
+    if (numId.equals(this.getIdentity().getIdentifier())) {
       return getIdentity();
     }
     // Initialize the level to begin looking at
     int level = lookupTable.getNumLevels();
     // If the target is greater than this node's numID, the search should continue to the right
-    if (this.numId < numId) {
+    if (this.getIdentity().getIdentifier().comparedTo(numId) == Identifier.COMPARE_LESS) {
       // Start from the top, while there is no right neighbor,
       // or the right neighbor's num ID is greater than what we are searching for keep going down
       while (level >= 0) {
         if (lookupTable.getRight(level) == LookupTable.EMPTY_NODE
-            || lookupTable.getRight(level).getIdentifier() > numId) {
+            || lookupTable.getRight(level).getIdentifier().comparedTo(numId) == Identifier.COMPARE_GREATER) {
           level--;
         } else {
           break;
@@ -462,7 +470,7 @@ public class SkipNode implements SkipNodeInterface {
       // or the right neighbor's num ID is greater than what we are searching for keep going down
       while (level >= 0) {
         if (lookupTable.getLeft(level) == LookupTable.EMPTY_NODE
-            || lookupTable.getLeft(level).getIdentifier() < numId) {
+            || lookupTable.getLeft(level).getIdentifier().comparedTo(numId) == Identifier.COMPARE_LESS) {
           level--;
         } else {
           break;
@@ -504,23 +512,27 @@ public class SkipNode implements SkipNodeInterface {
    * @return the node with the name ID most similar to the target name ID.
    */
   @Override
-  public SearchResult searchByNameId(String nameId) {
-    if (this.nameId.equals(nameId)) {
+  public SearchResult searchByNameId(MembershipVector nameId) {
+    if (this.getIdentity().getMembershipVector().equals(nameId)) {
       return new SearchResult(getIdentity());
     }
     // If the node is not completely inserted yet, return a tentative identity.
     if (!isAvailable()) {
-      logger.debug(
-          "num_id: " + getNumId() + " not completely inserted yet, returning a tentative identity");
+      logger.debug("num_id: " + getIdentity().getIdentifier() + " not completely inserted yet, returning a tentative identity");
       return new SearchResult(unavailableIdentity);
     }
     // Find the level in which the search should be started from.
-    int level = SkipNodeIdentity.commonBits(this.nameId, nameId);
+    int level = this.getIdentity().getMembershipVector().commonPrefix(nameId);
     if (level < 0) {
       return new SearchResult(getIdentity());
     }
     // Initiate the search.
-    return middleLayer.searchByNameIdRecursive(address, port, numId, nameId, level);
+    return middleLayer.searchByNameIdRecursive(
+        getIdentity().getAddress(),
+        getIdentity().getPort(),
+        getIdentity().getIdentifier(),
+        nameId,
+        level);
   }
 
   /**
@@ -529,11 +541,11 @@ public class SkipNode implements SkipNodeInterface {
    * @param targetNameId the target name ID.
    * @param level        the current level.
    * @return the SkipNodeIdentity of the closest SkipNode which has the common prefix
-   *         length larger than `level`.
+   * length larger than `level`.
    */
   @Override
-  public SearchResult searchByNameIdRecursive(String targetNameId, int level) {
-    if (nameId.equals(targetNameId)) {
+  public SearchResult searchByNameIdRecursive(MembershipVector targetNameId, int level) {
+    if (this.getIdentity().getMembershipVector().equals(targetNameId)) {
       return new SearchResult(getIdentity());
     }
     // Buffer contains the `most similar node` to return in case we cannot climb up anymore.
@@ -546,8 +558,8 @@ public class SkipNode implements SkipNodeInterface {
             : potentialRightLadder;
     // This loop will execute and we expand our search window until a ladder is found
     // either on the right or the left.
-    while (SkipNodeIdentity.commonBits(targetNameId, potentialLeftLadder.getMembershipVector()) <= level
-        && SkipNodeIdentity.commonBits(targetNameId, potentialRightLadder.getMembershipVector()) <= level) {
+    while (targetNameId.commonPrefix(potentialLeftLadder.getMembershipVector()) <= level
+        && targetNameId.commonPrefix(potentialRightLadder.getMembershipVector()) <= level) {
       // Return the potential ladder as the result if it is the result we are looking for.
       if (potentialLeftLadder.getMembershipVector().equals(targetNameId)) {
         return new SearchResult(potentialLeftLadder);
@@ -579,17 +591,16 @@ public class SkipNode implements SkipNodeInterface {
                 targetNameId);
       }
       // Try to climb up on the either ladder.
-      if (SkipNodeIdentity.commonBits(targetNameId, potentialRightLadder.getMembershipVector()) > level) {
-        level = SkipNodeIdentity.commonBits(targetNameId, potentialRightLadder.getMembershipVector());
+      if (targetNameId.commonPrefix(potentialRightLadder.getMembershipVector()) > level) {
+        level = targetNameId.commonPrefix(potentialRightLadder.getMembershipVector());
         return middleLayer.searchByNameIdRecursive(
             potentialRightLadder.getAddress(),
             potentialRightLadder.getPort(),
             potentialRightLadder.getIdentifier(),
             targetNameId,
             level);
-      } else if (SkipNodeIdentity.commonBits(targetNameId, potentialLeftLadder.getMembershipVector())
-          > level) {
-        level = SkipNodeIdentity.commonBits(targetNameId, potentialLeftLadder.getMembershipVector());
+      } else if (targetNameId.commonPrefix(potentialLeftLadder.getMembershipVector()) > level) {
+        level = targetNameId.commonPrefix(potentialLeftLadder.getMembershipVector());
         return middleLayer.searchByNameIdRecursive(
             potentialLeftLadder.getAddress(),
             potentialLeftLadder.getPort(),
@@ -611,7 +622,7 @@ public class SkipNode implements SkipNodeInterface {
   public SkipNodeIdentity updateLeftNode(SkipNodeIdentity snId, int level) {
     logger.debug(
         "num_id: "
-            + getNumId()
+            + getIdentity().getIdentifier()
             + " has received a updateLeftNode request with "
             + "skip_node_identity: "
             + snId
@@ -624,7 +635,7 @@ public class SkipNode implements SkipNodeInterface {
   public SkipNodeIdentity updateRightNode(SkipNodeIdentity snId, int level) {
     logger.debug(
         "num_id: "
-            + getNumId()
+            + getIdentity().getIdentifier()
             + " has received a updateRightNode request with "
             + "skip_node_identity: "
             + snId
@@ -636,26 +647,26 @@ public class SkipNode implements SkipNodeInterface {
   @Override
   public SkipNodeIdentity getRightNode(int level) {
     logger.debug(
-        "num_id: " + getNumId() + " has received a getRightNode request with " + "level: " + level);
+        "num_id: " + getIdentity().getIdentifier() + " has received a getRightNode request with " + "level: " + level);
     SkipNodeIdentity right = lookupTable.getRight(level);
     SkipNodeIdentity r =
         (right.equals(LookupTable.EMPTY_NODE))
             ? right
             : middleLayer.getIdentity(right.getAddress(), right.getPort(), right.getIdentifier());
-    logger.debug("num_id: " + getNumId() + " is returning a getRightNode response");
+    logger.debug("num_id: " + getIdentity().getIdentifier() + " is returning a getRightNode response");
     return r;
   }
 
   @Override
   public SkipNodeIdentity getLeftNode(int level) {
     logger.debug(
-        "num_id: " + getNumId() + " has received a getLeftNode request with " + "level: " + level);
+        "num_id: " + getIdentity().getIdentifier() + " has received a getLeftNode request with " + "level: " + level);
     SkipNodeIdentity left = lookupTable.getLeft(level);
     SkipNodeIdentity r =
         (left.equals(LookupTable.EMPTY_NODE))
             ? left
             : middleLayer.getIdentity(left.getAddress(), left.getPort(), left.getIdentifier());
-    logger.debug("num_id: " + getNumId() + " is returning a getLeftNode response");
+    logger.debug("num_id: " + getIdentity().getIdentifier() + " is returning a getLeftNode response");
     return r;
   }
 }

@@ -39,6 +39,7 @@ public class SkipNodeIdentity implements Serializable {
    * @param name2 String representing name id.
    * @return number of common bits.
    */
+  @Deprecated
   public static int commonBits(String name1, String name2) {
     if (name1 == null || name2 == null) {
       return -1;
