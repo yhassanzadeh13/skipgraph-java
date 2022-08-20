@@ -218,7 +218,7 @@ public class MiddleLayer {
   allowing for it to be used as if it was simply available locally.
    */
 
-  public SearchResult searchByNameId(String destinationAddress, int port, String nameId) {
+  public SearchResult searchByNameId(String destinationAddress, int port, MembershipVector nameId) {
     return searchByNameId(destinationAddress, port, null, nameId);
   }
 
@@ -231,7 +231,7 @@ public class MiddleLayer {
    * @param nameId             name id to be searched.
    * @return Search results from the search.
    */
-  public SearchResult searchByNameId(String destinationAddress, int port, Identifier receiverId, String nameId) {
+  public SearchResult searchByNameId(String destinationAddress, int port, Identifier receiverId, MembershipVector nameId) {
     Request request = new SearchByNameIdRequest(nameId);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -239,7 +239,7 @@ public class MiddleLayer {
     return ((SearchResultResponse) response).result;
   }
 
-  public SearchResult searchByNameIdRecursive(String destinationAddress, int port, String target, int level) {
+  public SearchResult searchByNameIdRecursive(String destinationAddress, int port, MembershipVector target, int level) {
     return searchByNameIdRecursive(destinationAddress, port, null, target, level);
   }
 
