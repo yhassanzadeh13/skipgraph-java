@@ -58,12 +58,13 @@ public class ConcurrentLookupTable implements LookupTable {
 
     lock.writeLock().unlock();
 
-    logger
-        .debug()
-        .addInt("owner_num_id", owner.getIdentifier())
-        .addInt("neighbor_num_id", node.getIdentifier())
-        .addInt("level", level)
-        .addMsg("updated left neighbor in lookup table");
+    // TODO: logging
+//    logger
+//        .debug()
+//        .addInt("owner_num_id", owner.getIdentifier())
+//        .addInt("neighbor_num_id", node.getIdentifier())
+//        .addInt("level", level)
+//        .addMsg("updated left neighbor in lookup table");
     return prev;
   }
 
@@ -80,12 +81,13 @@ public class ConcurrentLookupTable implements LookupTable {
 
     lock.writeLock().unlock();
 
-    logger
-        .debug()
-        .addInt("owner_num_id", owner.getIdentifier())
-        .addInt("neighbor_num_id", node.getIdentifier())
-        .addInt("level", level)
-        .addMsg("updated right in lookup table");
+    // TODO: logging
+//    logger
+//        .debug()
+//        .addInt("owner_num_id", owner.getIdentifier())
+//        .addInt("neighbor_num_id", node.getIdentifier())
+//        .addInt("level", level)
+//        .addMsg("updated right in lookup table");
     return prev;
   }
 
