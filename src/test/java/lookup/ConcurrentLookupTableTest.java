@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import skipnode.SkipNodeIdentity;
+import unittest.IdentifierFixture;
+import unittest.IdentityFixture;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,12 +20,11 @@ public class ConcurrentLookupTableTest {
   @BeforeEach
   void setUp() {
     int size = 30;
-    concurrentLookupTable = new ConcurrentLookupTable( size, new SkipNodeIdentity("0000", 1, "None", -1));
+    concurrentLookupTable = new ConcurrentLookupTable(size, IdentityFixture.newIdentity());
     nodesToInsert = new ArrayList<>();
 
     for (int i = 1; i <= size; i++) {
-      SkipNodeIdentity sn = new SkipNodeIdentity("0000", i, "None", -1);
-      nodesToInsert.add(sn);
+      nodesToInsert.add(IdentityFixture.newIdentity());
     }
   }
 

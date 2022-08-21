@@ -3,6 +3,7 @@ package skipnode;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
+import model.identifier.Identifier;
 import unittest.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
@@ -49,13 +50,13 @@ public class DataNodeTest {
     // Now, insert every node in a randomized order.
     g.insertAll();
 
-    // Create a map of num ids to their corresponding lookup tables.
-    Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
+    // Create a map of identities to lookup tables
+    Map<SkipNodeIdentity, LookupTable> tableMap = g.getNodes().stream()
+        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
 
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 

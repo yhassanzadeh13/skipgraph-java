@@ -22,6 +22,8 @@ import static unittest.LocalSkipGraph.prependToLength;
 import skipnode.SearchResult;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
+import unittest.IdentifierFixture;
+import unittest.MembershipVectorFixture;
 
 /**
  * The goal of the mvpTest is to establish a decentralized Skip Graph overlay of nodes and test for full connectivity over each node,
@@ -45,23 +47,13 @@ public class mvpTest {
       underlays.add(underlay);
     }
 
-
-    // numerical and name IDs
-    List<Integer> numIDs = new ArrayList<>(NODES);
-    for (int i = 0; i < NODES; i++) numIDs.add(i);
-    List<String> nameIDs = numIDs.stream()
-        .map(numID -> prependToLength(Integer.toBinaryString(numID), NameIdSize))
-        .collect(Collectors.toList());
-    // Randomly assign name IDs.
-    Collections.shuffle(nameIDs);
-
     // identities
     List<SkipNodeIdentity> identities = new ArrayList<>(NODES);
 
     for (int i = 0; i < NODES; i++) {
       identities.add(
-          new SkipNodeIdentity(nameIDs.get(i),
-              numIDs.get(i),
+          new SkipNodeIdentity(IdentifierFixture.newIdentifier(),
+              MembershipVectorFixture.newMembershipVector(),
               underlays.get(i).getAddress(),
               underlays.get(i).getPort()));
     }
@@ -140,9 +132,12 @@ public class mvpTest {
         // Choose the target.
         final SkipNode target = skipNodes.get(j);
         searchThreads[i + NODES * j] = new Thread(() -> {
-          SearchResult res = searcher.searchByNameId(target.getNameId());
+          SearchResult res = searcher.searchByNameId(target.getIdentity().getMembershipVector());
           try {
-            Assertions.assertEquals(target.getNameId(), res.result.getMembershipVector(), "Source: " + searcher.getNumId() + " Target: " + target.getNameId());
+            Assertions.assertEquals(
+                target.getIdentity().getMembershipVector(),
+                res.result.getMembershipVector(),
+                "Source: " + searcher.getIdentity().getMembershipVector() + " Target: " + target.getIdentity().getMembershipVector());
           } catch (AssertionError error) {
             assertionErrorCount.getAndIncrement();
           } finally {

@@ -35,7 +35,8 @@ public class InsertionLock {
    * @return {@code true} if lock is acquired {@code false} otherwise
    */
   public boolean startInsertion() {
-    logger.debug().addInt("owner_num_id", this.owner.getIdentifier()).addMsg("starting insertion");
+    // TODO: add logger.
+    // logger.debug().addInt("owner_num_id", this.owner.getIdentifier()).addMsg("starting insertion");
     boolean acquired = locked.tryAcquire();
     if (acquired) {
       holder = null;
@@ -47,7 +48,8 @@ public class InsertionLock {
    * releases the lock if no node holds this insertion lock.
    */
   public void endInsertion() {
-    logger.debug().addInt("owner_num_id", this.owner.getIdentifier()).addMsg("ending insertion");
+    // TODO: add logger.
+    // logger.debug().addInt("owner_num_id", this.owner.getIdentifier()).addMsg("ending insertion");
     if (holder == null) {
       locked.release();
     }
