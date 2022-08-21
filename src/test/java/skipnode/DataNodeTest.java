@@ -3,7 +3,7 @@ package skipnode;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
-import misc.LocalSkipGraph;
+import unittest.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
 
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static misc.LocalSkipGraph.prependToLength;
+import static unittest.LocalSkipGraph.prependToLength;
 import static skipnode.SkipNodeTest.tableConsistencyCheck;
 import static skipnode.SkipNodeTest.tableCorrectnessCheck;
 

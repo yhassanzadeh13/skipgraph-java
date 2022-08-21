@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
+import unittest.LocalSkipGraph;
 
 class LocalSkipGraphTest {
 

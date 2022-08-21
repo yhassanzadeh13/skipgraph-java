@@ -18,7 +18,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
-import static misc.LocalSkipGraph.prependToLength;
+import static unittest.LocalSkipGraph.prependToLength;
 import skipnode.SearchResult;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;

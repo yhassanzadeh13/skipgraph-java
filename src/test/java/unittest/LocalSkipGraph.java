@@ -1,4 +1,4 @@
-package misc;
+package unittest;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,27 +33,13 @@ public class LocalSkipGraph {
    * @param manualJoin   Boolean representing if its manual join or not.
    * @param nameIdSize   Integer representing the manual id size.
    */
-  public LocalSkipGraph(
-      int size, String localAddress, int startingPort, boolean manualJoin, int nameIdSize) {
-    // Create the numerical IDs.
-    List<Integer> numIds = new ArrayList<>(size);
-    for (int i = 0; i < size; i++) {
-      numIds.add(i);
-    }
-    // Create the name IDs.
-    List<String> nameIds =
-        numIds.stream()
-            .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
-            .collect(Collectors.toList());
-    // Randomly assign name IDs.
-    Collections.shuffle(nameIds);
-    // nameIds.forEach(x -> System.out.print(x + " "));
+  public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin, int nameIdSize) {
 
     // Create the identities.
     List<SkipNodeIdentity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       identities.add(
-          new SkipNodeIdentity(nameIds.get(i), numIds.get(i), localAddress, startingPort + i));
+          new SkipNodeIdentity(IdentifierFixture.newIdentifier(), MembershipVectorFixture.newMembershipVector(), localAddress, startingPort + i));
     }
     // Construct the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(size);
@@ -77,7 +63,7 @@ public class LocalSkipGraph {
             LookupTable lt2 = lookupTables.get(j);
             // Connect the nodes at this level if they should be connected
             // according to their name ID.
-            if (SkipNodeIdentity.commonBits(id1.getMembershipVector(), id2.getMembershipVector()) >= l) {
+            if (id1.getMembershipVector().commonPrefix(id2.getMembershipVector()) >= l) {
               lt1.updateRight(id2, l);
               lt2.updateLeft(id1, l);
               break;
