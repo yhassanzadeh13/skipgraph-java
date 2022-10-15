@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
+import model.identifier.Identifier;
+import model.identifier.MembershipVector;
 import unittest.LocalSkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -78,26 +80,26 @@ class SkipNodeTest {
 //    }
 
   // Checks the correctness of a lookup table owned by the node with the given identity parameters.
-  static void tableCorrectnessCheck(int numID, String nameID, LookupTable table) {
+  static void tableCorrectnessCheck(Identifier identifier, MembershipVector mv, LookupTable table) {
     for (int i = 0; i < table.getNumLevels(); i++) {
       SkipNodeIdentity left = table.getLeft(i);
       SkipNodeIdentity right = table.getRight(i);
 
       if (!left.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(left.getIdentifier() < numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(left.getMembershipVector(), nameID) >= i);
+        Assertions.assertTrue(left.getIdentifier().isLessThan(identifier));
+        Assertions.assertTrue(left.getMembershipVector().commonPrefix(mv) >= i);
       }
 
       if (!right.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(right.getIdentifier() > numID);
-        Assertions.assertTrue(SkipNodeIdentity.commonBits(right.getMembershipVector(), nameID) >= i);
+        Assertions.assertTrue(right.getIdentifier().isGreaterThan(identifier));
+        Assertions.assertTrue(right.getMembershipVector().commonPrefix(mv) >= i);
       }
     }
   }
 
   // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
   // then y is a neighbor of x at level l (in opposite directions).
-  static void tableConsistencyCheck(Map<Integer, LookupTable> tableMap, SkipNode node) {
+  static void tableConsistencyCheck(Map<Identifier, LookupTable> tableMap, SkipNode node) {
     LookupTable table = node.getLookupTable();
     for (int i = 0; i < table.getNumLevels(); i++) {
       SkipNodeIdentity left = table.getLeft(i);
@@ -160,12 +162,18 @@ class SkipNodeTest {
       }
     }
     // First, check the correctness and consistency of the lookup tables.
-    // Create a map of num ids to their corresponding lookup tables.
-    Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
+    // Create a map of identifier to their corresponding lookup tables.
+    // Identity -> LookupTable
+    Map<SkipNodeIdentity, LookupTable> identityMap = g.getNodes().stream()
+        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
+    // Identifier -> LookupTable
+    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity)
+        .collect(Collectors.toMap(SkipNodeIdentity::getIdentifier, identityMap::get));
+
     // Check the correctness & consistency of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
+      // TODO: replace with streams
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
     System.out.println("INSERTIONS COMPLETE.");
@@ -200,9 +208,9 @@ class SkipNodeTest {
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          SearchResult res = initiator.searchByNameId(target.getNameId());
-          Assertions.assertEquals(target.getNameId(), res.result.getMembershipVector(),
-              "Source: " + initiator.getNumId() + " Target: " + target.getNameId() + " " + excp
+          SearchResult res = initiator.searchByNameId(target.getIdentity().getMembershipVector());
+          Assertions.assertEquals(target.getIdentity().getMembershipVector(), res.result.getMembershipVector(),
+              "Source: " + initiator.getIdentity().getMembershipVector() + " Target: " + target.getIdentity().getMembershipVector() + " " + excp
                   + "\n" + fnl);
         });
       }
@@ -267,11 +275,16 @@ class SkipNodeTest {
       }
     }
     // Create a map of num ids to their corresponding lookup tables.
-    Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
+    Map<SkipNodeIdentity, LookupTable> idMap = g.getNodes().stream()
+        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
+    // Create a map of identifiers to their corresponding lookup tables.
+    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity)
+        .collect(Collectors.toMap(SkipNodeIdentity::getIdentifier, idMap::get));
+
     // Check the correctness & consistency of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
+      // TODO: replace with streams
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
   }
@@ -298,11 +311,13 @@ class SkipNodeTest {
     // Now, insert every node in a randomized order.
     g.insertAllRandomized();
     // Create a map of num ids to their corresponding lookup tables.
-    Map<Integer, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getNumId, SkipNode::getLookupTable));
+    Map<SkipNodeIdentity, LookupTable> idMap = g.getNodes().stream()
+        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
+    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity)
+        .collect(Collectors.toMap(SkipNodeIdentity::getIdentifier, idMap::get));
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
     underlays.forEach(Underlay::terminate);
@@ -332,9 +347,9 @@ class SkipNodeTest {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
         SkipNode target = g.getNodes().get(j);
-        SearchResult result = initiator.searchByNameId(target.getNameId());
+        SearchResult result = initiator.searchByNameId(target.getIdentity().getMembershipVector());
         if (!result.result.equals(target.getIdentity())) {
-          initiator.searchByNameId(target.getNameId());
+          initiator.searchByNameId(target.getIdentity().getMembershipVector());
         }
         Assertions.assertEquals(target.getIdentity(), result.result);
       }
@@ -367,7 +382,7 @@ class SkipNodeTest {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
         SkipNode target = g.getNodes().get(j);
-        SkipNodeIdentity result = initiator.searchByNumId(target.getNumId());
+        SkipNodeIdentity result = initiator.searchByNumId(target.getIdentity().getIdentifier());
         Assertions.assertEquals(target.getIdentity(), result);
       }
     }

@@ -90,4 +90,16 @@ public class Identifier {
     int result = Arrays.compare(this.byteRepresentation, other.byteRepresentation);
     return Integer.compare(result, 0);
   }
+
+  public boolean equals(Identifier other) {
+    return Arrays.equals(this.byteRepresentation, other.byteRepresentation);
+  }
+
+  public boolean isLessThan(Identifier other) {
+    return comparedTo(other) == COMPARE_LESS;
+  }
+
+  public boolean isGreaterThan(Identifier other) {
+    return comparedTo(other) == COMPARE_GREATER;
+  }
 }
