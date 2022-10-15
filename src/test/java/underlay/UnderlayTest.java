@@ -3,11 +3,15 @@ package underlay;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
+import model.identifier.Identifier;
+import model.identifier.MembershipVector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
 import underlay.packets.requests.*;
+import unittest.IdentifierFixture;
+import unittest.MembershipVectorFixture;
 
 /**
  * This test creates two underlays on the machine at different ports and checks the connectivity
@@ -48,6 +52,7 @@ public class UnderlayTest {
   }
 
   // Checks the message delivery for every request type between underlays.
+  // TODO: does this test actually test anything?
   // @Test
   void sendMessage() {
     // The address of the remote underlay.
@@ -56,13 +61,13 @@ public class UnderlayTest {
 
     // Check search by name ID request.
     Assertions.assertNotNull(
-        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIdRequest("")));
+        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIdRequest(MembershipVectorFixture.newMembershipVector())));
     // Check search by numerical ID request.
     Assertions.assertNotNull(
-        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByIdentifierRequest(0)));
+        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByIdentifierRequest(IdentifierFixture.newIdentifier())));
     // Check level-based search by name ID request.
     Assertions.assertNotNull(localUnderlay
-        .sendMessage(remoteAddress, remotePort, new NameIdLevelSearchRequest(0, 0, "")));
+        .sendMessage(remoteAddress, remotePort, new NameIdLevelSearchRequest(0, 0, MembershipVectorFixture.newMembershipVector())));
     // Check left/right update requests.
     Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort,
         new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));

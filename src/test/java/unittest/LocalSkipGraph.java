@@ -3,10 +3,12 @@ package unittest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
+import model.identifier.Identifier;
 import model.identifier.MembershipVector;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
@@ -140,5 +142,10 @@ public class LocalSkipGraph {
       SkipNode initiator = list.get(i - 1);
       list.get(i).insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
     }
+  }
+
+  public Map<Identifier, LookupTable> identifierLookupTableMap() {
+    Map<SkipNodeIdentity, LookupTable> idMap = skipNodes.stream().collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
+    return idMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getIdentifier(), Map.Entry::getValue));
   }
 }

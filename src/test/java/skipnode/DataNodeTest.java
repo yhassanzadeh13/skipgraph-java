@@ -4,6 +4,8 @@ import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import model.identifier.Identifier;
+import model.identifier.MembershipVector;
+import unittest.IdentifierFixture;
 import unittest.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
@@ -50,43 +52,35 @@ public class DataNodeTest {
     // Now, insert every node in a randomized order.
     g.insertAll();
 
-    // Create a map of identities to lookup tables
-    Map<SkipNodeIdentity, LookupTable> tableMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
-
+    Map<Identifier, LookupTable> tableMap = g.identifierLookupTableMap();
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 
-    // Create datanodes
-    List<Integer> numIDs = new ArrayList<>(NODES * DATANODESPERNODE);
-    for (int i = NODES; i < NODES * (DATANODESPERNODE + 1); i++) {
-      numIDs.add(i);
-    }
 
-    // Create the name IDs.
-    List<String> nameIDs = numIDs.stream()
-        .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
-        .collect(Collectors.toList());
 
-    int numDNodes = 0;
     for (SkipNodeInterface node : g.getNodes()) {
       for (int i = 0; i < DATANODESPERNODE; i++) {
-        SkipNodeIdentity dnID = new SkipNodeIdentity(nameIDs.get(numDNodes), numIDs.get(numDNodes),
-            node.getIdentity().getAddress(), node.getIdentity().getPort());
-        LookupTable lt = new ConcurrentLookupTable(nameIdSize, dnID);
-        SkipNode dNode = new SkipNode(dnID, lt);
-        tableMap.put(numIDs.get(numDNodes), lt);
+        Identifier identifier = IdentifierFixture.newIdentifier();
+        MembershipVector membershipVector = new MembershipVector(identifier.getBytes());
+
+        SkipNodeIdentity dnID = new SkipNodeIdentity(
+            identifier,
+            membershipVector,
+            node.getIdentity().getAddress(),
+            node.getIdentity().getPort());
+        LookupTable lookupTable = new ConcurrentLookupTable(nameIdSize, dnID);
+        SkipNode dNode = new SkipNode(dnID, lookupTable);
+        tableMap.put(identifier, lookupTable);
         node.insertDataNode(dNode);
-        numDNodes++;
       }
     }
 
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getNumId(), n.getNameId(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 

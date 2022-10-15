@@ -1,5 +1,7 @@
 package underlay.packets.requests;
 
+import model.identifier.Identifier;
+import model.identifier.MembershipVector;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -8,19 +10,19 @@ public class NameIdLevelSearchRequest extends Request {
 
   public final int level;
   public final int direction;
-  public final String targetNameId;
+  public final MembershipVector target;
 
   /**
    * Constructor for NameIdLevelSearchRequest.
    *
    * @param level Integer representing the level.
    * @param direction Integer representing the direction.
-   * @param targetNameId name id of the target node.
+   * @param target membership vector of the target node.
    */
-  public NameIdLevelSearchRequest(int level, int direction, String targetNameId) {
+  public NameIdLevelSearchRequest(int level, int direction, MembershipVector target) {
     super(RequestType.NameIdLevelSearch);
     this.level = level;
     this.direction = direction;
-    this.targetNameId = targetNameId;
+    this.target = target;
   }
 }
