@@ -1,6 +1,7 @@
 package underlay.tcp;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import underlay.UnderlayTest;
 
 /**
@@ -11,8 +12,8 @@ import underlay.UnderlayTest;
 class TCPUnderlayTest extends UnderlayTest {
 
   // Create two TCP underlays at different ports.
-  // @BeforeAll
-  static void setUp() {
+  @BeforeAll
+  static void setup() {
     // Construct the underlays.
     localUnderlay = new TcpUnderlay();
     remoteUnderlay = new TcpUnderlay();
@@ -20,7 +21,7 @@ class TCPUnderlayTest extends UnderlayTest {
     buildLayers(localUnderlay);
     buildLayers(remoteUnderlay);
 
-    Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT + 6));
-    Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT + 6));
+    Assertions.assertTrue(localUnderlay.initialize(LOCAL_PORT));
+    Assertions.assertTrue(remoteUnderlay.initialize(REMOTE_PORT));
   }
 }

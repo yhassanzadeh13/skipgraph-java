@@ -1,5 +1,7 @@
 package model.identifier;
 
+import java.io.Serializable;
+
 import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
 import io.ipfs.multibase.Multibase;
@@ -16,7 +18,7 @@ import model.skipgraph.SkipGraph;
  * "Interlaced: Fully decentralized churn stabilization for skip graph-based dhts."
  * Journal of Parallel and Distributed Computing 149 (2021): 13-28.
  */
-public class MembershipVector {
+public class MembershipVector implements Serializable {
   /**
    * Base58BTC representation of membership vector.
    */

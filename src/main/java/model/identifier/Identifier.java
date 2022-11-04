@@ -1,6 +1,7 @@
 package model.identifier;
 
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import io.ipfs.multibase.Multibase;
@@ -18,7 +19,7 @@ import model.skipgraph.SkipGraph;
  * "Interlaced: Fully decentralized churn stabilization for skip graph-based dhts."
  * Journal of Parallel and Distributed Computing 149 (2021): 13-28.
  */
-public class Identifier {
+public class Identifier implements Serializable {
 
   public static final int COMPARE_GREATER = 1;
   public static final int COMPARE_LESS = -1;
@@ -41,8 +42,7 @@ public class Identifier {
    */
   public Identifier(byte[] identifier) throws IllegalArgumentException {
     if (identifier.length != SkipGraph.IDENTIFIER_SIZE) {
-      throw new IllegalArgumentException("identifier must be exactly the legitimate size "
-          + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + identifier.length);
+      throw new IllegalArgumentException("identifier must be exactly the legitimate size " + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + identifier.length);
     }
 
     this.byteRepresentation = identifier;
@@ -84,7 +84,7 @@ public class Identifier {
    *
    * @param other represents other identifier to compared to.
    * @return 0 if two identifiers are equal, 1 if this identifier is greater than other,
-   *         -1 if other identifier is greater than this.
+   * -1 if other identifier is greater than this.
    */
   public int comparedTo(Identifier other) {
     int result = Arrays.compare(this.byteRepresentation, other.byteRepresentation);

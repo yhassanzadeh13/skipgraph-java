@@ -43,14 +43,18 @@ public class UdpUnderlay extends Underlay {
     try {
       udpSocket = new DatagramSocket(port);
     } catch (SocketException e) {
-      System.err.println("[UDPUnderlay] Could not initialize at the given port.");
-      e.printStackTrace();
-      return -1;
+      throw new IllegalStateException("could not create UDP socket.", e);
     }
+
     // Create the listener thread that will continuously listen to the UDP packets.
     listenerThread = new Thread(new UdpListener(udpSocket, this, responseLock));
     listenerThread.start();
-    return udpSocket.getPort();
+    int p = udpSocket.getPort();
+    while (!listenerThread.isAlive()) {
+      // Wait for the listener thread to start.
+0    }
+    System.out.println("UDP underlay initialized on port " + p);
+    return p;
   }
 
   /**

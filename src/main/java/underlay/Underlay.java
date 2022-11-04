@@ -62,17 +62,15 @@ public abstract class Underlay {
    */
   public final boolean initialize(int port) {
     port = initUnderlay(port);
-    if (port <= 0) {
-      return false;
+    if (port < 0) {
+      throw new IllegalArgumentException("port must be non-negative:" + port);
     }
 
     this.port = port;
     try {
       address = Inet4Address.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
-      System.err.println("[Underlay] Could not acquire the local host name during initialization.");
-      e.printStackTrace();
-      return false;
+      throw new IllegalStateException("could not get local host address.", e);
     }
     fullAddress = address + ":" + port;
     return true;
