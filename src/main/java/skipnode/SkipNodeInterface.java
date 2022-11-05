@@ -84,7 +84,7 @@ public interface SkipNodeInterface {
    *         returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
    *         nodes in the SkipGraph. Also contains the piggybacked information.
    */
-  SearchResult searchByNameId(MembershipVector nameId);
+  SearchResult searchByMembershipVector(MembershipVector nameId);
 
   /**
    * Used by the `searchByNameID` method. Implements a recursive name ID search algorithm.

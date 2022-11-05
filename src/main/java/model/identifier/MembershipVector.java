@@ -1,6 +1,7 @@
 package model.identifier;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
@@ -118,4 +119,12 @@ public class MembershipVector implements Serializable {
     return this.membershipVector;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj.getClass() != this.getClass()) {
+      return false;
+    }
+
+    return Arrays.equals(this.byteRepresentation, ((MembershipVector) obj).byteRepresentation);
+  }
 }

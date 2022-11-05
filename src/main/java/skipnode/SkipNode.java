@@ -82,7 +82,7 @@ public class SkipNode implements SkipNodeInterface {
       SkipNodeIdentity left;
       SkipNodeIdentity right;
 
-      // First, find my 0-level neighbor by making a num-id search through the introducer.
+      // First, find my 0-level neighbor by making an identifier search through the introducer.
       SkipNodeIdentity searchResult = middleLayer.searchByIdentifier(this.identity.getIdentifier(), introducerAddress, introducerPort);
       // Get my 0-level left and right neighbors.
       if (this.identity.getIdentifier().comparedTo(searchResult.getIdentifier()) < 0) {
@@ -100,6 +100,7 @@ public class SkipNode implements SkipNodeInterface {
               + left.getIdentifier()
               + " neighbor_right_identifier: "
               + right.getIdentifier());
+
       if (acquireNeighborLocks(left, right)) {
         break;
       }
@@ -450,7 +451,7 @@ public class SkipNode implements SkipNodeInterface {
       // Start from the top, while there is no right neighbor,
       // or the right neighbor's num ID is greater than what we are searching for keep going down
       while (level >= 0) {
-        if (lookupTable.getRight(level) == LookupTable.EMPTY_NODE
+        if (lookupTable.getRight(level).equals(LookupTable.EMPTY_NODE)
             || lookupTable.getRight(level).getIdentifier().comparedTo(numId) == Identifier.COMPARE_GREATER) {
           level--;
         } else {
@@ -469,7 +470,7 @@ public class SkipNode implements SkipNodeInterface {
       // Start from the top, while there is no right neighbor,
       // or the right neighbor's num ID is greater than what we are searching for keep going down
       while (level >= 0) {
-        if (lookupTable.getLeft(level) == LookupTable.EMPTY_NODE
+        if (lookupTable.getLeft(level).equals(LookupTable.EMPTY_NODE)
             || lookupTable.getLeft(level).getIdentifier().comparedTo(numId) == Identifier.COMPARE_LESS) {
           level--;
         } else {
@@ -505,24 +506,27 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   /**
-   * Performs a name ID lookup over the skip-graph. If the exact name ID is not found, the most
+   * Performs a membership vector lookup over the skip-graph. If the exact membership vector is not found, the most
    * similar one is returned.
    *
-   * @param nameId the target name ID.
-   * @return the node with the name ID most similar to the target name ID.
+   * @param target the target membership vector.
+   * @return the node with the membership vector most similar to the target.
    */
   @Override
-  public SearchResult searchByNameId(MembershipVector nameId) {
-    if (this.getIdentity().getMembershipVector().equals(nameId)) {
+  public SearchResult searchByMembershipVector(MembershipVector target) {
+    boolean isEmpty = this.getIdentity().equals(LookupTable.EMPTY_NODE);
+
+    if (this.getIdentity().getMembershipVector().equals(target)) {
       return new SearchResult(getIdentity());
     }
     // If the node is not completely inserted yet, return a tentative identity.
     if (!isAvailable()) {
+      // TODO: when the node is not ready it must return not ready status.
       logger.debug("num_id: " + getIdentity().getIdentifier() + " not completely inserted yet, returning a tentative identity");
       return new SearchResult(unavailableIdentity);
     }
     // Find the level in which the search should be started from.
-    int level = this.getIdentity().getMembershipVector().commonPrefix(nameId);
+    int level = this.getIdentity().getMembershipVector().commonPrefix(target);
     if (level < 0) {
       return new SearchResult(getIdentity());
     }
@@ -531,7 +535,7 @@ public class SkipNode implements SkipNodeInterface {
         getIdentity().getAddress(),
         getIdentity().getPort(),
         getIdentity().getIdentifier(),
-        nameId,
+        target,
         level);
   }
 

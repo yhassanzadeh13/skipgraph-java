@@ -79,10 +79,19 @@ public class SkipNodeIdentity implements Serializable {
       return false;
     }
     SkipNodeIdentity that = (SkipNodeIdentity) o;
-    return getIdentifier() == that.getIdentifier()
-        && getMembershipVector().equals(that.getMembershipVector())
-        && getAddress().equals(that.getAddress())
-        && getPort() == that.getPort();
+    if (this.port != that.port) {
+      return false;
+    }
+    if (!this.address.equals(that.address)) {
+      return false;
+    }
+    if (!this.getIdentifier().equals(that.getIdentifier())) {
+      return false;
+    }
+    if (!this.getMembershipVector().equals(that.getMembershipVector())) {
+      return false;
+    }
+    return true;
   }
 
   @Override

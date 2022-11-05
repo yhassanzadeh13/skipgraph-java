@@ -2,13 +2,12 @@ package integration;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
@@ -18,7 +17,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
-import static unittest.LocalSkipGraph.prependToLength;
 import skipnode.SearchResult;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
@@ -29,8 +27,7 @@ import unittest.MembershipVectorFixture;
  * The goal of the mvpTest is to establish a decentralized Skip Graph overlay of nodes and test for full connectivity over each node,
  * i.e., each node should be able to query every other node by both name and numerical IDs and get the correct response.
  */
-public class mvpTest {
-  private static final int STARTING_PORT = 4444;
+public class MvpTest {
   private static final int NODES = 32;
   private static final int NameIdSize = MembershipVector.computeSize(NODES);
   private static ArrayList<SkipNode> skipNodes;
@@ -43,7 +40,7 @@ public class mvpTest {
 
     for (int i = 0; i < NODES; i++) {
       Underlay underlay = Underlay.newDefaultUnderlay();
-      underlay.initialize(STARTING_PORT + i);
+      underlay.initialize(0);
       underlays.add(underlay);
     }
 
@@ -51,11 +48,12 @@ public class mvpTest {
     List<SkipNodeIdentity> identities = new ArrayList<>(NODES);
 
     for (int i = 0; i < NODES; i++) {
-      identities.add(
-          new SkipNodeIdentity(IdentifierFixture.newIdentifier(),
-              MembershipVectorFixture.newMembershipVector(),
-              underlays.get(i).getAddress(),
-              underlays.get(i).getPort()));
+      SkipNodeIdentity skid = new SkipNodeIdentity(IdentifierFixture.newIdentifier(),
+          MembershipVectorFixture.newMembershipVector(),
+          underlays.get(i).getAddress(),
+          underlays.get(i).getPort());
+      identities.add(skid);
+      System.out.println("Identity " + i + ": " + skid);
     }
 
     // Constructs the lookup tables.
@@ -132,7 +130,7 @@ public class mvpTest {
         // Choose the target.
         final SkipNode target = skipNodes.get(j);
         searchThreads[i + NODES * j] = new Thread(() -> {
-          SearchResult res = searcher.searchByNameId(target.getIdentity().getMembershipVector());
+          SearchResult res = searcher.searchByMembershipVector(target.getIdentity().getMembershipVector());
           try {
             Assertions.assertEquals(
                 target.getIdentity().getMembershipVector(),

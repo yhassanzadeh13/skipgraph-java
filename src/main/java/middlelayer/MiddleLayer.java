@@ -104,7 +104,7 @@ public class MiddleLayer {
         if (!overlay.isAvailable()) {
           return new Response(true);
         }
-        result = overlay.searchByNameId(((SearchByNameIdRequest) request).targetNameId);
+        result = overlay.searchByMembershipVector(((SearchByNameIdRequest) request).targetNameId);
         return new SearchResultResponse(result);
       case SearchByNameIDRecursive:
         // Check whether the node is available for lookups (i.e., already inserted.)
@@ -237,10 +237,6 @@ public class MiddleLayer {
     // Send the request through the underlay
     Response response = this.send(destinationAddress, port, request);
     return ((SearchResultResponse) response).result;
-  }
-
-  public SearchResult searchByNameIdRecursive(String destinationAddress, int port, MembershipVector target, int level) {
-    return searchByNameIdRecursive(destinationAddress, port, null, target, level);
   }
 
   /**

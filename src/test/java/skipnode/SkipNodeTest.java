@@ -208,7 +208,7 @@ class SkipNodeTest {
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
-          SearchResult res = initiator.searchByNameId(target.getIdentity().getMembershipVector());
+          SearchResult res = initiator.searchByMembershipVector(target.getIdentity().getMembershipVector());
           Assertions.assertEquals(target.getIdentity().getMembershipVector(), res.result.getMembershipVector(),
               "Source: " + initiator.getIdentity().getMembershipVector() + " Target: " + target.getIdentity().getMembershipVector() + " " + excp
                   + "\n" + fnl);
@@ -347,9 +347,9 @@ class SkipNodeTest {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
         SkipNode target = g.getNodes().get(j);
-        SearchResult result = initiator.searchByNameId(target.getIdentity().getMembershipVector());
+        SearchResult result = initiator.searchByMembershipVector(target.getIdentity().getMembershipVector());
         if (!result.result.equals(target.getIdentity())) {
-          initiator.searchByNameId(target.getIdentity().getMembershipVector());
+          initiator.searchByMembershipVector(target.getIdentity().getMembershipVector());
         }
         Assertions.assertEquals(target.getIdentity(), result.result);
       }

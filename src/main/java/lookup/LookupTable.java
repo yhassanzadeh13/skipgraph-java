@@ -10,8 +10,8 @@ import skipnode.SkipNodeIdentity;
  * Lookup Table interface.
  */
 public interface LookupTable {
-    SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity(SkipGraph.getEmptyIdentifier(), null, "EMPTY", -1);
-    SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity(SkipGraph.getInvalidIdentifier(), null, "INVALID", -1);
+    SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);
+    SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity(SkipGraph.getInvalidIdentifier(), SkipGraph.getEmptyMembershipVector(), "INVALID", -1);
 
   /**
    * Updates the left neighbor on the given level to be the node.
