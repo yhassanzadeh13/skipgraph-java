@@ -30,8 +30,7 @@ public class UdpListener implements Runnable {
    * @param underlay     UDP underlay instance.
    * @param responseLock response lock.
    */
-  public UdpListener(
-      DatagramSocket listenSocket, UdpUnderlay underlay, UdpResponseLock responseLock) {
+  public UdpListener(DatagramSocket listenSocket, UdpUnderlay underlay, UdpResponseLock responseLock) {
     this.listenSocket = listenSocket;
     this.underlay = underlay;
     this.responseLock = responseLock;
@@ -68,8 +67,7 @@ public class UdpListener implements Runnable {
         // we will stop listening.
         return;
       } catch (IOException e) {
-        System.err.println("[UDPListener] Could not acquire the packet.");
-        e.printStackTrace();
+        throw new IllegalStateException("could not receive UDP packet.", e);
       }
     }
   }

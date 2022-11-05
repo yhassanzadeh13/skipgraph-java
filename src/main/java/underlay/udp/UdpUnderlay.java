@@ -1,12 +1,7 @@
 package underlay.udp;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 
 import underlay.Underlay;
 import underlay.packets.Request;
@@ -21,7 +16,7 @@ public class UdpUnderlay extends Underlay {
    * The nature of UDP requires us to predefine the maximum size of a packet that could be
    * transferred. This parameter defines the maximum size of a packet in bytes.
    */
-  public static final int MAX_PACKET_SIZE = 512;
+  public static final int MAX_PACKET_SIZE = 1024;
   // This object will be used to transfer the responses from the listener thread
   // to the thread that the `sendMessage` was called from.
   private final UdpResponseLock responseLock = new UdpResponseLock();
@@ -49,12 +44,7 @@ public class UdpUnderlay extends Underlay {
     // Create the listener thread that will continuously listen to the UDP packets.
     listenerThread = new Thread(new UdpListener(udpSocket, this, responseLock));
     listenerThread.start();
-    int p = udpSocket.getPort();
-    while (!listenerThread.isAlive()) {
-      // Wait for the listener thread to start.
-0    }
-    System.out.println("UDP underlay initialized on port " + p);
-    return p;
+    return udpSocket.getLocalPort();
   }
 
   /**
@@ -115,9 +105,7 @@ public class UdpUnderlay extends Underlay {
       // Close the listener thread.
       listenerThread.join();
     } catch (InterruptedException e) {
-      System.err.println("[UDPUnderlay] Could not terminate.");
-      e.printStackTrace();
-      return false;
+      throw new IllegalStateException("could not terminate the underlay.", e);
     }
     return true;
   }
