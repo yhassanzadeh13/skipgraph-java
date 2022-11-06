@@ -54,6 +54,10 @@ public class SkipNode implements SkipNodeInterface {
     return this.identity;
   }
 
+  public Identifier getIdentifier() {
+    return this.identity.getIdentifier();
+  }
+
   @Override
   public void setMiddleLayer(MiddleLayer middleLayer) {
     this.middleLayer = middleLayer;

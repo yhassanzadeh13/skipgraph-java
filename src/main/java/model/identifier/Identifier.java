@@ -91,8 +91,20 @@ public class Identifier implements Serializable {
     return Integer.compare(result, 0);
   }
 
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(byteRepresentation);
+  }
+
   public boolean equals(Identifier other) {
-    return Arrays.equals(this.byteRepresentation, other.byteRepresentation);
+    if (this == other) {
+      return true;
+    }
+    if (other == null || getClass() != other.getClass()) {
+      return false;
+    }
+    Identifier that = (Identifier) other;
+    return Arrays.equals(this.byteRepresentation, that.byteRepresentation);
   }
 
   public boolean isLessThan(Identifier other) {

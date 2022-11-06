@@ -100,18 +100,26 @@ class SkipNodeTest {
   // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
   // then y is a neighbor of x at level l (in opposite directions).
   static void tableConsistencyCheck(Map<Identifier, LookupTable> tableMap, SkipNode node) {
+    // print hash code of keys in tableMap
+    System.out.println("tableMap keys:");
+    for (Identifier id : tableMap.keySet()) {
+      System.out.println(id.toString() + " " + id.hashCode());
+    }
+
     LookupTable table = node.getLookupTable();
     for (int i = 0; i < table.getNumLevels(); i++) {
-      SkipNodeIdentity left = table.getLeft(i);
-      SkipNodeIdentity right = table.getRight(i);
+      Identifier left = table.getLeft(i).getIdentifier();
+      Identifier right = table.getRight(i).getIdentifier();
 
       if (!left.equals(LookupTable.EMPTY_NODE)) {
-        LookupTable neighborMap = tableMap.get(left.getIdentifier());
+        System.out.println("left: " + left.toString() + " " + left.hashCode() + " " + tableMap.containsKey(left));
+        LookupTable neighborMap = tableMap.get(left);
         Assertions.assertTrue(neighborMap.isRightNeighbor(node.getIdentity(), i));
       }
 
       if (!right.equals(LookupTable.EMPTY_NODE)) {
-        LookupTable neighborMap = tableMap.get(right.getIdentifier());
+        System.out.println("right: " + right + " " + right.hashCode());
+        LookupTable neighborMap = tableMap.get(right);
         Assertions.assertTrue(neighborMap.isLeftNeighbor(node.getIdentity(), i));
       }
     }
@@ -163,13 +171,7 @@ class SkipNodeTest {
     }
     // First, check the correctness and consistency of the lookup tables.
     // Create a map of identifier to their corresponding lookup tables.
-    // Identity -> LookupTable
-    Map<SkipNodeIdentity, LookupTable> identityMap = g.getNodes().stream()
-        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
-    // Identifier -> LookupTable
-    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity)
-        .collect(Collectors.toMap(SkipNodeIdentity::getIdentifier, identityMap::get));
-
+    Map<Identifier, LookupTable> tableMap = g.identifierLookupTableMap();
     // Check the correctness & consistency of the tables.
     for (SkipNode n : g.getNodes()) {
       // TODO: replace with streams

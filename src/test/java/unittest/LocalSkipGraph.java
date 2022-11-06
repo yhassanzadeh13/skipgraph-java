@@ -145,7 +145,7 @@ public class LocalSkipGraph {
   }
 
   public Map<Identifier, LookupTable> identifierLookupTableMap() {
-    Map<SkipNodeIdentity, LookupTable> idMap = skipNodes.stream().collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
-    return idMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getIdentifier(), Map.Entry::getValue));
+    return  skipNodes.stream().collect(Collectors.toMap(SkipNode::getIdentifier, SkipNode::getLookupTable));
+    // return idMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getIdentifier(), Map.Entry::getValue));
   }
 }
