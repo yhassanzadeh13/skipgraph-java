@@ -12,10 +12,7 @@ import skipnode.SkipNodeIdentity;
  * ConcurrentLookupTable is a lookup table that supports concurrent calls.
  */
 public class ConcurrentLookupTable implements LookupTable {
-  private enum Direction {
-    LEFT,
-    RIGHT
-  }
+
 
   // TODO: logger should be passed as a constructor parameter.
   private static final Log4jLogger logger =

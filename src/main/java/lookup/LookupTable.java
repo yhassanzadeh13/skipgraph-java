@@ -1,8 +1,5 @@
 package lookup;
 
-import java.util.Arrays;
-
-import model.identifier.Identifier;
 import model.skipgraph.SkipGraph;
 import skipnode.SkipNodeIdentity;
 
@@ -10,8 +7,13 @@ import skipnode.SkipNodeIdentity;
  * Lookup Table interface.
  */
 public interface LookupTable {
-    SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);
-    SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity(SkipGraph.getInvalidIdentifier(), SkipGraph.getEmptyMembershipVector(), "INVALID", -1);
+  enum Direction {
+    LEFT,
+    RIGHT
+  }
+
+  SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);
+  SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity(SkipGraph.getInvalidIdentifier(), SkipGraph.getEmptyMembershipVector(), "INVALID", -1);
 
   /**
    * Updates the left neighbor on the given level to be the node.
