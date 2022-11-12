@@ -1,10 +1,16 @@
 package model.identifier;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.ipfs.multibase.Multibase;
+import lookup.LookupTable;
 import model.skipgraph.SkipGraph;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import unittest.Fixtures;
+import unittest.IdentifierFixture;
+
 import static model.identifier.Identifier.COMPARE_EQUAL;
 import static model.identifier.Identifier.COMPARE_GREATER;
 import static model.identifier.Identifier.COMPARE_LESS;
@@ -60,5 +66,16 @@ public class IdentifierTest {
     Assertions.assertEquals(COMPARE_GREATER, biggerId.comparedTo(smallerId));
     Assertions.assertEquals(COMPARE_EQUAL, smallerId.comparedTo(smallerId));
     Assertions.assertEquals(COMPARE_EQUAL, biggerId.comparedTo(biggerId));
+  }
+
+  @Test
+  void TestIdentifierMap() {
+    Map<Identifier, String> map = new HashMap<>();
+    Identifier id = IdentifierFixture.newIdentifier();
+    map.put(id, "true");
+    Assertions.assertEquals("true", map.get(id));
+
+    Identifier id2 = IdentifierFixture.newIdentifier();
+    Assertions.assertNull(map.get(id2));
   }
 }
