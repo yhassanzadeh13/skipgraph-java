@@ -617,6 +617,7 @@ public class MiddleLayer {
    *
    * @return true if the middlelayer stopped successfully. False if there is an error stopping it.
    */
+  // TODO: this should be with a timeout.
   public boolean terminate() {
     this.underlay.terminate();
     return true;

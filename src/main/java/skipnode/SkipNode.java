@@ -518,8 +518,6 @@ public class SkipNode implements SkipNodeInterface {
    */
   @Override
   public SearchResult searchByMembershipVector(MembershipVector target) {
-    boolean isEmpty = this.getIdentity().equals(LookupTable.EMPTY_NODE);
-
     if (this.getIdentity().getMembershipVector().equals(target)) {
       return new SearchResult(getIdentity());
     }

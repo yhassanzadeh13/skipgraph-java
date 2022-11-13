@@ -20,6 +20,7 @@ public interface SkipNodeInterface {
    * @param introducerAddress the address of the introducer.
    * @param introducerPort    the port of the introducer.
    */
+  // TODO: this method should receive an identity for introducer. Also, we need to have a self-insert method.
   void insert(String introducerAddress, int introducerPort);
 
   /**

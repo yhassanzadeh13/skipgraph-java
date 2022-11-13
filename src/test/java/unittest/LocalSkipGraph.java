@@ -8,10 +8,14 @@ import java.util.stream.Collectors;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
+import middlelayer.MiddleLayer;
 import model.identifier.Identifier;
 import model.identifier.MembershipVector;
+import model.skipgraph.SkipGraph;
+import org.junit.jupiter.api.Assertions;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
+import underlay.Underlay;
 
 /**
  * Represents a locally constructed skip-graph with correct lookup tables. The lookup tables are
@@ -21,32 +25,37 @@ import skipnode.SkipNodeIdentity;
 public class LocalSkipGraph {
 
   private final List<SkipNode> skipNodes;
+  private final List<Underlay> underlays;
 
   public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin) {
-    this(size, localAddress, startingPort, manualJoin, MembershipVector.computeSize(size));
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   /**
    * Constructor for LocalSkipGraph.
    *
    * @param size         Integer representing the size.
-   * @param localAddress String representing the local address.
-   * @param startingPort Integer representing the starting port.
    * @param manualJoin   Boolean representing if its manual join or not.
-   * @param nameIdSize   Integer representing the manual id size.
    */
-  public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin, int nameIdSize) {
-
-    // Create the identities.
+  public LocalSkipGraph(int size, boolean manualJoin) {
+    this.underlays = new ArrayList<>(size);
     List<SkipNodeIdentity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
+      Underlay underlay = Underlay.newDefaultUnderlay();
+      underlay.initialize(0);
+      Assertions.assertTrue(underlay.getPort() > 0);
+      underlays.add(underlay);
       identities.add(
-          new SkipNodeIdentity(IdentifierFixture.newIdentifier(), MembershipVectorFixture.newMembershipVector(), localAddress, startingPort + i));
+          new SkipNodeIdentity(
+              IdentifierFixture.newIdentifier(),
+              MembershipVectorFixture.newMembershipVector(),
+              underlay.getAddress(),
+              underlay.getPort()));
     }
     // Construct the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      ConcurrentLookupTable lookupTable = new ConcurrentLookupTable(nameIdSize, identities.get(i));
+      ConcurrentLookupTable lookupTable = new ConcurrentLookupTable(SkipGraph.IDENTIFIER_SIZE, identities.get(i));
       lookupTables.add(lookupTable);
     }
 
@@ -55,7 +64,7 @@ public class LocalSkipGraph {
     // i.e. without using the join protocol.
     if (manualJoin) {
       // At each level...
-      for (int l = 0; l < nameIdSize; l++) {
+      for (int l = 0; l < SkipGraph.IDENTIFIER_SIZE; l++) {
         // Check for the potential neighbours.
         for (int i = 0; i < size; i++) {
           SkipNodeIdentity id1 = identities.get(i);
@@ -74,10 +83,16 @@ public class LocalSkipGraph {
         }
       }
     }
+
     // Finally, construct the nodes.
     skipNodes = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       SkipNode skipNode = new SkipNode(identities.get(i), lookupTables.get(i));
+
+      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNode);
+      skipNode.setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(middleLayer);
+
       // Mark as inserted if lookup table was created manually.
       if (manualJoin) {
         skipNode.insert(null, -1);
@@ -147,5 +162,11 @@ public class LocalSkipGraph {
   public Map<Identifier, LookupTable> identifierLookupTableMap() {
     return  skipNodes.stream().collect(Collectors.toMap(SkipNode::getIdentifier, SkipNode::getLookupTable));
     // return idMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getIdentifier(), Map.Entry::getValue));
+  }
+
+  public void terminate() {
+    for (Underlay underlay : underlays) {
+      underlay.terminate();
+    }
   }
 }

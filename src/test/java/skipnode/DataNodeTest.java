@@ -37,8 +37,8 @@ public class DataNodeTest {
 
     // Then, construct the local skip graph without manually constructing the lookup tables.
     int nameIdSize = ((int) (Math.log(NODES * (DATANODESPERNODE + 1)) / Math.log(2)));
-    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(), STARTING_PORT,
-        false, nameIdSize);
+    // TODO: refactored local skip graph constructor, it is not gonna work with this constructor.
+    LocalSkipGraph g = new LocalSkipGraph(NODES, false);
 
     // Create the middle layers.
     for (int i = 0; i < NODES; i++) {
