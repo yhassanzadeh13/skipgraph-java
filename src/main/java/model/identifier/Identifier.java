@@ -96,15 +96,12 @@ public class Identifier implements Serializable {
     return Arrays.hashCode(byteRepresentation);
   }
 
-  public boolean equals(Identifier other) {
-    if (this == other) {
-      return true;
-    }
-    if (other == null || getClass() != other.getClass()) {
-      return false;
-    }
-    Identifier that = (Identifier) other;
-    return Arrays.equals(this.byteRepresentation, that.byteRepresentation);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Identifier that = (Identifier) o;
+    return identifier.equals(that.identifier) && Arrays.equals(byteRepresentation, that.byteRepresentation);
   }
 
   public boolean isLessThan(Identifier other) {
