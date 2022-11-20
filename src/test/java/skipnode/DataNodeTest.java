@@ -13,9 +13,7 @@ import underlay.Underlay;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static unittest.LocalSkipGraph.prependToLength;
 import static skipnode.SkipNodeTest.tableConsistencyCheck;
 import static skipnode.SkipNodeTest.tableCorrectnessCheck;
 
@@ -55,7 +53,7 @@ public class DataNodeTest {
     Map<Identifier, LookupTable> tableMap = g.identifierLookupTableMap();
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 
@@ -80,7 +78,7 @@ public class DataNodeTest {
 
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 

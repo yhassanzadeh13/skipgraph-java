@@ -10,7 +10,6 @@ import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import model.identifier.Identifier;
-import model.identifier.MembershipVector;
 import model.skipgraph.SkipGraph;
 import org.junit.jupiter.api.Assertions;
 import skipnode.SkipNode;
@@ -74,7 +73,7 @@ public class LocalSkipGraph {
             LookupTable lt2 = lookupTables.get(j);
             // Connect the nodes at this level if they should be connected
             // according to their name ID.
-            if (id1.getMembershipVector().commonPrefix(id2.getMembershipVector()) >= l) {
+            if (id1.getMemVec().commonPrefix(id2.getMemVec()) >= l) {
               lt1.updateRight(id2, l);
               lt2.updateLeft(id1, l);
               break;

@@ -130,12 +130,12 @@ public class MvpTest {
         // Choose the target.
         final SkipNode target = skipNodes.get(j);
         searchThreads[i + NODES * j] = new Thread(() -> {
-          SearchResult res = searcher.searchByMembershipVector(target.getIdentity().getMembershipVector());
+          SearchResult res = searcher.searchByMembershipVector(target.getIdentity().getMemVec());
           try {
             Assertions.assertEquals(
-                target.getIdentity().getMembershipVector(),
-                res.result.getMembershipVector(),
-                "Source: " + searcher.getIdentity().getMembershipVector() + " Target: " + target.getIdentity().getMembershipVector());
+                target.getIdentity().getMemVec(),
+                res.result.getMemVec(),
+                "Source: " + searcher.getIdentity().getMemVec() + " Target: " + target.getIdentity().getMemVec());
           } catch (AssertionError error) {
             assertionErrorCount.getAndIncrement();
           } finally {

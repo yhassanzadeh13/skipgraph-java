@@ -1,12 +1,10 @@
 package skipnode;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
@@ -16,16 +14,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import underlay.Underlay;
 import unittest.LocalSkipGraph;
 
 /**
  * Contains the skip-node tests.
  */
 class SkipNodeTest {
-  static int NODES = 16;
+  static int NODES = 30;
   private LocalSkipGraph g;
-  private List<MiddleLayer> middleLayers;
 
   @BeforeEach
   public void setup() {
@@ -103,12 +99,12 @@ class SkipNodeTest {
 
       if (!left.equals(LookupTable.EMPTY_NODE)) {
         Assertions.assertTrue(left.getIdentifier().isLessThan(identifier));
-        Assertions.assertTrue(left.getMembershipVector().commonPrefix(mv) >= i);
+        Assertions.assertTrue(left.getMemVec().commonPrefix(mv) >= i);
       }
 
       if (!right.equals(LookupTable.EMPTY_NODE)) {
         Assertions.assertTrue(right.getIdentifier().isGreaterThan(identifier));
-        Assertions.assertTrue(right.getMembershipVector().commonPrefix(mv) >= i);
+        Assertions.assertTrue(right.getMemVec().commonPrefix(mv) >= i);
       }
     }
   }
@@ -166,7 +162,7 @@ class SkipNodeTest {
     // check the correctness and consistency of the lookup tables.
     Map<Identifier, LookupTable> tableMap = g.identifierLookupTableMap();
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
 
@@ -179,10 +175,12 @@ class SkipNodeTest {
       for (int j = 0; j < NODES; j++) {
         final SkipNode target = g.getNodes().get(j);
         searchThreads[i + NODES * j] = new Thread(() -> {
-          SearchResult res = initiator.searchByMembershipVector(target.getIdentity().getMembershipVector());
-          if (target.getIdentity().getMembershipVector() != res.result.getMembershipVector()) {
+          SearchResult res = initiator.searchByMembershipVector(target.getIdentity().getMemVec());
+          if (!target.getIdentity().getMemVec().equals(res.result.getMemVec())) {
+            System.err.println("Search failed from " + initiator.getIdentity().getMemVec() + " expected: " + target.getIdentity().getMemVec() + " got: " + res.result.getMemVec());
             searchFailed.incrementAndGet();
           }
+          searchDone.countDown();
         });
       }
     }

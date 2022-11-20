@@ -112,7 +112,7 @@ public class MiddleLayer {
           return new Response(true);
         }
         result =
-            overlay.searchByNameIdRecursive(
+            overlay.searchByMembershipVector(
                 ((SearchByNameIdRecursiveRequest) request).target,
                 ((SearchByNameIdRecursiveRequest) request).level);
         return new SearchResultResponse(result);
@@ -240,16 +240,16 @@ public class MiddleLayer {
   }
 
   /**
-   * Method for searching by name id recursively.
+   * Searching by membership vector recursively.
    *
    * @param destinationAddress String value representing the destination address.
    * @param port               Integer value representing the port.
-   * @param receiverId         receiver id.
-   * @param target             String value representing the target.
+   * @param receiverId         Identifier of search receiver.
+   * @param target             Target membership vector of the search.
    * @param level              Integer representing level.
    * @return search result instance.
    */
-  public SearchResult searchByNameIdRecursive(String destinationAddress, int port, Identifier receiverId, MembershipVector target, int level) {
+  public SearchResult searchByMembershipVector(String destinationAddress, int port, Identifier receiverId, MembershipVector target, int level) {
     Request request = new SearchByNameIdRecursiveRequest(target, level);
     request.receiverId = receiverId;
     // Send the request through the underlay.

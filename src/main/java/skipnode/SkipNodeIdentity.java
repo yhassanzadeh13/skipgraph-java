@@ -3,10 +3,10 @@ package skipnode;
 import java.io.Serializable;
 import java.util.Objects;
 
-import log.Log4jLogger;
+import static lookup.LookupTable.EMPTY_NODE;
+
 import model.identifier.Identifier;
 import model.identifier.MembershipVector;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * Basic skipnode.SkipNodeIdentity class
@@ -54,7 +54,7 @@ public class SkipNodeIdentity implements Serializable {
     return i;
   }
 
-  public MembershipVector getMembershipVector() {
+  public MembershipVector getMemVec() {
     return membershipVector;
   }
 
@@ -88,7 +88,7 @@ public class SkipNodeIdentity implements Serializable {
     if (!this.getIdentifier().equals(that.getIdentifier())) {
       return false;
     }
-    if (!this.getMembershipVector().equals(that.getMembershipVector())) {
+    if (!this.getMemVec().equals(that.getMemVec())) {
       return false;
     }
     return true;
@@ -96,7 +96,15 @@ public class SkipNodeIdentity implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(getMembershipVector(), getIdentifier(), getAddress(), getPort());
+    return Objects.hash(getMemVec(), getIdentifier(), getAddress(), getPort());
+  }
+
+  public boolean isNotEmpty() {
+    return !this.equals(EMPTY_NODE);
+  }
+
+  public boolean isEmpty() {
+    return this.equals(EMPTY_NODE);
   }
 
   @Override

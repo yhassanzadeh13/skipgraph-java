@@ -94,7 +94,7 @@ public interface SkipNodeInterface {
    * @param level  the current level.
    * @return the identity of the node with the given name ID, or the node with the closest name ID.
    */
-  SearchResult searchByNameIdRecursive(MembershipVector target, int level);
+  SearchResult searchByMembershipVector(MembershipVector target, int level);
 
   /**
    * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity.

@@ -19,7 +19,7 @@ class LocalSkipGraphTest {
         if (neighbor.equals(LookupTable.EMPTY_NODE)) {
           continue;
         }
-        Assertions.assertTrue(neighbor.getMembershipVector().commonPrefix(membershipVector) >= i);
+        Assertions.assertTrue(neighbor.getMemVec().commonPrefix(membershipVector) >= i);
       }
       SkipNodeIdentity leftNeighbor = table.getLeft(i);
       SkipNodeIdentity rightNeighbor = table.getRight(i);
@@ -36,7 +36,7 @@ class LocalSkipGraphTest {
   void fourNodes() {
     LocalSkipGraph g = new LocalSkipGraph(4, "127.0.0.1", 9090, true);
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
   }
 
@@ -44,7 +44,7 @@ class LocalSkipGraphTest {
   void eightNodes() {
     LocalSkipGraph g = new LocalSkipGraph(8, "127.0.0.1", 9090, true);
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
   }
 
@@ -52,7 +52,7 @@ class LocalSkipGraphTest {
   void sixteenNodes() {
     LocalSkipGraph g = new LocalSkipGraph(16, "127.0.0.1", 9090, true);
     for (SkipNode n : g.getNodes()) {
-      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
   }
 
