@@ -22,7 +22,7 @@ import underlay.Underlay;
  * class can be used while testing.
  */
 public class LocalSkipGraph {
-
+  private final NetworkHub networkHub;
   private final List<SkipNode> skipNodes;
   private final List<Underlay> underlays;
 
@@ -37,10 +37,11 @@ public class LocalSkipGraph {
    * @param manualJoin   Boolean representing if its manual join or not.
    */
   public LocalSkipGraph(int size, boolean manualJoin) {
+    this.networkHub = new NetworkHub();
     this.underlays = new ArrayList<>(size);
     List<SkipNodeIdentity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      Underlay underlay = Underlay.newDefaultUnderlay();
+      Underlay underlay = new MockUnderlay(networkHub);
       underlay.initialize(0);
       Assertions.assertTrue(underlay.getPort() > 0);
       underlays.add(underlay);

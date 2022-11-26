@@ -1,13 +1,11 @@
 package skipnode;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lookup.LookupTable;
-import middlelayer.MiddleLayer;
 import model.identifier.Identifier;
 import model.identifier.MembershipVector;
 import org.junit.jupiter.api.AfterEach;
@@ -20,17 +18,45 @@ import unittest.LocalSkipGraph;
  * Contains the skip-node tests.
  */
 class SkipNodeTest {
-  static int NODES = 30;
+  static int NODES = 100;
   private LocalSkipGraph g;
 
-  @BeforeEach
-  public void setup() {
-    g = new LocalSkipGraph(NODES, false);
+  // Checks the correctness of a lookup table owned by the node with the given identity parameters.
+  static void tableCorrectnessCheck(Identifier identifier, MembershipVector mv, LookupTable table) {
+    for (int i = 0; i < table.getNumLevels(); i++) {
+      SkipNodeIdentity left = table.getLeft(i);
+      SkipNodeIdentity right = table.getRight(i);
+
+      if (!left.equals(LookupTable.EMPTY_NODE)) {
+        Assertions.assertTrue(left.getIdentifier().isLessThan(identifier));
+        Assertions.assertTrue(left.getMemVec().commonPrefix(mv) >= i);
+      }
+
+      if (!right.equals(LookupTable.EMPTY_NODE)) {
+        Assertions.assertTrue(right.getIdentifier().isGreaterThan(identifier));
+        Assertions.assertTrue(right.getMemVec().commonPrefix(mv) >= i);
+      }
+    }
   }
 
-  @AfterEach
-  public void teardown() {
-    g.terminate();
+  // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
+  // then y is a neighbor of x at level l (in opposite directions).
+  static void tableConsistencyCheck(Map<Identifier, LookupTable> tableMap, SkipNode node) {
+    LookupTable table = node.getLookupTable();
+    for (int i = 0; i < table.getNumLevels(); i++) {
+      SkipNodeIdentity left = table.getLeft(i);
+      SkipNodeIdentity right = table.getRight(i);
+
+      if (!left.equals(LookupTable.EMPTY_NODE)) {
+        LookupTable neighborMap = tableMap.get(left.getIdentifier());
+        Assertions.assertTrue(neighborMap.isRightNeighbor(node.getIdentity(), i));
+      }
+
+      if (!right.equals(LookupTable.EMPTY_NODE)) {
+        LookupTable neighborMap = tableMap.get(right.getIdentifier());
+        Assertions.assertTrue(neighborMap.isLeftNeighbor(node.getIdentity(), i));
+      }
+    }
   }
 
   // In this test I call the increment a lot of times through different threads
@@ -91,42 +117,14 @@ class SkipNodeTest {
 //        System.out.println(sum);
 //    }
 
-  // Checks the correctness of a lookup table owned by the node with the given identity parameters.
-  static void tableCorrectnessCheck(Identifier identifier, MembershipVector mv, LookupTable table) {
-    for (int i = 0; i < table.getNumLevels(); i++) {
-      SkipNodeIdentity left = table.getLeft(i);
-      SkipNodeIdentity right = table.getRight(i);
-
-      if (!left.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(left.getIdentifier().isLessThan(identifier));
-        Assertions.assertTrue(left.getMemVec().commonPrefix(mv) >= i);
-      }
-
-      if (!right.equals(LookupTable.EMPTY_NODE)) {
-        Assertions.assertTrue(right.getIdentifier().isGreaterThan(identifier));
-        Assertions.assertTrue(right.getMemVec().commonPrefix(mv) >= i);
-      }
-    }
+  @BeforeEach
+  public void setup() {
+    g = new LocalSkipGraph(NODES, false);
   }
 
-  // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
-  // then y is a neighbor of x at level l (in opposite directions).
-  static void tableConsistencyCheck(Map<Identifier, LookupTable> tableMap, SkipNode node) {
-    LookupTable table = node.getLookupTable();
-    for (int i = 0; i < table.getNumLevels(); i++) {
-      SkipNodeIdentity left = table.getLeft(i);
-      SkipNodeIdentity right = table.getRight(i);
-
-      if (!left.equals(LookupTable.EMPTY_NODE)) {
-        LookupTable neighborMap = tableMap.get(left.getIdentifier());
-        Assertions.assertTrue(neighborMap.isRightNeighbor(node.getIdentity(), i));
-      }
-
-      if (!right.equals(LookupTable.EMPTY_NODE)) {
-        LookupTable neighborMap = tableMap.get(right.getIdentifier());
-        Assertions.assertTrue(neighborMap.isLeftNeighbor(node.getIdentity(), i));
-      }
-    }
+  @AfterEach
+  public void teardown() {
+    g.terminate();
   }
 
   @Test
@@ -134,7 +132,7 @@ class SkipNodeTest {
     // Insert the first node.
     g.getNodes().get(0).insert(null, -1);
 
-    CountDownLatch insertionDone = new CountDownLatch(NODES-1);
+    CountDownLatch insertionDone = new CountDownLatch(NODES - 1);
     // insertion thread for all other nodes.
     Thread[] insertionThreads = new Thread[NODES - 1];
     for (int i = 1; i <= insertionThreads.length; i++) {
@@ -153,7 +151,7 @@ class SkipNodeTest {
     }
 
     try {
-      boolean doneOnTime = insertionDone.await(20, TimeUnit.SECONDS);
+      boolean doneOnTime = insertionDone.await(200, TimeUnit.SECONDS);
       Assertions.assertTrue(doneOnTime);
     } catch (InterruptedException e) {
       Assertions.fail(e);

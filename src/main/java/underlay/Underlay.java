@@ -12,7 +12,6 @@ import underlay.tcp.TcpUnderlay;
  * Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication.
  */
 public abstract class Underlay {
-
   private MiddleLayer middleLayer;
 
   private int port;
@@ -60,6 +59,7 @@ public abstract class Underlay {
    * @param port the port that the underlay should be bound to.
    * @return true iff the initialization was successful.
    */
+  // TODO: remove boolean return type.
   public final boolean initialize(int port) {
     port = initUnderlay(port);
     if (port < 0) {
