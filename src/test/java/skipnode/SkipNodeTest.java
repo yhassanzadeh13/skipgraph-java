@@ -1,5 +1,7 @@
 package skipnode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -12,13 +14,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import underlay.Underlay;
 import unittest.LocalSkipGraph;
 
 /**
  * Contains the skip-node tests.
  */
 class SkipNodeTest {
-  static int NODES = 100;
+  // total number of Skip Graph nodes involved in the test.
+  static final int NODES = 100;
   private LocalSkipGraph g;
 
   // Checks the correctness of a lookup table owned by the node with the given identity parameters.
@@ -59,9 +63,9 @@ class SkipNodeTest {
     }
   }
 
-  // In this test I call the increment a lot of times through different threads
-  // This tests whether all messages are in face received or not
-  // @Test
+//   In this test I call the increment a lot of times through different threads
+//   This tests whether all messages are in face received or not
+//   @Test
 //    void concurrentIncrements() {
 //        // First, construct the underlays.
 //        List<Underlay> underlays = new ArrayList<>(NODES);
@@ -142,6 +146,7 @@ class SkipNodeTest {
       insertionThreads[i - 1] = new Thread(() -> {
         node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
         insertionDone.countDown();
+        System.out.println("Insertion done " + insertionDone.toString());
       });
     }
 
@@ -179,6 +184,7 @@ class SkipNodeTest {
             searchFailed.incrementAndGet();
           }
           searchDone.countDown();
+          System.out.println(searchDone.toString());
         });
       }
     }
@@ -289,69 +295,46 @@ class SkipNodeTest {
 //    underlays.forEach(Underlay::terminate);
 //  }
 
-//  @Test
-//  void searchByNameID() {
-//    // First, construct the underlays.
-//    List<Underlay> underlays = new ArrayList<>(NODES);
-//    for (int i = 0; i < NODES; i++) {
-//      Underlay underlay = Underlay.newDefaultUnderlay();
-//      underlay.initialize(STARTING_PORT + i + 4 * NODES);
-//      underlays.add(underlay);
-//    }
-//    // Then, construct the local skip graph.
-//    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-//        STARTING_PORT + NODES * 4, true);
-//    // Create the middle layers.
-//    for (int i = 0; i < NODES; i++) {
-//      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
-//      // Assign the middle layer to the underlay & overlay.
-//      underlays.get(i).setMiddleLayer(middleLayer);
-//      g.getNodes().get(i).setMiddleLayer(middleLayer);
-//    }
-//    // We will now perform name ID searches for every node from each node in the skip graph.
-//    for (int i = 0; i < NODES; i++) {
-//      SkipNode initiator = g.getNodes().get(i);
-//      for (int j = 0; j < NODES; j++) {
-//        SkipNode target = g.getNodes().get(j);
-//        SearchResult result = initiator.searchByMembershipVector(target.getIdentity().getMembershipVector());
-//        if (!result.result.equals(target.getIdentity())) {
-//          initiator.searchByMembershipVector(target.getIdentity().getMembershipVector());
-//        }
-//        Assertions.assertEquals(target.getIdentity(), result.result);
-//      }
-//    }
-//    underlays.forEach(Underlay::terminate);
-//  }
 
-//  @Test
-//  void searchByNumID() {
-//    // First, construct the underlays.
-//    List<Underlay> underlays = new ArrayList<>(NODES);
-//    for (int i = 0; i < NODES; i++) {
-//      Underlay underlay = Underlay.newDefaultUnderlay();
-//      underlay.initialize(STARTING_PORT - NODES + i);
-//      underlays.add(underlay);
-//    }
-//    // Then, construct the local skip graph.
-//    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-//        STARTING_PORT - NODES, true);
-//    // Create the middle layers.
-//    for (int i = 0; i < NODES; i++) {
-//      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
-//      // Assign the middle layer to the underlay & overlay.
-//      underlays.get(i).setMiddleLayer(middleLayer);
-//      g.getNodes().get(i).setMiddleLayer(middleLayer);
-//    }
-//
-//    // We will now perform name ID searches for every node from each node in the skip graph.
-//    for (int i = 0; i < NODES; i++) {
-//      SkipNode initiator = g.getNodes().get(i);
-//      for (int j = 0; j < NODES; j++) {
-//        SkipNode target = g.getNodes().get(j);
-//        SkipNodeIdentity result = initiator.searchByNumId(target.getIdentity().getIdentifier());
-//        Assertions.assertEquals(target.getIdentity(), result);
-//      }
-//    }
-//    underlays.forEach(Underlay::terminate);
-//  }
+
+  /**
+   * Inserts all nodes sequentially. Then searches for every node from each
+   * node in the skip graph using the identifier.
+   */
+  @Test
+  void testSearchByIdentifierSequential() {
+    g.insertAll();
+
+    for (int i = 0; i < NODES; i++) {
+      SkipNode initiator = g.getNodes().get(i);
+      for (int j = 0; j < NODES; j++) {
+        SkipNode target = g.getNodes().get(j);
+        SkipNodeIdentity result = initiator.searchByNumId(target.getIdentity().getIdentifier());
+        Assertions.assertEquals(target.getIdentity(), result);
+      }
+    }
+  }
+
+  /**
+   * Inserts all nodes sequentially. Then searches for every node from each
+   * node in the skip graph using membership vector.
+   */
+  @Test
+  void testSearchByMembershipVectorSequential() {
+    System.out.println("Inserting sequentially.");
+    g.insertAll();
+    System.out.println("Insertion complete.");
+    for (int i = 0; i < NODES; i++) {
+      SkipNode initiator = g.getNodes().get(i);
+      for (int j = 0; j < NODES; j++) {
+        SkipNode target = g.getNodes().get(j);
+        SearchResult result = initiator.searchByMembershipVector(target.getIdentity().getMemVec());
+        if (!result.result.equals(target.getIdentity())) {
+          initiator.searchByMembershipVector(target.getIdentity().getMemVec());
+        }
+        Assertions.assertEquals(target.getIdentity(), result.result);
+        System.out.println("done with " + i + " " + j);
+      }
+    }
+  }
 }
