@@ -219,8 +219,7 @@ class SkipNodeTest {
    */
   @Test
   void sequentialSearchByIdentifier() {
-    // TODO: we should have variation of this test with insert in random and concurrent order.
-    g.insertAll();
+    g.insertAllRandomized();
 
     for (int i = 0; i < NODES; i++) {
       SkipNode initiator = g.getNodes().get(i);
@@ -233,13 +232,54 @@ class SkipNodeTest {
   }
 
   /**
+   * Concurrently searches for every node from each node in the skip graph using the identifier.
+   * Inserts all nodes using the local skip graph insert method (not the network).
+   */
+  @Test
+  void concurrentSearchByIdentifier() {
+    g.insertAllRandomized();
+
+    CountDownLatch searchDone = new CountDownLatch(NODES * NODES);
+    AtomicInteger searchFailed = new AtomicInteger(0);
+    Thread[] searchThreads = new Thread[NODES * NODES];
+    for (int i = 0; i < NODES; i++) {
+      final SkipNode initiator = g.getNodes().get(i);
+      for (int j = 0; j < NODES; j++) {
+        final SkipNode target = g.getNodes().get(j);
+        searchThreads[NODES * i + j] = new Thread(() -> {
+          SkipNodeIdentity res = initiator.searchByNumId(target.getIdentity().getIdentifier());
+          if (!target.getIdentity().getIdentifier().equals(res.getIdentifier())) {
+            System.err.println("Search failed from " + initiator.getIdentity()
+                .getMemVec() + " expected: " + target.getIdentity().getIdentifier() + " got: " + res.getIdentifier());
+            searchFailed.incrementAndGet();
+          }
+          searchDone.countDown();
+          System.out.println(searchDone);
+        });
+      }
+    }
+    // Start the search threads.
+    for (Thread t : searchThreads) {
+      t.start();
+    }
+    // Complete the threads.
+    try {
+      boolean doneOnTime = searchDone.await(20, TimeUnit.SECONDS);
+      Assertions.assertTrue(doneOnTime);
+    } catch (InterruptedException e) {
+      Assertions.fail(e);
+    }
+    Assertions.assertEquals(0, searchFailed.get(), "some searches failed");
+  }
+
+  /**
    * Inserts all nodes sequentially. Then searches for every node from each
    * node in the skip graph using membership vector.
+   * Inserts all nodes using the local skip graph insert method (not the network).
    */
   @Test
   void sequentialSearchByMembershipVector() {
-    // TODO: we should have variation of this test with insert in random and concurrent order.
-    g.insertAll();
+    g.insertAllRandomized();
     for (int i = 0; i < NODES; i++) {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
@@ -252,5 +292,7 @@ class SkipNodeTest {
       }
     }
   }
-  
+
+  // TODO: add concurrent search by membership vector test.
+
 }
