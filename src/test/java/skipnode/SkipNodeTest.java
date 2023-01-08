@@ -1,11 +1,10 @@
 package skipnode;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import lookup.LookupTable;
 import model.identifier.Identifier;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import underlay.Underlay;
 import unittest.LocalSkipGraph;
 
 /**
@@ -22,8 +20,18 @@ import unittest.LocalSkipGraph;
  */
 class SkipNodeTest {
   // total number of Skip Graph nodes involved in the test.
-  static final int NODES = 100;
+  static final int NODES = 20;
   private LocalSkipGraph g;
+
+  @BeforeEach
+  public void setup() {
+    g = new LocalSkipGraph(NODES, false);
+  }
+
+  @AfterEach
+  public void teardown() {
+    g.terminate();
+  }
 
   // Checks the correctness of a lookup table owned by the node with the given identity parameters.
   static void tableCorrectnessCheck(Identifier identifier, MembershipVector mv, LookupTable table) {
@@ -121,15 +129,7 @@ class SkipNodeTest {
 //        System.out.println(sum);
 //    }
 
-  @BeforeEach
-  public void setup() {
-    g = new LocalSkipGraph(NODES, false);
-  }
 
-  @AfterEach
-  public void teardown() {
-    g.terminate();
-  }
 
   @Test
   void concurrentInsertionsAndSearches() {
@@ -146,7 +146,7 @@ class SkipNodeTest {
       insertionThreads[i - 1] = new Thread(() -> {
         node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
         insertionDone.countDown();
-        System.out.println("Insertion done " + insertionDone.toString());
+        System.out.println("Insertion done " + insertionDone);
       });
     }
 
@@ -180,11 +180,12 @@ class SkipNodeTest {
         searchThreads[i + NODES * j] = new Thread(() -> {
           SearchResult res = initiator.searchByMembershipVector(target.getIdentity().getMemVec());
           if (!target.getIdentity().getMemVec().equals(res.result.getMemVec())) {
-            System.err.println("Search failed from " + initiator.getIdentity().getMemVec() + " expected: " + target.getIdentity().getMemVec() + " got: " + res.result.getMemVec());
+            System.err.println("Search failed from " + initiator.getIdentity()
+                .getMemVec() + " expected: " + target.getIdentity().getMemVec() + " got: " + res.result.getMemVec());
             searchFailed.incrementAndGet();
           }
           searchDone.countDown();
-          System.out.println(searchDone.toString());
+          System.out.println(searchDone);
         });
       }
     }
@@ -256,45 +257,27 @@ class SkipNodeTest {
 //    // Check the correctness & consistency of the tables.
 //    for (SkipNode n : g.getNodes()) {
 //      // TODO: replace with streams
-//      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
+//      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n
+//      .getLookupTable());
 //      tableConsistencyCheck(tableMap, n);
 //    }
 //  }
 
-//  @Test
-//  void insert() {
-//    // First, construct the underlays.
-//    List<Underlay> underlays = new ArrayList<>(NODES);
-//    for (int i = 0; i < NODES; i++) {
-//      Underlay underlay = Underlay.newDefaultUnderlay();
-//      underlay.initialize(STARTING_PORT + i + 3 * NODES);
-//      underlays.add(underlay);
-//    }
-//    // Then, construct the local skip graph without manually constructing the lookup tables.
-//    LocalSkipGraph g = new LocalSkipGraph(NODES, underlays.get(0).getAddress(),
-//        STARTING_PORT + NODES * 3, false);
-//    // Create the middle layers.
-//    for (int i = 0; i < NODES; i++) {
-//      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), g.getNodes().get(i));
-//      // Assign the middle layer to the underlay & overlay.
-//      underlays.get(i).setMiddleLayer(middleLayer);
-//      g.getNodes().get(i).setMiddleLayer(middleLayer);
-//    }
-//    // Now, insert every node in a randomized order.
-//    g.insertAllRandomized();
-//    // Create a map of num ids to their corresponding lookup tables.
-//    Map<SkipNodeIdentity, LookupTable> idMap = g.getNodes().stream()
-//        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
-//    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity)
-//        .collect(Collectors.toMap(SkipNodeIdentity::getIdentifier, idMap::get));
-//    // Check the correctness of the tables.
-//    for (SkipNode n : g.getNodes()) {
-//      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMembershipVector(), n.getLookupTable());
-//      tableConsistencyCheck(tableMap, n);
-//    }
-//    underlays.forEach(Underlay::terminate);
-//  }
-
+  @Test
+  void insert() {
+    g.insertAllRandomized();
+    // Create a map of num ids to their corresponding lookup tables.
+    Map<SkipNodeIdentity, LookupTable> idMap = g.getNodes().stream()
+        .collect(Collectors.toMap(SkipNode::getIdentity, SkipNode::getLookupTable));
+    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity)
+        .collect(Collectors.toMap(SkipNodeIdentity::getIdentifier, idMap::get));
+    // Check the correctness of the tables.
+    for (SkipNode n : g.getNodes()) {
+      tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n
+      .getLookupTable());
+      tableConsistencyCheck(tableMap, n);
+    }
+  }
 
 
   /**
@@ -303,6 +286,7 @@ class SkipNodeTest {
    */
   @Test
   void testSearchByIdentifierSequential() {
+    // TODO: we should have variation of this test with insert in random and concurrent order.
     g.insertAll();
 
     for (int i = 0; i < NODES; i++) {
@@ -321,9 +305,8 @@ class SkipNodeTest {
    */
   @Test
   void testSearchByMembershipVectorSequential() {
-    System.out.println("Inserting sequentially.");
+    // TODO: we should have variation of this test with insert in random and concurrent order.
     g.insertAll();
-    System.out.println("Insertion complete.");
     for (int i = 0; i < NODES; i++) {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
@@ -333,7 +316,6 @@ class SkipNodeTest {
           initiator.searchByMembershipVector(target.getIdentity().getMemVec());
         }
         Assertions.assertEquals(target.getIdentity(), result.result);
-        System.out.println("done with " + i + " " + j);
       }
     }
   }
