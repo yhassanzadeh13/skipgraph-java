@@ -11,13 +11,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import network.Network;
+import middlelayer.MiddleLayer;
 import misc.Utils;
 import model.identifier.MembershipVector;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import network.Underlay;
+import underlay.Underlay;
 import static misc.LocalSkipGraph.prependToLength;
 import skipnode.SearchResult;
 import skipnode.SkipNode;
@@ -28,6 +28,7 @@ import skipnode.SkipNodeIdentity;
  * i.e., each node should be able to query every other node by both name and numerical IDs and get the correct response.
  */
 public class mvpTest {
+  private static final int STARTING_PORT = 4444;
   private static final int NODES = 32;
   private static final int NameIdSize = MembershipVector.computeSize(NODES);
   private static ArrayList<SkipNode> skipNodes;
@@ -40,7 +41,7 @@ public class mvpTest {
 
     for (int i = 0; i < NODES; i++) {
       Underlay underlay = Underlay.newDefaultUnderlay();
-      underlay.initialize(0);
+      underlay.initialize(STARTING_PORT + i);
       underlays.add(underlay);
     }
 
@@ -61,7 +62,8 @@ public class mvpTest {
       identities.add(
           new SkipNodeIdentity(nameIDs.get(i),
               numIDs.get(i),
-              underlays.get(i).getAddress()));
+              underlays.get(i).getAddress(),
+              underlays.get(i).getPort()));
     }
 
     // Constructs the lookup tables.
@@ -78,14 +80,14 @@ public class mvpTest {
 
     // Create the middlelayers and wires in the underlays to the nodes
     for (int i = 0; i < NODES; i++) {
-      Network network = new Network(underlays.get(i), skipNodes.get(i));
+      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNodes.get(i));
       // Assign the middle layer to the underlay & overlay.
-      underlays.get(i).setMiddleLayer(network);
-      skipNodes.get(i).setMiddleLayer(network);
+      underlays.get(i).setMiddleLayer(middleLayer);
+      skipNodes.get(i).setMiddleLayer(middleLayer);
     }
 
     // first node inserts itself
-    skipNodes.get(0).insert(null);
+    skipNodes.get(0).insert(null, -1);
   }
 
   /**
@@ -103,7 +105,7 @@ public class mvpTest {
       // picks random introducer for a node
       final SkipNode introducer = (SkipNode) Utils.randomIndex(skipNodes, random, i);
       threads[i - 1] = new Thread(() -> {
-        node.insert(introducer.getIdentity().getAddress());
+        node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
         insertionDone.countDown();
       });
     }
@@ -163,7 +165,7 @@ public class mvpTest {
       e.printStackTrace();
     }
 
-    Assertions.assertEquals(0, assertionErrorCount.get(), "unsuccessful searches results"); // no assertion error should happen in any search thread
+    Assertions.assertEquals(0, assertionErrorCount.get(), "unsuccessful searches results"); // no assertion error should happen in any search thread.
   }
 
   /**

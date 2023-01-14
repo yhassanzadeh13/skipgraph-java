@@ -1,7 +1,6 @@
 package skipnode;
 
-import model.Address;
-import network.Network;
+import middlelayer.MiddleLayer;
 
 /**
  * Skip Node interface.
@@ -11,14 +10,15 @@ public interface SkipNodeInterface {
   /**
    * Set the middle layer which would handle communication with remote nodes.
    */
-  void setMiddleLayer(Network network);
+  void setMiddleLayer(MiddleLayer middleLayer);
 
   /**
    * Add the SkipNode to the SkipGraph through an introducer.
    *
    * @param introducerAddress the address of the introducer.
+   * @param introducerPort    the port of the introducer.
    */
-  void insert(Address introducerAddress);
+  void insert(String introducerAddress, int introducerPort);
 
   /**
    * Adds a data node to the list of overlays of the middle layer Inserts the node into the Skip
@@ -158,14 +158,13 @@ public interface SkipNodeInterface {
   boolean isLocked();
 
   /**
-   * Method for checking if the lock is locked by that address.
+   * Method for checking if the lock is locked by that address port combination.
    *
    * @param address String value representing the address.
+   * @param port    Integer value representing the port.
    * @return Boolean value for whether the lock is locked by that address port combination or not.
    */
-  // todo: must be checked for locked by identifier not address.
-  // todo: maybe we can make isLocked return the lock holder and remove this method.
-  boolean isLockedBy(Address address);
+  boolean isLockedBy(String address, int port);
 
   /**
    * Terminates the node and its underlying network.

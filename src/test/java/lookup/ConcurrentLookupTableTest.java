@@ -18,11 +18,11 @@ public class ConcurrentLookupTableTest {
   @BeforeEach
   void setUp() {
     int size = 30;
-    concurrentLookupTable = new ConcurrentLookupTable( size, new SkipNodeIdentity("0000", 1, null, -1));
+    concurrentLookupTable = new ConcurrentLookupTable( size, new SkipNodeIdentity("0000", 1, "None", -1));
     nodesToInsert = new ArrayList<>();
 
     for (int i = 1; i <= size; i++) {
-      SkipNodeIdentity sn = new SkipNodeIdentity("0000", i, null, -1);
+      SkipNodeIdentity sn = new SkipNodeIdentity("0000", i, "None", -1);
       nodesToInsert.add(sn);
     }
   }

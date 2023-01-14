@@ -3,7 +3,6 @@ package skipnode;
 import java.util.concurrent.Semaphore;
 
 import log.Log4jLogger;
-import model.Address;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -81,13 +80,15 @@ public class InsertionLock {
    * Method for checking if the lock holder of this lock has specified address and port.
    *
    * @param address represents a node address
-   * @return {@code true} if the lock holder of this lock has specified address {@code
+   * @param port    represents a node port
+   * @return {@code true} if the lock holder of this lock has specified address and port {@code
    * false} otherwise
    */
-  public boolean isLockedBy(Address address) {
+  public boolean isLockedBy(String address, int port) {
     return isLocked()
         && holder != null
-        && holder.getAddress().equals(address);
+        && holder.getAddress().equals(address)
+        && holder.getPort() == port;
   }
 
   /**
