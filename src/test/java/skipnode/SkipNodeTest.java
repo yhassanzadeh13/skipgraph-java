@@ -293,6 +293,40 @@ class SkipNodeTest {
     }
   }
 
-  // TODO: add concurrent search by membership vector test.
+  @Test
+  void concurrentSearchByMembershipVector() {
+    g.insertAllRandomized();
+    CountDownLatch searchDone = new CountDownLatch(NODES * NODES);
+    AtomicInteger searchFailed = new AtomicInteger(0);
+    Thread[] searchThreads = new Thread[NODES * NODES];
+    for (int i = 0; i < NODES; i++) {
+      final SkipNode initiator = g.getNodes().get(i);
+      for (int j = 0; j < NODES; j++) {
+        final SkipNode target = g.getNodes().get(j);
+        searchThreads[NODES * i + j] = new Thread(() -> {
+          SearchResult res = initiator.searchByMembershipVector(target.getIdentity().getMemVec());
+          // TODO: shorten this chain of calls with target.isIdentityEqual(res.result)
+          if (!target.getIdentity().getIdentifier().equals(res.result.getIdentifier())) {
+            System.err.println("Search failed from " + initiator.getIdentity()
+                .getMemVec() + " expected: " + target.getIdentity().getIdentifier() + " got: " + res.result.getIdentifier());
+            searchFailed.incrementAndGet();
+          }
+          searchDone.countDown();
+        });
+      }
+    }
+    // Start the search threads.
+    for (Thread t : searchThreads) {
+      t.start();
+    }
+    // Complete the threads.
+    try {
+      boolean doneOnTime = searchDone.await(20, TimeUnit.SECONDS);
+      Assertions.assertTrue(doneOnTime);
+    } catch (InterruptedException e) {
+      Assertions.fail(e);
+    }
+    Assertions.assertEquals(0, searchFailed.get(), "some searches failed");
+  }
 
 }
