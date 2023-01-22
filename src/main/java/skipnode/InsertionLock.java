@@ -13,8 +13,7 @@ public class InsertionLock {
 
   // Represents an acquired lock from a neighbor.
 
-  private static final Log4jLogger logger =
-      new Log4jLogger(LogManager.getLogger(InsertionLock.class));
+  private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(InsertionLock.class));
   private final Semaphore locked = new Semaphore(1, true);
   /**
    * Represents the holder node of this insertion lock.
@@ -84,13 +83,10 @@ public class InsertionLock {
    * @param address represents a node address
    * @param port    represents a node port
    * @return {@code true} if the lock holder of this lock has specified address and port {@code
-   * false} otherwise
+   *     false} otherwise
    */
   public boolean isLockedBy(String address, int port) {
-    return isLocked()
-        && holder != null
-        && holder.getAddress().equals(address)
-        && holder.getPort() == port;
+    return isLocked() && holder != null && holder.getAddress().equals(address) && holder.getPort() == port;
   }
 
   /**

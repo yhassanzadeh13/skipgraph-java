@@ -42,7 +42,8 @@ public class Identifier implements Serializable {
    */
   public Identifier(byte[] identifier) throws IllegalArgumentException {
     if (identifier.length != SkipGraph.IDENTIFIER_SIZE) {
-      throw new IllegalArgumentException("identifier must be exactly the legitimate size " + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + identifier.length);
+      throw new IllegalArgumentException(
+          "identifier must be exactly the legitimate size " + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + identifier.length);
     }
 
     this.byteRepresentation = identifier;
@@ -84,7 +85,7 @@ public class Identifier implements Serializable {
    *
    * @param other represents other identifier to compared to.
    * @return 0 if two identifiers are equal, 1 if this identifier is greater than other,
-   * -1 if other identifier is greater than this.
+   *     -1 if other identifier is greater than this.
    */
   public int comparedTo(Identifier other) {
     int result = Arrays.compare(this.byteRepresentation, other.byteRepresentation);
@@ -98,8 +99,12 @@ public class Identifier implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     Identifier that = (Identifier) o;
     return identifier.equals(that.identifier) && Arrays.equals(byteRepresentation, that.byteRepresentation);
   }

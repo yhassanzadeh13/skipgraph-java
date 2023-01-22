@@ -7,7 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-/** Contains various static helper methods to be used by the UDP Underlay implementation. */
+/**
+ * Contains various static helper methods to be used by the UDP Underlay implementation.
+ */
 public class UdpUtils {
 
   /**
@@ -54,7 +56,7 @@ public class UdpUtils {
   /**
    * Converts the given byte array into its object representation.
    *
-   * @param bytes the byte array to convert.
+   * @param bytes  the byte array to convert.
    * @param length length of the byte array.
    * @return the object representation.
    */

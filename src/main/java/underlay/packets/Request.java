@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import model.identifier.Identifier;
 
-/** Represents a serializable request packet. Every request type must inherit from this class. */
+/**
+ * Represents a serializable request packet. Every request type must inherit from this class.
+ */
 // TODO: make the fields final
 public class Request implements Serializable {
   public final RequestType type;

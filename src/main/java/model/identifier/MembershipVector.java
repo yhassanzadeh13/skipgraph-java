@@ -1,9 +1,9 @@
 package model.identifier;
 
+import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
+
 import java.io.Serializable;
 import java.util.Arrays;
-
-import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
 import io.ipfs.multibase.Multibase;
 import misc.Utils;
@@ -38,8 +38,8 @@ public class MembershipVector implements Serializable {
    */
   public MembershipVector(byte[] membershipVector) throws IllegalArgumentException {
     if (membershipVector.length != SkipGraph.IDENTIFIER_SIZE) {
-      throw new IllegalArgumentException("membership vector must be exactly the legitimate size "
-          + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + membershipVector.length);
+      throw new IllegalArgumentException(
+          "membership vector must be exactly the legitimate size " + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + membershipVector.length);
     }
 
     this.byteRepresentation = membershipVector;

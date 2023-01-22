@@ -15,8 +15,7 @@ public class ConcurrentLookupTable implements LookupTable {
 
 
   // TODO: logger should be passed as a constructor parameter.
-  private static final Log4jLogger logger =
-      new Log4jLogger(LogManager.getLogger(ConcurrentLookupTable.class));
+  private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(ConcurrentLookupTable.class));
   private final SkipNodeIdentity owner;
   private final int numLevels;
   private final ReadWriteLock lock;
@@ -55,13 +54,9 @@ public class ConcurrentLookupTable implements LookupTable {
 
     lock.writeLock().unlock();
 
-    // TODO: logging
-//    logger
-//        .debug()
-//        .addInt("owner_num_id", owner.getIdentifier())
-//        .addInt("neighbor_num_id", node.getIdentifier())
-//        .addInt("level", level)
-//        .addMsg("updated left neighbor in lookup table");
+
+    //    logger.debug().addInt("owner_num_id", owner.getIdentifier()).addInt("neighbor_num_id", node.getIdentifier()).addInt("level", level).addMsg(
+    //        "updated left neighbor in lookup table");
     return prev;
   }
 
@@ -78,13 +73,13 @@ public class ConcurrentLookupTable implements LookupTable {
 
     lock.writeLock().unlock();
 
-    // TODO: logging
-//    logger
-//        .debug()
-//        .addInt("owner_num_id", owner.getIdentifier())
-//        .addInt("neighbor_num_id", node.getIdentifier())
-//        .addInt("level", level)
-//        .addMsg("updated right in lookup table");
+    //    logger.debug().addInt("owner_num_id", owner.getIdentifier()).addInt("neighbor_num_id", node.getIdentifier()).addInt("level", level).addMsg(
+    //    logger
+    //        .debug()
+    //        .addInt("owner_num_id", owner.getIdentifier())
+    //        .addInt("neighbor_num_id", node.getIdentifier())
+    //        .addInt("level", level)
+    //        .addMsg("updated right in lookup table");
     return prev;
   }
 

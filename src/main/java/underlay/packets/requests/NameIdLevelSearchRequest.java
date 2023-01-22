@@ -1,11 +1,12 @@
 package underlay.packets.requests;
 
-import model.identifier.Identifier;
 import model.identifier.MembershipVector;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/** Request for name id level search. */
+/**
+ * Request for name id level search.
+ */
 public class NameIdLevelSearchRequest extends Request {
 
   public final int level;
@@ -15,9 +16,9 @@ public class NameIdLevelSearchRequest extends Request {
   /**
    * Constructor for NameIdLevelSearchRequest.
    *
-   * @param level Integer representing the level.
+   * @param level     Integer representing the level.
    * @param direction Integer representing the direction.
-   * @param target membership vector of the target node.
+   * @param target    membership vector of the target node.
    */
   public NameIdLevelSearchRequest(int level, int direction, MembershipVector target) {
     super(RequestType.NameIdLevelSearch);

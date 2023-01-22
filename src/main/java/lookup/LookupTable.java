@@ -7,9 +7,11 @@ import skipnode.SkipNodeIdentity;
  * Lookup Table interface.
  */
 public interface LookupTable {
+  /**
+   * Direction of the neighbor; Left or Right.
+   */
   enum Direction {
-    LEFT,
-    RIGHT
+    LEFT, RIGHT
   }
 
   SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);

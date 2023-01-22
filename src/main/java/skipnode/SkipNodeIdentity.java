@@ -1,9 +1,9 @@
 package skipnode;
 
+import static lookup.LookupTable.EMPTY_NODE;
+
 import java.io.Serializable;
 import java.util.Objects;
-
-import static lookup.LookupTable.EMPTY_NODE;
 
 import model.identifier.Identifier;
 import model.identifier.MembershipVector;
@@ -20,10 +20,10 @@ public class SkipNodeIdentity implements Serializable {
   /**
    * Constructor for SkipNodeIdentity.
    *
-   * @param identifier identifier of the node (aka numerical ID).
+   * @param identifier       identifier of the node (aka numerical ID).
    * @param membershipVector membership vector of the node (aka name ID).
-   * @param address String representing the address of the node.
-   * @param port    Integer representing the port of the node.
+   * @param address          String representing the address of the node.
+   * @param port             Integer representing the port of the node.
    */
   public SkipNodeIdentity(Identifier identifier, MembershipVector membershipVector, String address, int port) {
     this.membershipVector = membershipVector;
@@ -88,10 +88,7 @@ public class SkipNodeIdentity implements Serializable {
     if (!this.getIdentifier().equals(that.getIdentifier())) {
       return false;
     }
-    if (!this.getMemVec().equals(that.getMemVec())) {
-      return false;
-    }
-    return true;
+    return this.getMemVec().equals(that.getMemVec());
   }
 
   @Override
@@ -109,13 +106,7 @@ public class SkipNodeIdentity implements Serializable {
 
   @Override
   public String toString() {
-    return "identifier: "
-        + identifier.toString()
-        + "\tmembership vector: "
-        + membershipVector.toString()
-        + "\taddress: "
-        + address
-        + "\tport: "
+    return "identifier: " + identifier.toString() + "\tmembership vector: " + membershipVector.toString() + "\taddress: " + address + "\tport: "
         + port;
   }
 }

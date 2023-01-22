@@ -3,7 +3,9 @@ package underlay.packets.requests;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/** Request for getting right ladder. */
+/**
+ * Request for getting right ladder.
+ */
 public class GetRightLadderRequest extends Request {
 
   public final int level;
@@ -12,7 +14,7 @@ public class GetRightLadderRequest extends Request {
   /**
    * Constructor for GetRightLadderRequest.
    *
-   * @param level Integer representing level.
+   * @param level  Integer representing level.
    * @param nameId Name id of the node.
    */
   public GetRightLadderRequest(int level, String nameId) {

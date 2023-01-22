@@ -1,7 +1,12 @@
 package underlay.udp;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import underlay.Underlay;
 import underlay.packets.Request;
@@ -74,8 +79,7 @@ public class UdpUnderlay extends Underlay {
       return null;
     }
     // Then, send the request.
-    DatagramPacket requestPacket =
-        new DatagramPacket(requestBytes, requestBytes.length, destAddress, port);
+    DatagramPacket requestPacket = new DatagramPacket(requestBytes, requestBytes.length, destAddress, port);
     try {
       udpSocket.send(requestPacket);
     } catch (IOException e) {

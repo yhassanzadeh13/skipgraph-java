@@ -33,12 +33,7 @@ public class UdpHandler implements Runnable {
    * @param clientPort    Integer representing client port.
    * @param underlay      UDP underlay instance.
    */
-  public UdpHandler(
-      DatagramSocket udpSocket,
-      Request request,
-      InetAddress clientAddress,
-      int clientPort,
-      UdpUnderlay underlay) {
+  public UdpHandler(DatagramSocket udpSocket, Request request, InetAddress clientAddress, int clientPort, UdpUnderlay underlay) {
     this.udpSocket = udpSocket;
     this.request = request;
     this.clientAddress = clientAddress;
@@ -57,8 +52,7 @@ public class UdpHandler implements Runnable {
       return;
     }
     // Construct the response packet.
-    DatagramPacket responsePacket =
-        new DatagramPacket(responseBytes, responseBytes.length, clientAddress, clientPort);
+    DatagramPacket responsePacket = new DatagramPacket(responseBytes, responseBytes.length, clientAddress, clientPort);
     // Send the response packet.
     try {
       udpSocket.send(responsePacket);

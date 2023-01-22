@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class Log4jLogger implements LoggerInterface {
 
-  private Logger logger;
+  private final Logger logger;
 
   public Log4jLogger(Logger logger) {
     this.logger = logger;

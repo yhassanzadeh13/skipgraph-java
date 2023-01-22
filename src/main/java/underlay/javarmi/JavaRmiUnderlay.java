@@ -80,8 +80,7 @@ public class JavaRmiUnderlay extends Underlay {
     // Connect to the remote adapter.
     JavaRmiService remote = remote(address + ":" + port);
     if (remote == null) {
-      System.err.println(
-          "[JavaRMIUnderlay] Could not connect to the address: " + address + ":" + port);
+      System.err.println("[JavaRMIUnderlay] Could not connect to the address: " + address + ":" + port);
       return null;
     }
     // Use the remote handler to dispatch the request.

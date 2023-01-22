@@ -4,7 +4,9 @@ import model.identifier.MembershipVector;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/** Request for searching by name id recursively. */
+/**
+ * Request for searching by name id recursively.
+ */
 public class SearchByNameIdRecursiveRequest extends Request {
 
   public final MembershipVector target;
@@ -14,7 +16,7 @@ public class SearchByNameIdRecursiveRequest extends Request {
    * Constructor for SearchByNameIdRecursiveRequest.
    *
    * @param target name id of the target node.
-   * @param level Integer representing the level.
+   * @param level  Integer representing the level.
    */
   public SearchByNameIdRecursiveRequest(MembershipVector target, int level) {
     super(RequestType.SearchByNameIDRecursive);
