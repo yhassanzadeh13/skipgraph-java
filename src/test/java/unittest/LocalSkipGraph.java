@@ -1,7 +1,9 @@
 package unittest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -58,6 +60,9 @@ public class LocalSkipGraph {
       ConcurrentLookupTable lookupTable = new ConcurrentLookupTable(SkipGraph.IDENTIFIER_SIZE, identities.get(i));
       lookupTables.add(lookupTable);
     }
+
+    // Sort the identities by their identifier in ascending order.
+    identities.sort((id1, id2) -> id1.getIdentifier().comparedTo(id2.getIdentifier()));
 
 
     // If manualJoin flag is set, then construct the lookup table manually,

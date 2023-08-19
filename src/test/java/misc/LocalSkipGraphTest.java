@@ -34,7 +34,7 @@ class LocalSkipGraphTest {
 
   @Test
   void fourNodes() {
-    LocalSkipGraph g = new LocalSkipGraph(4, "127.0.0.1", 9090, true);
+    LocalSkipGraph g = new LocalSkipGraph(4, true);
     for (SkipNode n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
@@ -42,7 +42,7 @@ class LocalSkipGraphTest {
 
   @Test
   void eightNodes() {
-    LocalSkipGraph g = new LocalSkipGraph(8, "127.0.0.1", 9090, true);
+    LocalSkipGraph g = new LocalSkipGraph(8,  true);
     for (SkipNode n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
