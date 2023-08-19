@@ -50,7 +50,7 @@ class LocalSkipGraphTest {
 
   @Test
   void sixteenNodes() {
-    LocalSkipGraph g = new LocalSkipGraph(16, "127.0.0.1", 9090, true);
+    LocalSkipGraph g = new LocalSkipGraph(16, true);
     for (SkipNode n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
