@@ -59,9 +59,12 @@ public class LocalSkipGraph {
       lookupTables.add(lookupTable);
     }
 
+
     // If manualJoin flag is set, then construct the lookup table manually,
     // i.e. without using the join protocol.
     if (manualJoin) {
+      // Sort the identities by their identifier in ascending order.
+      identities.sort((id1, id2) -> id1.getIdentifier().comparedTo(id2.getIdentifier()));
       // At each level...
       for (int l = 0; l < SkipGraph.IDENTIFIER_SIZE; l++) {
         // Check for the potential neighbours.

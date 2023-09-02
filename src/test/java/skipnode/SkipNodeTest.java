@@ -86,7 +86,6 @@ class SkipNodeTest {
       insertionThreads[i - 1] = new Thread(() -> {
         node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
         insertionDone.countDown();
-        System.out.println("Insertion done " + insertionDone);
       });
     }
 
@@ -146,6 +145,7 @@ class SkipNodeTest {
   /**
    * Concurrently inserts all nodes in the graph and checks the correctness of the lookup tables.
    */
+  // TODO: this test is flakey; fix it!
   @Test
   void concurrentInsertions() {
     // Insert the first node.
@@ -186,7 +186,6 @@ class SkipNodeTest {
 
     // Check the correctness & consistency of the tables.
     for (SkipNode n : g.getNodes()) {
-      // TODO: replace with streams
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
