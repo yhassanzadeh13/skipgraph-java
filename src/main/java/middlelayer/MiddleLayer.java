@@ -14,7 +14,23 @@ import skipnode.SkipNodeInterface;
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
-import underlay.packets.requests.*;
+import underlay.packets.requests.AcquireLockRequest;
+import underlay.packets.requests.AnnounceNeighborRequest;
+import underlay.packets.requests.FindLadderRequest;
+import underlay.packets.requests.GetIdentityRequest;
+import underlay.packets.requests.GetLeftLadderRequest;
+import underlay.packets.requests.GetLeftNodeRequest;
+import underlay.packets.requests.GetRightLadderRequest;
+import underlay.packets.requests.GetRightNodeRequest;
+import underlay.packets.requests.IncrementRequest;
+import underlay.packets.requests.InjectionRequest;
+import underlay.packets.requests.IsAvailableRequest;
+import underlay.packets.requests.ReleaseLockRequest;
+import underlay.packets.requests.SearchByIdentifierRequest;
+import underlay.packets.requests.SearchByNameIdRecursiveRequest;
+import underlay.packets.requests.SearchByNameIdRequest;
+import underlay.packets.requests.UpdateLeftNodeRequest;
+import underlay.packets.requests.UpdateRightNodeRequest;
 import underlay.packets.responses.AckResponse;
 import underlay.packets.responses.BooleanResponse;
 import underlay.packets.responses.IdentityResponse;
@@ -28,12 +44,11 @@ import underlay.packets.responses.SearchResultResponse;
  * local overlay, and the emitted response is returned to the overlay.
  */
 public class MiddleLayer {
-  private final Logger logger;
-
   /**
    * Max trial denotes the maximum number of send trial attempts before giving up.
    */
   private static final int MAX_TRIAL = 3;
+  private final Logger logger;
   private final Underlay underlay;
   private final SkipNodeInterface masterOverlay;
   private final ArrayList<SkipNodeInterface> overlays;
@@ -119,7 +134,7 @@ public class MiddleLayer {
           return new Response(true);
         }
         result = overlay.searchByMembershipVector(((SearchByNameIdRecursiveRequest) request).target,
-            ((SearchByNameIdRecursiveRequest) request).level);
+                                                  ((SearchByNameIdRecursiveRequest) request).level);
         return new SearchResultResponse(result);
       case SearchByNumId:
         // Check whether the node is available for lookups (i.e., already inserted.)
@@ -169,8 +184,8 @@ public class MiddleLayer {
           return new Response(true);
         }
         identity = overlay.findLadder(((FindLadderRequest) request).level,
-            ((FindLadderRequest) request).direction,
-            ((FindLadderRequest) request).target);
+                                      ((FindLadderRequest) request).direction,
+                                      ((FindLadderRequest) request).target);
         return new IdentityResponse(identity);
       case AnnounceNeighbor:
         overlay.announceNeighbor(((AnnounceNeighborRequest) request).newNeighbor, ((AnnounceNeighborRequest) request).minLevel);
