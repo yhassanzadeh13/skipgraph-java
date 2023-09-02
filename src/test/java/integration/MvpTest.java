@@ -3,7 +3,6 @@ package integration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,14 +10,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
-import misc.Utils;
 import model.identifier.MembershipVector;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
-import skipnode.SearchResult;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
 import unittest.IdentifierFixture;
@@ -33,7 +29,7 @@ import unittest.NetworkHub;
 public class MvpTest {
   // TODO: this test fails if number of nodes increased, we should fix it.
   private static final int NODES = 5;
-  private static final int NameIdSize = MembershipVector.computeSize(NODES);
+  private static final int MembershipVectorSize = MembershipVector.computeSize(NODES);
   private ArrayList<SkipNode> skipNodes;
 
   /**
@@ -62,7 +58,7 @@ public class MvpTest {
 
     // Constructs the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(NODES);
-    for (int i = 0; i < NODES; i++) lookupTables.add(new ConcurrentLookupTable(NameIdSize, identities.get(i)));
+    for (int i = 0; i < NODES; i++) lookupTables.add(new ConcurrentLookupTable(MembershipVectorSize, identities.get(i)));
 
     // Finally, constructs the nodes.
     skipNodes = new ArrayList<>(NODES);
@@ -121,7 +117,7 @@ public class MvpTest {
 
 
   /**
-   * Does searches based on nameID and numID concurrently for all of the node pairs.
+   * Performs the searches from every node to every other node by identifier.
    */
   private void doSearches() {
     AtomicInteger assertionErrorCount = new AtomicInteger();
@@ -135,7 +131,7 @@ public class MvpTest {
         // Choose the target.
         final SkipNode target = skipNodes.get(j);
         searchThreads[i + NODES * j] = new Thread(() -> {
-          SkipNodeIdentity res = searcher.searchByNumId(target.getIdentity().getIdentifier());
+          SkipNodeIdentity res = searcher.searchByIdentifier(target.getIdentity().getIdentifier());
           try {
             Assertions.assertEquals(
                 target.getIdentity().getIdentifier(),
@@ -168,7 +164,7 @@ public class MvpTest {
   }
 
   /**
-   * Create a decentralized skipGraph, insert the nodes concurrently, do searches based on nameID and numID concurrently.
+   * Create a decentralized skipGraph, insert the nodes concurrently, do searches based on membership vector and identifier.
    */
   @Test
   public void MVP_TEST() {

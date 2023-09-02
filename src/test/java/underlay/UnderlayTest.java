@@ -3,8 +3,6 @@ package underlay;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
-import model.identifier.Identifier;
-import model.identifier.MembershipVector;
 import org.junit.jupiter.api.*;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
@@ -59,7 +57,7 @@ public class UnderlayTest {
 
     // Check search by name ID request.
     Assertions.assertNotNull(
-        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIdRequest(MembershipVectorFixture.newMembershipVector())));
+        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByMembershipVectorRequest(MembershipVectorFixture.newMembershipVector())));
     // Check search by numerical ID request.
     Assertions.assertNotNull(
         localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByIdentifierRequest(IdentifierFixture.newIdentifier())));

@@ -7,7 +7,7 @@ import underlay.packets.RequestType;
 /**
  * Request for searching by name id recursively.
  */
-public class SearchByNameIdRecursiveRequest extends Request {
+public class SearchByMembershipVectorRecursiveRequest extends Request {
 
   public final MembershipVector target;
   public final int level;
@@ -18,8 +18,8 @@ public class SearchByNameIdRecursiveRequest extends Request {
    * @param target name id of the target node.
    * @param level  Integer representing the level.
    */
-  public SearchByNameIdRecursiveRequest(MembershipVector target, int level) {
-    super(RequestType.SearchByNameIDRecursive);
+  public SearchByMembershipVectorRecursiveRequest(MembershipVector target, int level) {
+    super(RequestType.SearchByMembershipVectorRecursive);
     this.target = target;
     this.level = level;
   }

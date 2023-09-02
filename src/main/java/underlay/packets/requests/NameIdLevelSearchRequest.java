@@ -21,7 +21,7 @@ public class NameIdLevelSearchRequest extends Request {
    * @param target    membership vector of the target node.
    */
   public NameIdLevelSearchRequest(int level, int direction, MembershipVector target) {
-    super(RequestType.NameIdLevelSearch);
+    super(RequestType.MembershipVectorLevelSearch);
     this.level = level;
     this.direction = direction;
     this.target = target;

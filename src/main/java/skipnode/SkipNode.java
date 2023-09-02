@@ -17,7 +17,6 @@ import skipnode.InsertionLock.NeighborInstance;
  * Skip Node class.
  */
 public class SkipNode implements SkipNodeInterface {
-
   // The identity to be returned in case the node is currently unreachable (i.e., being inserted.)
   private static final SkipNodeIdentity unavailableIdentity = LookupTable.EMPTY_NODE;
   private static final Logger logger = LogManager.getLogger(SkipNode.class);
@@ -351,29 +350,29 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   /**
-   * Search for the given numID.
+   * Search for the given identifier.
    *
-   * @param numId The numID to search for
-   * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns the SkipNodeIdentity of the SkipNode with NumID
+   * @param targetIdentifier the target identifier.
+   * @return The SkipNodeIdentity of the node with the given target identifier. If it does not exist, returns the SkipNodeIdentity of the SkipNode with NumID
    *     closest to the given numID from the direction the search is initiated. For example: Initiating a search for a SkipNode with NumID 50 from
    *     a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode with NumID 50 is it exists. If no such SnipNode exists, the
    *     SkipNodeIdentity of the SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is returned.
    */
   @Override
-  public SkipNodeIdentity searchByNumId(Identifier numId) {
+  public SkipNodeIdentity searchByIdentifier(Identifier targetIdentifier) {
     // If this is the node the search request is looking for, return its identity
-    if (numId.equals(this.getIdentity().getIdentifier())) {
+    if (targetIdentifier.equals(this.getIdentity().getIdentifier())) {
       return getIdentity();
     }
     // Initialize the level to begin looking at
     int level = lookupTable.getNumLevels();
     // If the target is greater than this node's numID, the search should continue to the right
-    if (this.getIdentity().getIdentifier().comparedTo(numId) == Identifier.COMPARE_LESS) {
+    if (this.getIdentity().getIdentifier().comparedTo(targetIdentifier) == Identifier.COMPARE_LESS) {
       // Start from the top, while there is no right neighbor,
       // or the right neighbor's num ID is greater than what we are searching for keep going down
       while (level >= 0) {
         if (lookupTable.getRight(level).equals(LookupTable.EMPTY_NODE)
-            || lookupTable.getRight(level).getIdentifier().comparedTo(numId) == Identifier.COMPARE_GREATER) {
+            || lookupTable.getRight(level).getIdentifier().comparedTo(targetIdentifier) == Identifier.COMPARE_GREATER) {
           level--;
         } else {
           break;
@@ -386,13 +385,13 @@ public class SkipNode implements SkipNodeInterface {
       }
       // Else, delegate the search to that node on the right
       SkipNodeIdentity delegateNode = lookupTable.getRight(level);
-      return middleLayer.searchByIdentifier(delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), numId);
+      return middleLayer.searchByIdentifier(delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), targetIdentifier);
     } else {
       // Start from the top, while there is no right neighbor,
       // or the right neighbor's num ID is greater than what we are searching for keep going down
       while (level >= 0) {
         if (lookupTable.getLeft(level).equals(LookupTable.EMPTY_NODE)
-            || lookupTable.getLeft(level).getIdentifier().comparedTo(numId) == Identifier.COMPARE_LESS) {
+            || lookupTable.getLeft(level).getIdentifier().comparedTo(targetIdentifier) == Identifier.COMPARE_LESS) {
           level--;
         } else {
           break;
@@ -405,7 +404,7 @@ public class SkipNode implements SkipNodeInterface {
       }
       // Else, delegate the search to that node on the right
       SkipNodeIdentity delegateNode = lookupTable.getLeft(level);
-      return middleLayer.searchByIdentifier(delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), numId);
+      return middleLayer.searchByIdentifier(delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), targetIdentifier);
     }
   }
 

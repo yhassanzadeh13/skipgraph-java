@@ -75,7 +75,7 @@ public interface SkipNodeInterface {
    *     SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
    *     returned.
    */
-  SkipNodeIdentity searchByNumId(Identifier numId);
+  SkipNodeIdentity searchByIdentifier(Identifier numId);
 
   /**
    * Search for the given nameID.

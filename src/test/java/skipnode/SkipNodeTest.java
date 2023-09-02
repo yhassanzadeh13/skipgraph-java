@@ -224,7 +224,7 @@ class SkipNodeTest {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
         SkipNode target = g.getNodes().get(j);
-        SkipNodeIdentity result = initiator.searchByNumId(target.getIdentity().getIdentifier());
+        SkipNodeIdentity result = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
         Assertions.assertEquals(target.getIdentity(), result);
       }
     }
@@ -246,7 +246,7 @@ class SkipNodeTest {
       for (int j = 0; j < NODES; j++) {
         final SkipNode target = g.getNodes().get(j);
         searchThreads[NODES * i + j] = new Thread(() -> {
-          SkipNodeIdentity res = initiator.searchByNumId(target.getIdentity().getIdentifier());
+          SkipNodeIdentity res = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
           if (!target.getIdentity().getIdentifier().equals(res.getIdentifier())) {
             System.err.println("Search failed from " + initiator.getIdentity()
                 .getMemVec() + " expected: " + target.getIdentity().getIdentifier() + " got: " + res.getIdentifier());
