@@ -1,9 +1,7 @@
 package unittest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,8 +33,8 @@ public class LocalSkipGraph {
   /**
    * Constructor for LocalSkipGraph.
    *
-   * @param size         Integer representing the size.
-   * @param manualJoin   Boolean representing if its manual join or not.
+   * @param size       Integer representing the size.
+   * @param manualJoin Boolean representing if its manual join or not.
    */
   public LocalSkipGraph(int size, boolean manualJoin) {
     this.networkHub = new NetworkHub();
@@ -48,11 +46,11 @@ public class LocalSkipGraph {
       Assertions.assertTrue(underlay.getPort() > 0);
       underlays.add(underlay);
       identities.add(
-          new SkipNodeIdentity(
-              IdentifierFixture.newIdentifier(),
-              MembershipVectorFixture.newMembershipVector(),
-              underlay.getAddress(),
-              underlay.getPort()));
+        new SkipNodeIdentity(
+          IdentifierFixture.newIdentifier(),
+          MembershipVectorFixture.newMembershipVector(),
+          underlay.getAddress(),
+          underlay.getPort()));
     }
     // Construct the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(size);
@@ -60,10 +58,6 @@ public class LocalSkipGraph {
       ConcurrentLookupTable lookupTable = new ConcurrentLookupTable(SkipGraph.IDENTIFIER_SIZE, identities.get(i));
       lookupTables.add(lookupTable);
     }
-
-    // Sort the identities by their identifier in ascending order.
-    identities.sort((id1, id2) -> id1.getIdentifier().comparedTo(id2.getIdentifier()));
-
 
     // If manualJoin flag is set, then construct the lookup table manually,
     // i.e. without using the join protocol.
@@ -142,8 +136,8 @@ public class LocalSkipGraph {
     for (int i = 1; i < getNodes().size(); i++) {
       SkipNode initiator = getNodes().get(i - 1);
       getNodes()
-          .get(i)
-          .insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
+        .get(i)
+        .insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
     }
   }
 
@@ -165,7 +159,7 @@ public class LocalSkipGraph {
   }
 
   public Map<Identifier, LookupTable> identifierLookupTableMap() {
-    return  skipNodes.stream().collect(Collectors.toMap(SkipNode::getIdentifier, SkipNode::getLookupTable));
+    return skipNodes.stream().collect(Collectors.toMap(SkipNode::getIdentifier, SkipNode::getLookupTable));
     // return idMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getIdentifier(), Map.Entry::getValue));
   }
 
