@@ -6,29 +6,15 @@ import java.util.List;
 import lookup.LookupTable;
 import model.identifier.Identifier;
 import model.identifier.MembershipVector;
+import module.logger.Logger;
+import module.logger.SkipGraphLogger;
 import skipnode.SearchResult;
 import skipnode.SkipNodeIdentity;
 import skipnode.SkipNodeInterface;
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;
-import underlay.packets.requests.AcquireLockRequest;
-import underlay.packets.requests.AnnounceNeighborRequest;
-import underlay.packets.requests.FindLadderRequest;
-import underlay.packets.requests.GetIdentityRequest;
-import underlay.packets.requests.GetLeftLadderRequest;
-import underlay.packets.requests.GetLeftNodeRequest;
-import underlay.packets.requests.GetRightLadderRequest;
-import underlay.packets.requests.GetRightNodeRequest;
-import underlay.packets.requests.IncrementRequest;
-import underlay.packets.requests.InjectionRequest;
-import underlay.packets.requests.IsAvailableRequest;
-import underlay.packets.requests.ReleaseLockRequest;
-import underlay.packets.requests.SearchByIdentifierRequest;
-import underlay.packets.requests.SearchByNameIdRecursiveRequest;
-import underlay.packets.requests.SearchByNameIdRequest;
-import underlay.packets.requests.UpdateLeftNodeRequest;
-import underlay.packets.requests.UpdateRightNodeRequest;
+import underlay.packets.requests.*;
 import underlay.packets.responses.AckResponse;
 import underlay.packets.responses.BooleanResponse;
 import underlay.packets.responses.IdentityResponse;
@@ -42,7 +28,12 @@ import underlay.packets.responses.SearchResultResponse;
  * local overlay, and the emitted response is returned to the overlay.
  */
 public class MiddleLayer {
+  private final Logger logger;
 
+  /**
+   * Max trial denotes the maximum number of send trial attempts before giving up.
+   */
+  private static final int MAX_TRIAL = 3;
   private final Underlay underlay;
   private final SkipNodeInterface masterOverlay;
   private final ArrayList<SkipNodeInterface> overlays;
@@ -58,6 +49,7 @@ public class MiddleLayer {
     this.masterOverlay = overlay;
     this.overlays = new ArrayList<>();
     this.overlays.add(overlay);
+    this.logger = SkipGraphLogger.getLoggerForNodeComponent(this.getClass().getName(), overlay.getIdentity().getIdentifier());
   }
 
   /**
@@ -82,8 +74,8 @@ public class MiddleLayer {
         try {
           Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
-          System.err.println("[MiddleLayer.send] Could not back off.");
-          e.printStackTrace();
+          this.logger.fatal("could not backoff the send trial attempt", e);
+          return null; // technically the return should never executed, since this is a fatal log.
         }
       }
       // Check if the destination address == address of this node.
