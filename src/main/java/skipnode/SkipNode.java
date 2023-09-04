@@ -270,7 +270,7 @@ public class SkipNode implements SkipNodeInterface {
 
   /**
    * Finds the `ladder`, i.e. the node that should be used to propagate a newly joined node to the
-   * upper layer. Only used by the insertion protocol, and not by the name ID search protocol even
+   * upper layer. Only used by the insertion protocol, and not by the membership vector search protocol even
    * though both of them makes use of ladders.
    *
    * @return the `ladder` node information.

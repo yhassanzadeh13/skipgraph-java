@@ -233,7 +233,7 @@ public class MiddleLayer {
   }
 
   /**
-   * Method for searching by the name id.
+   * Method for searching by the membership vector.
    *
    * @param destinationAddress String representing the destination address.
    * @param port               Integer representing the port.

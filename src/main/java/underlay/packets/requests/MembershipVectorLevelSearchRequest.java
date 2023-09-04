@@ -5,9 +5,9 @@ import underlay.packets.Request;
 import underlay.packets.RequestType;
 
 /**
- * Request for name id level search.
+ * Request for membership vector level search.
  */
-public class NameIdLevelSearchRequest extends Request {
+public class MembershipVectorLevelSearchRequest extends Request {
 
   public final int level;
   public final int direction;
@@ -20,7 +20,7 @@ public class NameIdLevelSearchRequest extends Request {
    * @param direction Integer representing the direction.
    * @param target    membership vector of the target node.
    */
-  public NameIdLevelSearchRequest(int level, int direction, MembershipVector target) {
+  public MembershipVectorLevelSearchRequest(int level, int direction, MembershipVector target) {
     super(RequestType.MembershipVectorLevelSearch);
     this.level = level;
     this.direction = direction;

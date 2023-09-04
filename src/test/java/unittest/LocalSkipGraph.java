@@ -75,7 +75,7 @@ public class LocalSkipGraph {
             SkipNodeIdentity id2 = identities.get(j);
             LookupTable lt2 = lookupTables.get(j);
             // Connect the nodes at this level if they should be connected
-            // according to their name ID.
+            // according to their membership vector.
             if (id1.getMemVec().commonPrefix(id2.getMemVec()) >= l) {
               lt1.updateRight(id2, l);
               lt2.updateLeft(id1, l);

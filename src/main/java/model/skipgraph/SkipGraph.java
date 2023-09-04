@@ -10,7 +10,7 @@ import model.identifier.MembershipVector;
  */
 public class SkipGraph {
   /**
-   * Size of name ID and numerical ID in bits.
+   * Size of identifier and membership vector in bits.
    * It is set to 32 bytes which corresponds to 256 bits.
    */
   public static final int IDENTIFIER_SIZE = 32;

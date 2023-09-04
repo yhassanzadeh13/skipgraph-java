@@ -7,8 +7,8 @@ parameters are:
 * The Underlay Protocol to be used.
 * Port
 * Introducer Address
-* Name ID Assignment Protocol
-* Name ID value if Assignment Protocol is self-assgined
+* Membership Vector Assignment Protocol
+* Membership Vector value if Assignment Protocol is self-assgined
 * Numerical ID Assignment Protocol
 * Numerical ID value if Assignment Protocol is self-assigned
 * Storage Path
@@ -29,11 +29,11 @@ numerical ID to conduct the search. Then, the query is executed from the designa
 node as the source of the query, and finally, it prints to the user the information of 
 the node returned as the result of the query.
 
-## Search by Name ID
+## Search by Membership Vector (aka Search by Name ID)
 
 After the user picks this option, the interactor API prompts the user to privde the target
-name ID to conduct the search, which can be either a binary string, or a hexadecimal number
-denoting the bytes of the name ID. Then, the query is executed  from th desginated skip node
+membership vector to conduct the search, which can be either a binary string, or a hexadecimal number
+denoting the bytes of the membership vector. Then, the query is executed  from th desginated skip node
 as the source of the query, and finally, it prints to the user the information of the node
 returned as the result of the query.    
 
