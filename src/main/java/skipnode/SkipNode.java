@@ -267,7 +267,6 @@ public class SkipNode implements SkipNodeInterface {
   public boolean isAvailable() {
     return inserted && !insertionLock.isLocked();
   }
-
   /**
    * Finds the `ladder`, i.e. the node that should be used to propagate a newly joined node to the
    * upper layer. Only used by the insertion protocol, and not by the membership vector search protocol even

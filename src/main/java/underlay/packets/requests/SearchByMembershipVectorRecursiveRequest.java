@@ -5,7 +5,7 @@ import underlay.packets.Request;
 import underlay.packets.RequestType;
 
 /**
- * Request for searching by name id recursively.
+ * Request for searching by membership vector recursively.
  */
 public class SearchByMembershipVectorRecursiveRequest extends Request {
 
@@ -15,7 +15,7 @@ public class SearchByMembershipVectorRecursiveRequest extends Request {
   /**
    * Constructor for SearchByNameIdRecursiveRequest.
    *
-   * @param target name id of the target node.
+   * @param target membership vector of the target node.
    * @param level  Integer representing the level.
    */
   public SearchByMembershipVectorRecursiveRequest(MembershipVector target, int level) {

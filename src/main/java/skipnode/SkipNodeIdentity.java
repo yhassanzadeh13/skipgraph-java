@@ -32,28 +32,6 @@ public class SkipNodeIdentity implements Serializable {
     this.port = port;
   }
 
-  /**
-   * Method that calculates common bits for 2 name ids.
-   *
-   * @param name1 String representing name id.
-   * @param name2 String representing name id.
-   * @return number of common bits.
-   */
-  @Deprecated
-  public static int commonBits(String name1, String name2) {
-    if (name1 == null || name2 == null) {
-      return -1;
-    }
-    if (name1.length() != name2.length()) {
-      return -1;
-    }
-    int i = 0;
-    while (i < name1.length() && name1.charAt(i) == name2.charAt(i)) {
-      i++;
-    }
-    return i;
-  }
-
   public MembershipVector getMemVec() {
     return membershipVector;
   }

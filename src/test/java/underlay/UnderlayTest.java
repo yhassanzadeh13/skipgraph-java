@@ -55,7 +55,7 @@ public class UnderlayTest {
     String remoteAddress = remoteUnderlay.getAddress();
     int remotePort = remoteUnderlay.getPort();
 
-    // Check search by name ID request.
+    // Check search by membership vector request.
     Assertions.assertNotNull(
         localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByMembershipVectorRequest(MembershipVectorFixture.newMembershipVector())));
     // Check search by numerical ID request.

@@ -5,7 +5,7 @@ import underlay.packets.Request;
 import underlay.packets.RequestType;
 
 /**
- * Request for searching by name id.
+ * Request for searching by membership vector.
  */
 public class SearchByMembershipVectorRequest extends Request {
 

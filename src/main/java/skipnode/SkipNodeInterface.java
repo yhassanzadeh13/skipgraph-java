@@ -88,11 +88,11 @@ public interface SkipNodeInterface {
   SearchResult searchByMembershipVector(MembershipVector nameId);
 
   /**
-   * Used by the `searchByNameID` method. Implements a recursive name ID search algorithm.
+   * Used by the `searchByMembershipVector` method. Implements a recursive search by membership vector algorithm.
    *
-   * @param target the target name ID.
+   * @param target the target membership vector.
    * @param level  the current level.
-   * @return the identity of the node with the given name ID, or the node with the closest name ID.
+   * @return the identity of the node with the given membership vector, or the node with the closest membership vector.
    */
   SearchResult searchByMembershipVector(MembershipVector target, int level);
 
