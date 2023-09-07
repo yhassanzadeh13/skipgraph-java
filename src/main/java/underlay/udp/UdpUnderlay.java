@@ -21,7 +21,7 @@ public class UdpUnderlay extends Underlay {
    * The nature of UDP requires us to predefine the maximum size of a packet that could be
    * transferred. This parameter defines the maximum size of a packet in bytes.
    */
-  public static final int MAX_PACKET_SIZE = 512;
+  public static final int MAX_PACKET_SIZE = 1024;
   // This object will be used to transfer the responses from the listener thread
   // to the thread that the `sendMessage` was called from.
   private final UdpResponseLock responseLock = new UdpResponseLock();
@@ -43,14 +43,13 @@ public class UdpUnderlay extends Underlay {
     try {
       udpSocket = new DatagramSocket(port);
     } catch (SocketException e) {
-      System.err.println("[UDPUnderlay] Could not initialize at the given port.");
-      e.printStackTrace();
-      return -1;
+      throw new IllegalStateException("could not create UDP socket.", e);
     }
+
     // Create the listener thread that will continuously listen to the UDP packets.
     listenerThread = new Thread(new UdpListener(udpSocket, this, responseLock));
     listenerThread.start();
-    return udpSocket.getPort();
+    return udpSocket.getLocalPort();
   }
 
   /**
@@ -80,8 +79,7 @@ public class UdpUnderlay extends Underlay {
       return null;
     }
     // Then, send the request.
-    DatagramPacket requestPacket =
-        new DatagramPacket(requestBytes, requestBytes.length, destAddress, port);
+    DatagramPacket requestPacket = new DatagramPacket(requestBytes, requestBytes.length, destAddress, port);
     try {
       udpSocket.send(requestPacket);
     } catch (IOException e) {
@@ -111,9 +109,7 @@ public class UdpUnderlay extends Underlay {
       // Close the listener thread.
       listenerThread.join();
     } catch (InterruptedException e) {
-      System.err.println("[UDPUnderlay] Could not terminate.");
-      e.printStackTrace();
-      return false;
+      throw new IllegalStateException("could not terminate the underlay.", e);
     }
     return true;
   }

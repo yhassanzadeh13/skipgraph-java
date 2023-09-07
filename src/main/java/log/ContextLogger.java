@@ -14,8 +14,8 @@ import org.apache.logging.log4j.Logger;
  */
 public class ContextLogger implements ContextLoggerInterface {
 
-  private Logger logger;
-  private JsonMessage msg = new JsonMessage();
+  private final Logger logger;
+  private final JsonMessage msg = new JsonMessage();
 
   public ContextLogger(Logger logger) {
     this.logger = logger;

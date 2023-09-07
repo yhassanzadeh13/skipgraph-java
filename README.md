@@ -7,10 +7,10 @@ parameters are:
 * The Underlay Protocol to be used.
 * Port
 * Introducer Address
-* Name ID Assignment Protocol
-* Name ID value if Assignment Protocol is self-assgined
-* Numerical ID Assignment Protocol
-* Numerical ID value if Assignment Protocol is self-assigned
+* Membership Vector Assignment Protocol
+* Membership Vector value if Assignment Protocol is self-assgined
+* Identifier Assignment Protocol
+* Identifier value if Assignment Protocol is self-assigned
 * Storage Path
 
 After the configuration file is ready, the skip graph node can be run by running the executable
@@ -22,18 +22,18 @@ After setting up a Skip Graph process in the network and having it running, the 
 interact with the Skip Graph Node in an online manner. While the Node is running, options
 for possible queries will appear to the user. These options are:
 
-## Search by Numerical ID
+## Search by Identifier
 
 After the user picks this option, the interactor API prompts the user to provide the target
-numerical ID to conduct the search. Then, the query is executed from the designated skip 
+identifier to conduct the search. Then, the query is executed from the designated skip 
 node as the source of the query, and finally, it prints to the user the information of 
 the node returned as the result of the query.
 
-## Search by Name ID
+## Search by Membership Vector (aka Search by Name ID)
 
 After the user picks this option, the interactor API prompts the user to privde the target
-name ID to conduct the search, which can be either a binary string, or a hexadecimal number
-denoting the bytes of the name ID. Then, the query is executed  from th desginated skip node
+membership vector to conduct the search, which can be either a binary string, or a hexadecimal number
+denoting the bytes of the membership vector. Then, the query is executed  from th desginated skip node
 as the source of the query, and finally, it prints to the user the information of the node
 returned as the result of the query.    
 

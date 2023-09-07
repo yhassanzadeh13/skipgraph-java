@@ -1,6 +1,8 @@
 package skipnode;
 
 import middlelayer.MiddleLayer;
+import model.identifier.Identifier;
+import model.identifier.MembershipVector;
 
 /**
  * Skip Node interface.
@@ -18,6 +20,7 @@ public interface SkipNodeInterface {
    * @param introducerAddress the address of the introducer.
    * @param introducerPort    the port of the introducer.
    */
+  // TODO: this method should receive an identity for introducer. Also, we need to have a self-insert method.
   void insert(String introducerAddress, int introducerPort);
 
   /**
@@ -42,7 +45,7 @@ public interface SkipNodeInterface {
    *
    * @return the ladder's node information.
    */
-  SkipNodeIdentity findLadder(int level, int direction, String target);
+  SkipNodeIdentity findLadder(int level, int direction, MembershipVector target);
 
   /**
    * Adds the given neighbor to the appropriate lookup table entries of this node. Should only be
@@ -61,37 +64,37 @@ public interface SkipNodeInterface {
   boolean delete();
 
   /**
-   * Search for the given numID.
+   * Search for the given identifier.
    *
-   * @param numId The numID to search for
-   * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   *         the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
-   *         direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *         NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   *         with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   *         SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
-   *         returned.
+   * @param targetIdentifier The target identifier to search for
+   * @return The SkipNodeIdentity of the node with the given identifier. If it does not exist, returns
+   *     the SkipNodeIdentity of the SkipNode with identifier closest to the given identifier from the
+   *     direction the search is initiated. For example: Initiating a search for a SkipNode with
+   *     identifier 50 from a SnipNode with identifier 10 will return the SkipNodeIdentity of the SnipNode
+   *     with identifier 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   *     SnipNode whose identifier is closest to 50 among the nodes whose identifier is less than 50 is
+   *     returned.
    */
-  SkipNodeIdentity searchByNumId(int numId);
+  SkipNodeIdentity searchByIdentifier(Identifier targetIdentifier);
 
   /**
-   * Search for the given nameID.
+   * Search for the given membership vector.
    *
-   * @param nameId The nameID to search for
-   * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist
-   *         returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
-   *         nodes in the SkipGraph. Also contains the piggybacked information.
+   * @param membershipVector The membership vector to search for
+   * @return The SkipNodeIdentity of the SkipNode with the given membership vector. If it does not exist
+   *     returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
+   *     nodes in the SkipGraph. Also contains the piggybacked information.
    */
-  SearchResult searchByNameId(String nameId);
+  SearchResult searchByMembershipVector(MembershipVector membershipVector);
 
   /**
-   * Used by the `searchByNameID` method. Implements a recursive name ID search algorithm.
+   * Used by the `searchByMembershipVector` method. Implements a recursive search by membership vector algorithm.
    *
-   * @param target the target name ID.
+   * @param target the target membership vector.
    * @param level  the current level.
-   * @return the identity of the node with the given name ID, or the node with the closest name ID.
+   * @return the identity of the node with the given membership vector, or the node with the closest membership vector.
    */
-  SearchResult searchByNameIdRecursive(String target, int level);
+  SearchResult searchByMembershipVector(MembershipVector target, int level);
 
   /**
    * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity.
@@ -148,7 +151,7 @@ public interface SkipNodeInterface {
    * @param requester Skip node that requested the lock.
    * @return boolean value for whether the lock is acquired or not.
    */
-  boolean tryAcquire(SkipNodeIdentity requester, int version);
+  boolean tryAcquire(SkipNodeIdentity requester);
 
   /**
    * Method for checking whether is lock is locked or not.

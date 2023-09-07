@@ -1,23 +1,26 @@
 package underlay.packets.requests;
 
+import model.identifier.MembershipVector;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
-/** Request for finding ladder. */
+/**
+ * Request for finding ladder.
+ */
 public class FindLadderRequest extends Request {
 
   public final int level;
   public final int direction;
-  public final String target;
+  public final MembershipVector target;
 
   /**
-   * Constructor for FindLadderRequest.
+   * Constructor.
    *
-   * @param level Integer representing level.
-   * @param direction Integer representing direction.
-   * @param target String representing the target
+   * @param level     ?.
+   * @param direction ?.
+   * @param target    ?.
    */
-  public FindLadderRequest(int level, int direction, String target) {
+  public FindLadderRequest(int level, int direction, MembershipVector target) {
     super(RequestType.FindLadder);
     this.level = level;
     this.direction = direction;

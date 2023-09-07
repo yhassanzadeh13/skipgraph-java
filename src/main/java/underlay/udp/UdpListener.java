@@ -30,8 +30,7 @@ public class UdpListener implements Runnable {
    * @param underlay     UDP underlay instance.
    * @param responseLock response lock.
    */
-  public UdpListener(
-      DatagramSocket listenSocket, UdpUnderlay underlay, UdpResponseLock responseLock) {
+  public UdpListener(DatagramSocket listenSocket, UdpUnderlay underlay, UdpResponseLock responseLock) {
     this.listenSocket = listenSocket;
     this.underlay = underlay;
     this.responseLock = responseLock;
@@ -51,10 +50,7 @@ public class UdpListener implements Runnable {
         // If the packet is a request, handle it in a new `UDPHandler` thread.
         if (packetObject instanceof Request) {
           Request request = (Request) packetObject;
-          new Thread(
-              new UdpHandler(
-                  listenSocket, request, packet.getAddress(), packet.getPort(), underlay))
-              .start();
+          new Thread(new UdpHandler(listenSocket, request, packet.getAddress(), packet.getPort(), underlay)).start();
         } else if (packetObject instanceof Response) {
           // If the packet is a response, dispatch the response to the main thread.
           responseLock.dispatch((Response) packetObject);
@@ -68,8 +64,7 @@ public class UdpListener implements Runnable {
         // we will stop listening.
         return;
       } catch (IOException e) {
-        System.err.println("[UDPListener] Could not acquire the packet.");
-        e.printStackTrace();
+        throw new IllegalStateException("could not receive UDP packet.", e);
       }
     }
   }

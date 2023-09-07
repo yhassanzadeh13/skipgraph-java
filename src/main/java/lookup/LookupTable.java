@@ -1,14 +1,21 @@
 package lookup;
 
+import model.skipgraph.SkipGraph;
 import skipnode.SkipNodeIdentity;
 
 /**
  * Lookup Table interface.
  */
 public interface LookupTable {
+  /**
+   * Direction of the neighbor; Left or Right.
+   */
+  enum Direction {
+    LEFT, RIGHT
+  }
 
-  SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity("EMPTY", -1, "EMPTY", -1);
-  SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity("INVALID", -1, "INVALID", -1);
+  SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);
+  SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity(SkipGraph.getInvalidIdentifier(), SkipGraph.getEmptyMembershipVector(), "INVALID", -1);
 
   /**
    * Updates the left neighbor on the given level to be the node.

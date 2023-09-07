@@ -12,7 +12,6 @@ import underlay.tcp.TcpUnderlay;
  * Represents the underlay layer of the skip-graph DHT. Handles node-to-node communication.
  */
 public abstract class Underlay {
-
   private MiddleLayer middleLayer;
 
   private int port;
@@ -60,19 +59,18 @@ public abstract class Underlay {
    * @param port the port that the underlay should be bound to.
    * @return true iff the initialization was successful.
    */
+  // TODO: remove boolean return type.
   public final boolean initialize(int port) {
     port = initUnderlay(port);
-    if (port <= 0) {
-      return false;
+    if (port < 0) {
+      throw new IllegalArgumentException("port must be non-negative:" + port);
     }
 
     this.port = port;
     try {
       address = Inet4Address.getLocalHost().getHostAddress();
     } catch (UnknownHostException e) {
-      System.err.println("[Underlay] Could not acquire the local host name during initialization.");
-      e.printStackTrace();
-      return false;
+      throw new IllegalStateException("could not get local host address.", e);
     }
     fullAddress = address + ":" + port;
     return true;

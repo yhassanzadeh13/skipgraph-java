@@ -13,8 +13,7 @@ public class InsertionLock {
 
   // Represents an acquired lock from a neighbor.
 
-  private static final Log4jLogger logger =
-      new Log4jLogger(LogManager.getLogger(InsertionLock.class));
+  private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(InsertionLock.class));
   private final Semaphore locked = new Semaphore(1, true);
   /**
    * Represents the holder node of this insertion lock.
@@ -35,7 +34,8 @@ public class InsertionLock {
    * @return {@code true} if lock is acquired {@code false} otherwise
    */
   public boolean startInsertion() {
-    logger.debug().addInt("owner_num_id", this.owner.getNumId()).addMsg("starting insertion");
+    // TODO: add logger.
+    // logger.debug().addInt("owner_num_id", this.owner.getIdentifier()).addMsg("starting insertion");
     boolean acquired = locked.tryAcquire();
     if (acquired) {
       holder = null;
@@ -47,7 +47,8 @@ public class InsertionLock {
    * releases the lock if no node holds this insertion lock.
    */
   public void endInsertion() {
-    logger.debug().addInt("owner_num_id", this.owner.getNumId()).addMsg("ending insertion");
+    // TODO: add logger.
+    // logger.debug().addInt("owner_num_id", this.owner.getIdentifier()).addMsg("ending insertion");
     if (holder == null) {
       locked.release();
     }
@@ -82,13 +83,10 @@ public class InsertionLock {
    * @param address represents a node address
    * @param port    represents a node port
    * @return {@code true} if the lock holder of this lock has specified address and port {@code
-   * false} otherwise
+   *     false} otherwise
    */
   public boolean isLockedBy(String address, int port) {
-    return isLocked()
-        && holder != null
-        && holder.getAddress().equals(address)
-        && holder.getPort() == port;
+    return isLocked() && holder != null && holder.getAddress().equals(address) && holder.getPort() == port;
   }
 
   /**

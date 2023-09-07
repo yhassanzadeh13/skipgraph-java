@@ -1,6 +1,8 @@
 package log;
 
-/** Appender interface for adding multiple key-value pairs to JsonMessage. */
+/**
+ * Appender interface for adding multiple key-value pairs to JsonMessage.
+ */
 public interface Appender {
 
   Appender addInt(String key, int value);

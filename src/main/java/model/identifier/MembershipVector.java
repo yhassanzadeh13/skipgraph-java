@@ -2,6 +2,9 @@ package model.identifier;
 
 import static model.skipgraph.SkipGraph.IDENTIFIER_SIZE;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 import io.ipfs.multibase.Multibase;
 import misc.Utils;
 import model.skipgraph.SkipGraph;
@@ -16,7 +19,7 @@ import model.skipgraph.SkipGraph;
  * "Interlaced: Fully decentralized churn stabilization for skip graph-based dhts."
  * Journal of Parallel and Distributed Computing 149 (2021): 13-28.
  */
-public class MembershipVector {
+public class MembershipVector implements Serializable {
   /**
    * Base58BTC representation of membership vector.
    */
@@ -35,8 +38,8 @@ public class MembershipVector {
    */
   public MembershipVector(byte[] membershipVector) throws IllegalArgumentException {
     if (membershipVector.length != SkipGraph.IDENTIFIER_SIZE) {
-      throw new IllegalArgumentException("membership vector must be exactly the legitimate size "
-          + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + membershipVector.length);
+      throw new IllegalArgumentException(
+          "membership vector must be exactly the legitimate size " + "(" + SkipGraph.IDENTIFIER_SIZE + "): " + membershipVector.length);
     }
 
     this.byteRepresentation = membershipVector;
@@ -44,7 +47,7 @@ public class MembershipVector {
   }
 
   /**
-   * A class to automatically calculate nameId's size.
+   * A class to automatically calculate membership vector's size.
    *
    * @param nodes (total/maximum) number of nodes in Skip Graph
    * @return membership vector size
@@ -116,4 +119,12 @@ public class MembershipVector {
     return this.membershipVector;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if (obj.getClass() != this.getClass()) {
+      return false;
+    }
+
+    return Arrays.equals(this.byteRepresentation, ((MembershipVector) obj).byteRepresentation);
+  }
 }

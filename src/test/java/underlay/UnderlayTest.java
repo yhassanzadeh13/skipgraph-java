@@ -3,20 +3,20 @@ package underlay;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.*;
 import skipnode.SkipNode;
 import skipnode.SkipNodeInterface;
 import underlay.packets.requests.*;
+import unittest.IdentifierFixture;
+import unittest.MembershipVectorFixture;
 
 /**
  * This test creates two underlays on the machine at different ports and checks the connectivity
  * between them. Uses the default underlay implementation.
  */
 public class UnderlayTest {
-
-  protected static final int LOCAL_PORT = 9090;
-  protected static final int REMOTE_PORT = 9091;
+  protected static final int LOCAL_PORT = 0;
+  protected static final int REMOTE_PORT = 0;
 
   protected static Underlay localUnderlay;
   protected static Underlay remoteUnderlay;
@@ -35,8 +35,8 @@ public class UnderlayTest {
   }
 
   // Initializes the underlays.
-  @BeforeAll
-  static void setUp() {
+  @BeforeEach
+  void setup() {
     localUnderlay = Underlay.newDefaultUnderlay();
     remoteUnderlay = Underlay.newDefaultUnderlay();
 
@@ -48,31 +48,27 @@ public class UnderlayTest {
   }
 
   // Checks the message delivery for every request type between underlays.
-  // @Test
+  // TODO: does this test actually test anything?
+  @Test
   void sendMessage() {
     // The address of the remote underlay.
     String remoteAddress = remoteUnderlay.getAddress();
     int remotePort = remoteUnderlay.getPort();
 
-    // Check search by name ID request.
+    // Check search by membership vector request.
     Assertions.assertNotNull(
-        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNameIdRequest("")));
-    // Check search by numerical ID request.
+        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByMembershipVectorRequest(MembershipVectorFixture.newMembershipVector())));
+    // Check search by identifier request.
     Assertions.assertNotNull(
-        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByNumIdRequest(0)));
-    // Check level-based search by name ID request.
-    Assertions.assertNotNull(localUnderlay
-        .sendMessage(remoteAddress, remotePort, new NameIdLevelSearchRequest(0, 0, "")));
+        localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByIdentifierRequest(IdentifierFixture.newIdentifier())));
     // Check left/right update requests.
-    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort,
-        new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));
-    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort,
-        new UpdateRightNodeRequest(0, LookupTable.EMPTY_NODE)));
+    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));
+    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateRightNodeRequest(0, LookupTable.EMPTY_NODE)));
   }
 
   // Terminates the underlays.
-  // @AfterAll
-  static void tearDown() {
+  @AfterEach
+  void tearDown() {
     Assertions.assertTrue(localUnderlay.terminate());
     Assertions.assertTrue(remoteUnderlay.terminate());
   }

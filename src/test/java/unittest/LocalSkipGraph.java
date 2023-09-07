@@ -1,15 +1,20 @@
-package misc;
+package unittest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
-import model.identifier.MembershipVector;
+import middlelayer.MiddleLayer;
+import model.identifier.Identifier;
+import model.skipgraph.SkipGraph;
+import org.junit.jupiter.api.Assertions;
 import skipnode.SkipNode;
 import skipnode.SkipNodeIdentity;
+import underlay.Underlay;
 
 /**
  * Represents a locally constructed skip-graph with correct lookup tables. The lookup tables are
@@ -17,48 +22,40 @@ import skipnode.SkipNodeIdentity;
  * class can be used while testing.
  */
 public class LocalSkipGraph {
-
+  private final NetworkHub networkHub;
   private final List<SkipNode> skipNodes;
+  private final List<Underlay> underlays;
 
   public LocalSkipGraph(int size, String localAddress, int startingPort, boolean manualJoin) {
-    this(size, localAddress, startingPort, manualJoin, MembershipVector.computeSize(size));
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   /**
    * Constructor for LocalSkipGraph.
    *
-   * @param size         Integer representing the size.
-   * @param localAddress String representing the local address.
-   * @param startingPort Integer representing the starting port.
-   * @param manualJoin   Boolean representing if its manual join or not.
-   * @param nameIdSize   Integer representing the manual id size.
+   * @param size       Integer representing the size.
+   * @param manualJoin Boolean representing if its manual join or not.
    */
-  public LocalSkipGraph(
-      int size, String localAddress, int startingPort, boolean manualJoin, int nameIdSize) {
-    // Create the numerical IDs.
-    List<Integer> numIds = new ArrayList<>(size);
-    for (int i = 0; i < size; i++) {
-      numIds.add(i);
-    }
-    // Create the name IDs.
-    List<String> nameIds =
-        numIds.stream()
-            .map(numID -> prependToLength(Integer.toBinaryString(numID), nameIdSize))
-            .collect(Collectors.toList());
-    // Randomly assign name IDs.
-    Collections.shuffle(nameIds);
-    // nameIds.forEach(x -> System.out.print(x + " "));
-
-    // Create the identities.
+  public LocalSkipGraph(int size, boolean manualJoin) {
+    this.networkHub = new NetworkHub();
+    this.underlays = new ArrayList<>(size);
     List<SkipNodeIdentity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
+      Underlay underlay = new MockUnderlay(networkHub);
+      underlay.initialize(0);
+      Assertions.assertTrue(underlay.getPort() > 0);
+      underlays.add(underlay);
       identities.add(
-          new SkipNodeIdentity(nameIds.get(i), numIds.get(i), localAddress, startingPort + i));
+        new SkipNodeIdentity(
+          IdentifierFixture.newIdentifier(),
+          MembershipVectorFixture.newMembershipVector(),
+          underlay.getAddress(),
+          underlay.getPort()));
     }
     // Construct the lookup tables.
     List<LookupTable> lookupTables = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      ConcurrentLookupTable lookupTable = new ConcurrentLookupTable(nameIdSize, identities.get(i));
+      ConcurrentLookupTable lookupTable = new ConcurrentLookupTable(SkipGraph.IDENTIFIER_SIZE, identities.get(i));
       lookupTables.add(lookupTable);
     }
 
@@ -66,8 +63,10 @@ public class LocalSkipGraph {
     // If manualJoin flag is set, then construct the lookup table manually,
     // i.e. without using the join protocol.
     if (manualJoin) {
+      // Sort the identities by their identifier in ascending order.
+      identities.sort((id1, id2) -> id1.getIdentifier().comparedTo(id2.getIdentifier()));
       // At each level...
-      for (int l = 0; l < nameIdSize; l++) {
+      for (int l = 0; l < SkipGraph.IDENTIFIER_SIZE; l++) {
         // Check for the potential neighbours.
         for (int i = 0; i < size; i++) {
           SkipNodeIdentity id1 = identities.get(i);
@@ -76,8 +75,8 @@ public class LocalSkipGraph {
             SkipNodeIdentity id2 = identities.get(j);
             LookupTable lt2 = lookupTables.get(j);
             // Connect the nodes at this level if they should be connected
-            // according to their name ID.
-            if (SkipNodeIdentity.commonBits(id1.getNameId(), id2.getNameId()) >= l) {
+            // according to their membership vector.
+            if (id1.getMemVec().commonPrefix(id2.getMemVec()) >= l) {
               lt1.updateRight(id2, l);
               lt2.updateLeft(id1, l);
               break;
@@ -86,10 +85,16 @@ public class LocalSkipGraph {
         }
       }
     }
+
     // Finally, construct the nodes.
     skipNodes = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       SkipNode skipNode = new SkipNode(identities.get(i), lookupTables.get(i));
+
+      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNode);
+      skipNode.setMiddleLayer(middleLayer);
+      underlays.get(i).setMiddleLayer(middleLayer);
+
       // Mark as inserted if lookup table was created manually.
       if (manualJoin) {
         skipNode.insert(null, -1);
@@ -134,8 +139,8 @@ public class LocalSkipGraph {
     for (int i = 1; i < getNodes().size(); i++) {
       SkipNode initiator = getNodes().get(i - 1);
       getNodes()
-          .get(i)
-          .insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
+        .get(i)
+        .insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
     }
   }
 
@@ -153,6 +158,17 @@ public class LocalSkipGraph {
     for (int i = 1; i < list.size(); i++) {
       SkipNode initiator = list.get(i - 1);
       list.get(i).insert(initiator.getIdentity().getAddress(), initiator.getIdentity().getPort());
+    }
+  }
+
+  public Map<Identifier, LookupTable> identifierLookupTableMap() {
+    return skipNodes.stream().collect(Collectors.toMap(SkipNode::getIdentifier, SkipNode::getLookupTable));
+    // return idMap.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().getIdentifier(), Map.Entry::getValue));
+  }
+
+  public void terminate() {
+    for (Underlay underlay : underlays) {
+      underlay.terminate();
     }
   }
 }
