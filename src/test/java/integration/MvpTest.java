@@ -24,7 +24,7 @@ import unittest.NetworkHub;
 
 /**
  * The goal of the mvpTest is to establish a decentralized Skip Graph overlay of nodes and test for full connectivity over each node,
- * i.e., each node should be able to query every other node by both name and numerical IDs and get the correct response.
+ * i.e., each node should be able to query every other node by both identifiers and membership vectors and get the correct response.
  */
 public class MvpTest {
   // TODO: this test fails if number of nodes increased, we should fix it.

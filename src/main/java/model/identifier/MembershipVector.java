@@ -47,7 +47,7 @@ public class MembershipVector implements Serializable {
   }
 
   /**
-   * A class to automatically calculate nameId's size.
+   * A class to automatically calculate membership vector's size.
    *
    * @param nodes (total/maximum) number of nodes in Skip Graph
    * @return membership vector size

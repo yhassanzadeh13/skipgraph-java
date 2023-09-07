@@ -38,7 +38,7 @@ public class DataNodeTest {
     }
 
     // Then, construct the local skip graph without manually constructing the lookup tables.
-    int nameIdSize = ((int) (Math.log(NODES * (DATANODESPERNODE + 1)) / Math.log(2)));
+    int membershipVectorSize = ((int) (Math.log(NODES * (DATANODESPERNODE + 1)) / Math.log(2)));
     // TODO: refactored local skip graph constructor, it is not gonna work with this constructor.
     LocalSkipGraph g = new LocalSkipGraph(NODES, false);
 
@@ -73,7 +73,7 @@ public class DataNodeTest {
             membershipVector,
             node.getIdentity().getAddress(),
             node.getIdentity().getPort());
-        LookupTable lookupTable = new ConcurrentLookupTable(nameIdSize, dnID);
+        LookupTable lookupTable = new ConcurrentLookupTable(membershipVectorSize, dnID);
         SkipNode dNode = new SkipNode(dnID, lookupTable);
         tableMap.put(identifier, lookupTable);
         node.insertDataNode(dNode);

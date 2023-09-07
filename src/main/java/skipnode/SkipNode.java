@@ -305,7 +305,7 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   /**
-   * Given a new neighbor, inserts it to the appropriate levels according to the name ID of the new
+   * Given a new neighbor, inserts it to the appropriate levels according to the membership vector of the new
    * node.
    *
    * @param newNeighbor the identity of the new neighbor.
@@ -316,8 +316,7 @@ public class SkipNode implements SkipNodeInterface {
   }
 
   /**
-   * Puts the given node into every appropriate level & direction according to its name ID and
-   * numerical ID.
+   * Puts the given node into every appropriate level & direction according to its identifier and membership vector.
    *
    * @param node the node to insert.
    */
@@ -352,10 +351,10 @@ public class SkipNode implements SkipNodeInterface {
    * Search for the given identifier.
    *
    * @param targetIdentifier the target identifier.
-   * @return The SkipNodeIdentity of the node with the given target identifier. If it does not exist, returns the SkipNodeIdentity of the SkipNode with NumID
-   *     closest to the given numID from the direction the search is initiated. For example: Initiating a search for a SkipNode with NumID 50 from
-   *     a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode with NumID 50 is it exists. If no such SnipNode exists, the
-   *     SkipNodeIdentity of the SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is returned.
+   * @return The SkipNodeIdentity of the node with the given target identifier. If it does not exist, returns the SkipNodeIdentity of the SkipNode with target identifier.
+   *     closest to the given identifier from the direction the search is initiated. For example: Initiating a search for a SkipNode with identifier 50 from
+   *     a SnipNode with identifier 10 will return the SkipNodeIdentity of the SnipNode with identifier 50 is it exists. If no such node exists, the
+   *     SkipNodeIdentity of the SnipNode whose identifier is closest to 50 among the nodes whose identifer is less than 50 is returned.
    */
   @Override
   public SkipNodeIdentity searchByIdentifier(Identifier targetIdentifier) {
@@ -365,10 +364,10 @@ public class SkipNode implements SkipNodeInterface {
     }
     // Initialize the level to begin looking at
     int level = lookupTable.getNumLevels();
-    // If the target is greater than this node's numID, the search should continue to the right
+    // If the target is greater than this node's identifier, the search should continue to the right
     if (this.getIdentity().getIdentifier().comparedTo(targetIdentifier) == Identifier.COMPARE_LESS) {
       // Start from the top, while there is no right neighbor,
-      // or the right neighbor's num ID is greater than what we are searching for keep going down
+      // or the right neighbor's identifier is greater than what we are searching for keep going down
       while (level >= 0) {
         if (lookupTable.getRight(level).equals(LookupTable.EMPTY_NODE)
             || lookupTable.getRight(level).getIdentifier().comparedTo(targetIdentifier) == Identifier.COMPARE_GREATER) {
@@ -378,7 +377,7 @@ public class SkipNode implements SkipNodeInterface {
         }
       }
       // If the level is less than zero, then this node is the closest node to the
-      // numID being searched for from the right. Return.
+      // identifier being searched for from the right. Return.
       if (level < 0) {
         return getIdentity();
       }
@@ -387,7 +386,7 @@ public class SkipNode implements SkipNodeInterface {
       return middleLayer.searchByIdentifier(delegateNode.getAddress(), delegateNode.getPort(), delegateNode.getIdentifier(), targetIdentifier);
     } else {
       // Start from the top, while there is no right neighbor,
-      // or the right neighbor's num ID is greater than what we are searching for keep going down
+      // or the right neighbor's identifier is greater than what we are searching for keep going down
       while (level >= 0) {
         if (lookupTable.getLeft(level).equals(LookupTable.EMPTY_NODE)
             || lookupTable.getLeft(level).getIdentifier().comparedTo(targetIdentifier) == Identifier.COMPARE_LESS) {
@@ -396,7 +395,7 @@ public class SkipNode implements SkipNodeInterface {
           break;
         }
       }
-      // If the level is less than zero, then this node is the closest node to the numID
+      // If the level is less than zero, then this node is the closest node to the identifier
       // being searched for from the right. Return.
       if (level < 0) {
         return getIdentity();

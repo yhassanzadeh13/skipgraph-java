@@ -58,7 +58,7 @@ public class UnderlayTest {
     // Check search by membership vector request.
     Assertions.assertNotNull(
         localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByMembershipVectorRequest(MembershipVectorFixture.newMembershipVector())));
-    // Check search by numerical ID request.
+    // Check search by identifier request.
     Assertions.assertNotNull(
         localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByIdentifierRequest(IdentifierFixture.newIdentifier())));
     // Check left/right update requests.

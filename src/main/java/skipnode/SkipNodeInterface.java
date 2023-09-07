@@ -64,28 +64,28 @@ public interface SkipNodeInterface {
   boolean delete();
 
   /**
-   * Search for the given numID.
+   * Search for the given identifier.
    *
-   * @param numId The numID to search for
-   * @return The SkipNodeIdentity of the node with the given numID. If it does not exist, returns
-   *     the SkipNodeIdentity of the SkipNode with NumID closest to the given numID from the
+   * @param targetIdentifier The target identifier to search for
+   * @return The SkipNodeIdentity of the node with the given identifier. If it does not exist, returns
+   *     the SkipNodeIdentity of the SkipNode with identifier closest to the given identifier from the
    *     direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *     NumID 50 from a SnipNode with NumID 10 will return the SkipNodeIdentity of the SnipNode
-   *     with NumID 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
-   *     SnipNode whose NumID is closest to 50 among the nodes whose NumID is less than 50 is
+   *     identifier 50 from a SnipNode with identifier 10 will return the SkipNodeIdentity of the SnipNode
+   *     with identifier 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   *     SnipNode whose identifier is closest to 50 among the nodes whose identifier is less than 50 is
    *     returned.
    */
-  SkipNodeIdentity searchByIdentifier(Identifier numId);
+  SkipNodeIdentity searchByIdentifier(Identifier targetIdentifier);
 
   /**
-   * Search for the given nameID.
+   * Search for the given membership vector.
    *
-   * @param nameId The nameID to search for
-   * @return The SkipNodeIdentity of the SkipNode with the given nameID. If it does not exist
+   * @param membershipVector The membership vector to search for
+   * @return The SkipNodeIdentity of the SkipNode with the given membership vector. If it does not exist
    *     returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
    *     nodes in the SkipGraph. Also contains the piggybacked information.
    */
-  SearchResult searchByMembershipVector(MembershipVector nameId);
+  SearchResult searchByMembershipVector(MembershipVector membershipVector);
 
   /**
    * Used by the `searchByMembershipVector` method. Implements a recursive search by membership vector algorithm.

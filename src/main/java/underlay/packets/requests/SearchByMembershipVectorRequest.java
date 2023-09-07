@@ -11,8 +11,8 @@ public class SearchByMembershipVectorRequest extends Request {
 
   public final MembershipVector targetMembershipVector;
 
-  public SearchByMembershipVectorRequest(MembershipVector targetNameId) {
+  public SearchByMembershipVectorRequest(MembershipVector targetMembershipVector) {
     super(RequestType.SearchByMembershipVector);
-    this.targetMembershipVector = targetNameId;
+    this.targetMembershipVector = targetMembershipVector;
   }
 }

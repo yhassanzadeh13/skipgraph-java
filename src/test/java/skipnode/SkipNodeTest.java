@@ -176,7 +176,7 @@ class SkipNodeTest {
       Assertions.fail(e);
     }
 
-    // Create a map of num ids to their corresponding lookup tables.
+    // Create a map of identifiers to their corresponding lookup tables.
     Map<SkipNodeIdentity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(SkipNode::getIdentity,
         SkipNode::getLookupTable));
     // Create a map of identifiers to their corresponding lookup tables.

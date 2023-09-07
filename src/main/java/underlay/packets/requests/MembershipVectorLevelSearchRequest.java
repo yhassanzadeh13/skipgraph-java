@@ -14,7 +14,7 @@ public class MembershipVectorLevelSearchRequest extends Request {
   public final MembershipVector target;
 
   /**
-   * Constructor for NameIdLevelSearchRequest.
+   * Constructor for MembershipVectorLevelSearchRequest.
    *
    * @param level     Integer representing the level.
    * @param direction Integer representing the direction.

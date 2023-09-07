@@ -10,8 +10,8 @@ import underlay.packets.RequestType;
 public class SearchByIdentifierRequest extends Request {
   public final Identifier searchByIdentifier;
 
-  public SearchByIdentifierRequest(Identifier targetNumId) {
+  public SearchByIdentifierRequest(Identifier targetIdentifier) {
     super(RequestType.SearchByIdentifier);
-    this.searchByIdentifier = targetNumId;
+    this.searchByIdentifier = targetIdentifier;
   }
 }

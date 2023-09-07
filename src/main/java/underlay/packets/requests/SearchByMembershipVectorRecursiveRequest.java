@@ -13,7 +13,7 @@ public class SearchByMembershipVectorRecursiveRequest extends Request {
   public final int level;
 
   /**
-   * Constructor for SearchByNameIdRecursiveRequest.
+   * Constructor for SearchByMembershipVectorRecursiveRequest.
    *
    * @param target membership vector of the target node.
    * @param level  Integer representing the level.
