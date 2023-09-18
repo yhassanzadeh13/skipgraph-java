@@ -6,7 +6,7 @@ import model.identifier.MembershipVector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import skipnode.SkipNode;
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import unittest.LocalSkipGraph;
 
 class LocalSkipGraphTest {
@@ -15,14 +15,14 @@ class LocalSkipGraphTest {
   static void tableCorrectnessCheck(Identifier identifier, MembershipVector membershipVector, LookupTable table) {
     for (int i = 0; i < table.getNumLevels(); i++) {
       for (int j = 0; j < 2; j++) {
-        SkipNodeIdentity neighbor = (j == 0) ? table.getLeft(i) : table.getRight(i);
+        Identity neighbor = (j == 0) ? table.getLeft(i) : table.getRight(i);
         if (neighbor.equals(LookupTable.EMPTY_NODE)) {
           continue;
         }
         Assertions.assertTrue(neighbor.getMemVec().commonPrefix(membershipVector) >= i);
       }
-      SkipNodeIdentity leftNeighbor = table.getLeft(i);
-      SkipNodeIdentity rightNeighbor = table.getRight(i);
+      Identity leftNeighbor = table.getLeft(i);
+      Identity rightNeighbor = table.getRight(i);
       if (!leftNeighbor.equals(LookupTable.EMPTY_NODE)) {
         Assertions.assertEquals(Identifier.COMPARE_LESS, leftNeighbor.getIdentifier().comparedTo(identifier));
       }

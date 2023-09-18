@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -9,9 +9,9 @@ import underlay.packets.RequestType;
  */
 public class ReleaseLockRequest extends Request {
 
-  public final SkipNodeIdentity owner;
+  public final Identity owner;
 
-  public ReleaseLockRequest(SkipNodeIdentity owner) {
+  public ReleaseLockRequest(Identity owner) {
     super(RequestType.ReleaseLock);
     this.owner = owner;
   }

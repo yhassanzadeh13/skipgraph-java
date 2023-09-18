@@ -1,6 +1,6 @@
 package underlay.packets.responses;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.packets.Response;
 
 /**
@@ -8,9 +8,9 @@ import underlay.packets.Response;
  */
 public class IdentityResponse extends Response {
 
-  public final SkipNodeIdentity identity;
+  public final Identity identity;
 
-  public IdentityResponse(SkipNodeIdentity identity) {
+  public IdentityResponse(Identity identity) {
     this.identity = identity;
   }
 }

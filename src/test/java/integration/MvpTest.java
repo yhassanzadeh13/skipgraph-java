@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
 import skipnode.SkipNode;
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import unittest.IdentifierFixture;
 import unittest.MembershipVectorFixture;
 import unittest.MockUnderlay;
@@ -45,13 +45,13 @@ public class MvpTest {
     }
 
     // identities
-    List<SkipNodeIdentity> identities = new ArrayList<>(NODES);
+    List<Identity> identities = new ArrayList<>(NODES);
 
     for (int i = 0; i < NODES; i++) {
-      SkipNodeIdentity skid = new SkipNodeIdentity(IdentifierFixture.newIdentifier(),
-          MembershipVectorFixture.newMembershipVector(),
-          underlays.get(i).getAddress(),
-          underlays.get(i).getPort());
+      Identity skid = new Identity(IdentifierFixture.newIdentifier(),
+                                   MembershipVectorFixture.newMembershipVector(),
+                                   underlays.get(i).getAddress(),
+                                   underlays.get(i).getPort());
       identities.add(skid);
       System.out.println("Identity " + i + ": " + skid);
     }
@@ -131,7 +131,7 @@ public class MvpTest {
         // Choose the target.
         final SkipNode target = skipNodes.get(j);
         searchThreads[i + NODES * j] = new Thread(() -> {
-          SkipNodeIdentity res = searcher.searchByIdentifier(target.getIdentity().getIdentifier());
+          Identity res = searcher.searchByIdentifier(target.getIdentity().getIdentifier());
           try {
             Assertions.assertEquals(
                 target.getIdentity().getIdentifier(),

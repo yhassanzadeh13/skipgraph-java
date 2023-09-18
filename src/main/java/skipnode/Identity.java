@@ -1,31 +1,31 @@
 package skipnode;
 
-import static lookup.LookupTable.EMPTY_NODE;
-
 import java.io.Serializable;
 import java.util.Objects;
+
+import static lookup.LookupTable.EMPTY_NODE;
 
 import model.identifier.Identifier;
 import model.identifier.MembershipVector;
 
 /**
- * Basic skipnode.SkipNodeIdentity class
+ * Identity of a node in the skip graph; it contains the membership vector, the identifier, the address and the port of the node.
  */
-public class SkipNodeIdentity implements Serializable {
+public class Identity implements Serializable {
   private final MembershipVector membershipVector; // aka name Id
   private final Identifier identifier; // aka numerical id
   private final String address;
   private final int port;
 
   /**
-   * Constructor for SkipNodeIdentity.
+   * Constructor for Identity.
    *
    * @param identifier       identifier of the node (aka numerical ID).
    * @param membershipVector membership vector of the node (aka name ID).
    * @param address          String representing the address of the node.
    * @param port             Integer representing the port of the node.
    */
-  public SkipNodeIdentity(Identifier identifier, MembershipVector membershipVector, String address, int port) {
+  public Identity(Identifier identifier, MembershipVector membershipVector, String address, int port) {
     this.membershipVector = membershipVector;
     this.identifier = identifier;
     this.address = address;
@@ -56,7 +56,7 @@ public class SkipNodeIdentity implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    SkipNodeIdentity that = (SkipNodeIdentity) o;
+    Identity that = (Identity) o;
     if (this.port != that.port) {
       return false;
     }

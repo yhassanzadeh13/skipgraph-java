@@ -18,13 +18,13 @@ public class InsertionLock {
   /**
    * Represents the holder node of this insertion lock.
    */
-  public SkipNodeIdentity holder = null;
+  public Identity holder = null;
   /**
    * Represents the node that owns this insertion lock.
    */
-  public SkipNodeIdentity owner;
+  public Identity owner;
 
-  public InsertionLock(SkipNodeIdentity owner) {
+  public InsertionLock(Identity owner) {
     this.owner = owner;
   }
 
@@ -60,7 +60,7 @@ public class InsertionLock {
    * @param receiver node that wants to acquire owners insertion lock
    * @return {@code true} if the lock is receiver holds the lock {@code false} otherwise
    */
-  public boolean tryAcquire(SkipNodeIdentity receiver) {
+  public boolean tryAcquire(Identity receiver) {
     boolean acquired = (receiver.equals(holder)) || locked.tryAcquire();
     if (acquired) {
       holder = receiver;
@@ -95,7 +95,7 @@ public class InsertionLock {
    * @param holder represents a node
    * @return {@code true} if the lock is held by holder {@code false} otherwise
    */
-  public boolean unlockOwned(SkipNodeIdentity holder) {
+  public boolean unlockOwned(Identity holder) {
     if (!this.holder.equals(holder)) {
       return false;
     }
@@ -109,10 +109,10 @@ public class InsertionLock {
    */
   public static class NeighborInstance {
 
-    public final SkipNodeIdentity node;
+    public final Identity node;
     public final int minLevel;
 
-    public NeighborInstance(SkipNodeIdentity node, int minLevel) {
+    public NeighborInstance(Identity node, int minLevel) {
       this.node = node;
       this.minLevel = minLevel;
     }

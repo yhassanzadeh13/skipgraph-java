@@ -13,7 +13,7 @@ import model.identifier.Identifier;
 import model.skipgraph.SkipGraph;
 import org.junit.jupiter.api.Assertions;
 import skipnode.SkipNode;
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.Underlay;
 
 /**
@@ -39,14 +39,14 @@ public class LocalSkipGraph {
   public LocalSkipGraph(int size, boolean manualJoin) {
     this.networkHub = new NetworkHub();
     this.underlays = new ArrayList<>(size);
-    List<SkipNodeIdentity> identities = new ArrayList<>(size);
+    List<Identity> identities = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
       Underlay underlay = new MockUnderlay(networkHub);
       underlay.initialize(0);
       Assertions.assertTrue(underlay.getPort() > 0);
       underlays.add(underlay);
       identities.add(
-        new SkipNodeIdentity(
+        new Identity(
           IdentifierFixture.newIdentifier(),
           MembershipVectorFixture.newMembershipVector(),
           underlay.getAddress(),
@@ -69,10 +69,10 @@ public class LocalSkipGraph {
       for (int l = 0; l < SkipGraph.IDENTIFIER_SIZE; l++) {
         // Check for the potential neighbours.
         for (int i = 0; i < size; i++) {
-          SkipNodeIdentity id1 = identities.get(i);
+          Identity id1 = identities.get(i);
           LookupTable lt1 = lookupTables.get(i);
           for (int j = i + 1; j < size; j++) {
-            SkipNodeIdentity id2 = identities.get(j);
+            Identity id2 = identities.get(j);
             LookupTable lt2 = lookupTables.get(j);
             // Connect the nodes at this level if they should be connected
             // according to their membership vector.

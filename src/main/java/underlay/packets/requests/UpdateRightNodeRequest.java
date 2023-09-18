@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -10,7 +10,7 @@ import underlay.packets.RequestType;
 public class UpdateRightNodeRequest extends Request {
 
   public final int level;
-  public final SkipNodeIdentity snId;
+  public final Identity snId;
 
   /**
    * Constructor for UpdateRightNodeRequest.
@@ -18,7 +18,7 @@ public class UpdateRightNodeRequest extends Request {
    * @param level Integer representing the level.
    * @param snId  Skipnode identity.
    */
-  public UpdateRightNodeRequest(int level, SkipNodeIdentity snId) {
+  public UpdateRightNodeRequest(int level, Identity snId) {
     super(RequestType.UpdateRightNode);
     this.level = level;
     this.snId = snId;

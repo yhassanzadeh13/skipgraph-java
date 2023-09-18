@@ -9,9 +9,9 @@ public class SearchResult implements Serializable {
 
   // todo: this should be renamed to identity and also should be private.
   // todo: we should also record the search path.
-  public final SkipNodeIdentity result;
+  public final Identity result;
 
-  public SearchResult(SkipNodeIdentity result) {
+  public SearchResult(Identity result) {
     this.result = result;
   }
 }

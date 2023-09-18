@@ -5,9 +5,7 @@ import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import model.identifier.Identifier;
 import model.identifier.MembershipVector;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
-import org.opentest4j.TestSkippedException;
 import unittest.IdentifierFixture;
 import unittest.LocalSkipGraph;
 import org.junit.jupiter.api.Test;
@@ -68,7 +66,7 @@ public class DataNodeTest {
         Identifier identifier = IdentifierFixture.newIdentifier();
         MembershipVector membershipVector = new MembershipVector(identifier.getBytes());
 
-        SkipNodeIdentity dnID = new SkipNodeIdentity(
+        Identity dnID = new Identity(
             identifier,
             membershipVector,
             node.getIdentity().getAddress(),

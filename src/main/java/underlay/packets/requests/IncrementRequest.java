@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -10,7 +10,7 @@ import underlay.packets.RequestType;
 public class IncrementRequest extends Request {
 
   public final int level;
-  public final SkipNodeIdentity snId;
+  public final Identity snId;
 
   /**
    * Constructor for IncrementRequest.
@@ -18,7 +18,7 @@ public class IncrementRequest extends Request {
    * @param level Integer representing level.
    * @param snId  Skipnode identity
    */
-  public IncrementRequest(int level, SkipNodeIdentity snId) {
+  public IncrementRequest(int level, Identity snId) {
     super(RequestType.Increment);
     this.level = level;
     this.snId = snId;

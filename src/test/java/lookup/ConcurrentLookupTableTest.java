@@ -3,18 +3,16 @@ package lookup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import skipnode.SkipNodeIdentity;
-import unittest.IdentifierFixture;
+import skipnode.Identity;
 import unittest.IdentityFixture;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ConcurrentLookupTableTest {
 
   protected static ConcurrentLookupTable concurrentLookupTable;
-  protected static List<SkipNodeIdentity> nodesToInsert;
+  protected static List<Identity> nodesToInsert;
 
   // Initializes lookup table.
   @BeforeEach

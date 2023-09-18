@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -9,7 +9,7 @@ import underlay.packets.RequestType;
  */
 public class AnnounceNeighborRequest extends Request {
 
-  public final SkipNodeIdentity newNeighbor;
+  public final Identity newNeighbor;
   public final int minLevel;
 
   /**
@@ -18,7 +18,7 @@ public class AnnounceNeighborRequest extends Request {
    * @param newNeighbor Skipnode that is the new neighbour.
    * @param minLevel    Integer representing the minimum level.
    */
-  public AnnounceNeighborRequest(SkipNodeIdentity newNeighbor, int minLevel) {
+  public AnnounceNeighborRequest(Identity newNeighbor, int minLevel) {
     super(RequestType.AnnounceNeighbor);
     this.newNeighbor = newNeighbor;
     this.minLevel = minLevel;

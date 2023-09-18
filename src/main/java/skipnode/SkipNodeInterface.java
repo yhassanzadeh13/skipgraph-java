@@ -45,7 +45,7 @@ public interface SkipNodeInterface {
    *
    * @return the ladder's node information.
    */
-  SkipNodeIdentity findLadder(int level, int direction, MembershipVector target);
+  Identity findLadder(int level, int direction, MembershipVector target);
 
   /**
    * Adds the given neighbor to the appropriate lookup table entries of this node. Should only be
@@ -54,7 +54,7 @@ public interface SkipNodeInterface {
    * @param newNeighbor the identity of the new neighbor.
    * @param minLevel    the minimum level in which the new neighbor should be connected.
    */
-  void announceNeighbor(SkipNodeIdentity newNeighbor, int minLevel);
+  void announceNeighbor(Identity newNeighbor, int minLevel);
 
   /**
    * Remove the node from the SkipGraph. Joins the neighbors on each level together.
@@ -67,22 +67,22 @@ public interface SkipNodeInterface {
    * Search for the given identifier.
    *
    * @param targetIdentifier The target identifier to search for
-   * @return The SkipNodeIdentity of the node with the given identifier. If it does not exist, returns
-   *     the SkipNodeIdentity of the SkipNode with identifier closest to the given identifier from the
+   * @return The identity of the node with the given identifier. If it does not exist, returns
+   *     the identity of the SkipNode with identifier closest to the given identifier from the
    *     direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *     identifier 50 from a SnipNode with identifier 10 will return the SkipNodeIdentity of the SnipNode
-   *     with identifier 50 is it exists. If no such SnipNode exists, the SkipNodeIdentity of the
+   *     identifier 50 from a SnipNode with identifier 10 will return the identity of the SnipNode
+   *     with identifier 50 is it exists. If no such SnipNode exists, the identity of the
    *     SnipNode whose identifier is closest to 50 among the nodes whose identifier is less than 50 is
    *     returned.
    */
-  SkipNodeIdentity searchByIdentifier(Identifier targetIdentifier);
+  Identity searchByIdentifier(Identifier targetIdentifier);
 
   /**
    * Search for the given membership vector.
    *
    * @param membershipVector The membership vector to search for
-   * @return The SkipNodeIdentity of the SkipNode with the given membership vector. If it does not exist
-   *     returns the SkipNodeIdentity of the SkipNode which shares the longest prefix among the
+   * @return The identity of the SkipNode with the given membership vector. If it does not exist
+   *     returns the identity of the SkipNode which shares the longest prefix among the
    *     nodes in the SkipGraph. Also contains the piggybacked information.
    */
   SearchResult searchByMembershipVector(MembershipVector membershipVector);
@@ -97,29 +97,29 @@ public interface SkipNodeInterface {
   SearchResult searchByMembershipVector(MembershipVector target, int level);
 
   /**
-   * Updates the SkipNode on the left on the given level to the given SkipNodeIdentity.
+   * Updates the SkipNode on the left on the given level to the given identity.
    *
-   * @param snId  The new SkipNodeIdentity to be placed in the given level
-   * @param level The level to place the given SkipNodeIdentity
-   * @return The SkipNodeIdentity that was replaced (Could be an EMPTY_NODE)
+   * @param snId  The new identity to be placed in the given level
+   * @param level The level to place the given identity.
+   * @return The identity that was replaced (Could be an EMPTY_NODE)
    */
-  SkipNodeIdentity updateLeftNode(SkipNodeIdentity snId, int level);
+  Identity updateLeftNode(Identity snId, int level);
 
   /**
-   * Updates the SkipNode on the right on the given level to the given SkipNodeIdentity.
+   * Updates the SkipNode on the right on the given level to the given identity.
    *
-   * @param snId  The new SkipNodeIdentity to be placed in the given level
-   * @param level The level to place the given SkipNodeIdentity
-   * @return The SkipNodeIdentity that was replaced (Could be an EMPTY_NODE)
+   * @param snId  The new identity to be placed in the given level
+   * @param level The level to place the given identity.
+   * @return The identity that was replaced (Could be an EMPTY_NODE)
    */
-  SkipNodeIdentity updateRightNode(SkipNodeIdentity snId, int level);
+  Identity updateRightNode(Identity snId, int level);
 
   /**
    * Returns the up-to-date identity of this node.
    *
    * @return the up-to-date identity of this node.
    */
-  SkipNodeIdentity getIdentity();
+  Identity getIdentity();
 
   /**
    * Returns the right neighbor of the node at the given level.
@@ -127,7 +127,7 @@ public interface SkipNodeInterface {
    * @param level the level of the right neighbor.
    * @return the right neighbor at the given level.
    */
-  SkipNodeIdentity getRightNode(int level);
+  Identity getRightNode(int level);
 
   /**
    * Returns the left neighbor of the node at the given level.
@@ -135,7 +135,7 @@ public interface SkipNodeInterface {
    * @param level the level of the left neighbor.
    * @return the left neighbor at the given level.
    */
-  SkipNodeIdentity getLeftNode(int level);
+  Identity getLeftNode(int level);
 
   /**
    * Method for releasing the lock.
@@ -143,7 +143,7 @@ public interface SkipNodeInterface {
    * @param owner owner node instance.
    * @return Boolean value whether the lock is held by that node or not.
    */
-  boolean unlock(SkipNodeIdentity owner);
+  boolean unlock(Identity owner);
 
   /**
    * Method for trying to acquire the lock.
@@ -151,7 +151,7 @@ public interface SkipNodeInterface {
    * @param requester Skip node that requested the lock.
    * @return boolean value for whether the lock is acquired or not.
    */
-  boolean tryAcquire(SkipNodeIdentity requester);
+  boolean tryAcquire(Identity requester);
 
   /**
    * Method for checking whether is lock is locked or not.

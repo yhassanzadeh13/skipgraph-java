@@ -9,7 +9,7 @@ import model.identifier.MembershipVector;
 import module.logger.Logger;
 import module.logger.SkipGraphLogger;
 import skipnode.SearchResult;
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import skipnode.SkipNodeInterface;
 import underlay.Underlay;
 import underlay.packets.Request;
@@ -112,7 +112,7 @@ public class MiddleLayer {
    * @return response emitted by the overlay.
    */
   public Response receive(Request request) {
-    SkipNodeIdentity identity;
+    Identity identity;
     SearchResult result;
     SkipNodeInterface overlay = request.receiverId == null ? masterOverlay : getById(request.receiverId);
     // Invalid ID
@@ -267,7 +267,7 @@ public class MiddleLayer {
     return ((SearchResultResponse) response).result;
   }
 
-  public SkipNodeIdentity searchByIdentifier(Identifier identifier, String destinationAddress, int port) {
+  public Identity searchByIdentifier(Identifier identifier, String destinationAddress, int port) {
     return searchByIdentifier(destinationAddress, port, null, identifier);
   }
 
@@ -280,7 +280,7 @@ public class MiddleLayer {
    * @param targetIdentifier   target identifier.
    * @return skip node identity.
    */
-  public SkipNodeIdentity searchByIdentifier(String destinationAddress, int port, Identifier receiverId, Identifier targetIdentifier) {
+  public Identity searchByIdentifier(String destinationAddress, int port, Identifier receiverId, Identifier targetIdentifier) {
     Request request = new SearchByIdentifierRequest(targetIdentifier);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -297,7 +297,7 @@ public class MiddleLayer {
    * @param req                skip node identity.
    * @return boolean value representing whether the lock is acquired or not.
    */
-  public boolean tryAcquire(String destinationAddress, int port, Identifier receiverId, SkipNodeIdentity req) {
+  public boolean tryAcquire(String destinationAddress, int port, Identifier receiverId, Identity req) {
     Request request = new AcquireLockRequest(req);
     request.receiverId = receiverId;
 
@@ -305,7 +305,7 @@ public class MiddleLayer {
     return ((BooleanResponse) response).answer;
   }
 
-  public boolean unlock(String destinationAddress, int port, SkipNodeIdentity owner) {
+  public boolean unlock(String destinationAddress, int port, Identity owner) {
     return unlock(destinationAddress, port, null, owner);
   }
 
@@ -318,14 +318,14 @@ public class MiddleLayer {
    * @param owner              owner node.
    * @return boolean value representing if the lock is unlocked or not.
    */
-  public boolean unlock(String destinationAddress, int port, Identifier receiverId, SkipNodeIdentity owner) {
+  public boolean unlock(String destinationAddress, int port, Identifier receiverId, Identity owner) {
     Request request = new ReleaseLockRequest(owner);
     request.receiverId = receiverId;
     Response response = this.send(destinationAddress, port, request);
     return ((BooleanResponse) response).answer;
   }
 
-  public SkipNodeIdentity updateRightNode(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
+  public Identity updateRightNode(String destinationAddress, int port, Identity snId, int level) {
     return updateRightNode(destinationAddress, port, null, snId, level);
   }
 
@@ -339,7 +339,7 @@ public class MiddleLayer {
    * @param level              Integer representing the level.
    * @return skip node identity.
    */
-  public SkipNodeIdentity updateRightNode(String destinationAddress, int port, Identifier receiverId, SkipNodeIdentity snId, int level) {
+  public Identity updateRightNode(String destinationAddress, int port, Identifier receiverId, Identity snId, int level) {
 
     Request request = new UpdateRightNodeRequest(level, snId);
     request.receiverId = receiverId;
@@ -348,7 +348,7 @@ public class MiddleLayer {
     return ((IdentityResponse) response).identity;
   }
 
-  public SkipNodeIdentity updateLeftNode(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
+  public Identity updateLeftNode(String destinationAddress, int port, Identity snId, int level) {
     return updateLeftNode(destinationAddress, port, null, snId, level);
   }
 
@@ -362,7 +362,7 @@ public class MiddleLayer {
    * @param level              Integer representing the level.
    * @return skip node identity.
    */
-  public SkipNodeIdentity updateLeftNode(String destinationAddress, int port, Identifier receiverId, SkipNodeIdentity snId, int level) {
+  public Identity updateLeftNode(String destinationAddress, int port, Identifier receiverId, Identity snId, int level) {
 
     Request request = new UpdateLeftNodeRequest(level, snId);
     request.receiverId = receiverId;
@@ -371,7 +371,7 @@ public class MiddleLayer {
     return ((IdentityResponse) response).identity;
   }
 
-  public SkipNodeIdentity getIdentity(String destinationAddress, int port) {
+  public Identity getIdentity(String destinationAddress, int port) {
     return getIdentity(destinationAddress, port, null);
   }
 
@@ -383,18 +383,18 @@ public class MiddleLayer {
    * @param receiverId         receiver id.
    * @return skip node identity.
    */
-  public SkipNodeIdentity getIdentity(String destinationAddress, int port, Identifier receiverId) {
+  public Identity getIdentity(String destinationAddress, int port, Identifier receiverId) {
     Request request = new GetIdentityRequest();
     request.receiverId = receiverId;
     Response r = send(destinationAddress, port, new GetIdentityRequest());
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getRightNeighborOf(String destinationAddress, int port, int level) {
+  public Identity getRightNeighborOf(String destinationAddress, int port, int level) {
     return getRightNeighborOf(true, destinationAddress, port, null, level);
   }
 
-  public SkipNodeIdentity getRightNeighborOf(String destinationAddress, int port, Identifier receiverId, int level) {
+  public Identity getRightNeighborOf(String destinationAddress, int port, Identifier receiverId, int level) {
     return getRightNeighborOf(true, destinationAddress, port, receiverId, level);
   }
 
@@ -408,7 +408,7 @@ public class MiddleLayer {
    * @param level              Integer representing the level
    * @return skip node identity.
    */
-  public SkipNodeIdentity getRightNeighborOf(boolean backoff, String destinationAddress, int port, Identifier receiverId, int level) {
+  public Identity getRightNeighborOf(boolean backoff, String destinationAddress, int port, Identifier receiverId, int level) {
     // Send the request through the underlay
     GetRightNodeRequest req = new GetRightNodeRequest(level);
     req.backoff = backoff;
@@ -422,7 +422,7 @@ public class MiddleLayer {
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getLeftNeighborOf(String destinationAddress, int port, Identifier receiverId, int level) {
+  public Identity getLeftNeighborOf(String destinationAddress, int port, Identifier receiverId, int level) {
     return getLeftNeighborOf(true, destinationAddress, port, receiverId, level);
   }
 
@@ -436,7 +436,7 @@ public class MiddleLayer {
    * @param level              Integer representing the level
    * @return skip node identity.
    */
-  public SkipNodeIdentity getLeftNeighborOf(boolean backoff, String destinationAddress, int port, Identifier receiverId, int level) {
+  public Identity getLeftNeighborOf(boolean backoff, String destinationAddress, int port, Identifier receiverId, int level) {
     // Send the request through the underlay
     GetLeftNodeRequest req = new GetLeftNodeRequest(level);
     req.backoff = backoff;
@@ -461,8 +461,8 @@ public class MiddleLayer {
    * @param membershipVector   String representing the target.
    * @return skip node identity.
    */
-  public SkipNodeIdentity findLadder(String destinationAddress, int port, Identifier receiverId, int level, int direction,
-                                     MembershipVector membershipVector) {
+  public Identity findLadder(String destinationAddress, int port, Identifier receiverId, int level, int direction,
+                             MembershipVector membershipVector) {
 
     Request request = new FindLadderRequest(level, direction, membershipVector);
     request.receiverId = receiverId;
@@ -471,7 +471,7 @@ public class MiddleLayer {
     return ((IdentityResponse) r).identity;
   }
 
-  public void announceNeighbor(String destinationAddress, int port, SkipNodeIdentity newNeighbor, int minLevel) {
+  public void announceNeighbor(String destinationAddress, int port, Identity newNeighbor, int minLevel) {
     announceNeighbor(destinationAddress, port, null, newNeighbor, minLevel);
   }
 
@@ -484,7 +484,7 @@ public class MiddleLayer {
    * @param newNeighbor        skip node identity of the new neighbour.
    * @param minLevel           Integer representing the minimum level.
    */
-  public void announceNeighbor(String destinationAddress, int port, Identifier receiverId, SkipNodeIdentity newNeighbor, int minLevel) {
+  public void announceNeighbor(String destinationAddress, int port, Identifier receiverId, Identity newNeighbor, int minLevel) {
     Request request = new AnnounceNeighborRequest(newNeighbor, minLevel);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -510,7 +510,7 @@ public class MiddleLayer {
     return ((BooleanResponse) r).answer;
   }
 
-  public SkipNodeIdentity getLeftLadder(String destinationAddress, int port, int level, MembershipVector membershipVector) {
+  public Identity getLeftLadder(String destinationAddress, int port, int level, MembershipVector membershipVector) {
     return getLeftLadder(destinationAddress, port, null, level, membershipVector);
   }
 
@@ -524,7 +524,7 @@ public class MiddleLayer {
    * @param membershipVector   The membership vector of the node.
    * @return Skip Graph node identity.
    */
-  public SkipNodeIdentity getLeftLadder(String destinationAddress, int port, Identifier receiverId, int level, MembershipVector membershipVector) {
+  public Identity getLeftLadder(String destinationAddress, int port, Identifier receiverId, int level, MembershipVector membershipVector) {
     Request request = new GetLeftLadderRequest(level, membershipVector);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -532,7 +532,7 @@ public class MiddleLayer {
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity getRightLadder(String destinationAddress, int port, int level, MembershipVector membershipVector) {
+  public Identity getRightLadder(String destinationAddress, int port, int level, MembershipVector membershipVector) {
     return getRightLadder(destinationAddress, port, null, level, membershipVector);
   }
 
@@ -546,7 +546,7 @@ public class MiddleLayer {
    * @param membershipVector   The membership vector of the node.
    * @return Skip Graph node identity.
    */
-  public SkipNodeIdentity getRightLadder(String destinationAddress, int port, Identifier receiverId, int level, MembershipVector membershipVector) {
+  public Identity getRightLadder(String destinationAddress, int port, Identifier receiverId, int level, MembershipVector membershipVector) {
     Request request = new GetRightLadderRequest(level, membershipVector);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -554,7 +554,7 @@ public class MiddleLayer {
     return ((IdentityResponse) r).identity;
   }
 
-  public SkipNodeIdentity increment(String destinationAddress, int port, SkipNodeIdentity snId, int level) {
+  public Identity increment(String destinationAddress, int port, Identity snId, int level) {
     return increment(destinationAddress, port, null, snId, level);
   }
 
@@ -568,7 +568,7 @@ public class MiddleLayer {
    * @param level              Integer representing the level.
    * @return skip node identity.
    */
-  public SkipNodeIdentity increment(String destinationAddress, int port, Identifier receiverId, SkipNodeIdentity snId, int level) {
+  public Identity increment(String destinationAddress, int port, Identifier receiverId, Identity snId, int level) {
     Request request = new IncrementRequest(level, snId);
     request.receiverId = receiverId;
     // Send the request through the underlay
@@ -584,7 +584,7 @@ public class MiddleLayer {
     return ((IdentityResponse) response).identity;
   }
 
-  public boolean inject(String destinationAddress, int port, List<SkipNodeIdentity> snIds) {
+  public boolean inject(String destinationAddress, int port, List<Identity> snIds) {
     return inject(destinationAddress, port, null, snIds);
   }
 
@@ -597,7 +597,7 @@ public class MiddleLayer {
    * @param snIds              list of skip node identities for injection.
    * @return boolean value representing if injection succeeded or not.
    */
-  public boolean inject(String destinationAddress, int port, Identifier receiverId, List<SkipNodeIdentity> snIds) {
+  public boolean inject(String destinationAddress, int port, Identifier receiverId, List<Identity> snIds) {
     Request request = new InjectionRequest(snIds);
     request.receiverId = receiverId;
     // Send the request through the underlay

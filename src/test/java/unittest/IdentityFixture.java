@@ -1,10 +1,10 @@
 package unittest;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 
 public class IdentityFixture {
-  public static SkipNodeIdentity newIdentity() {
-    return new SkipNodeIdentity(
+  public static Identity newIdentity() {
+    return new Identity(
         IdentifierFixture.newIdentifier(),
         MembershipVectorFixture.newMembershipVector(),
         "0.0.0.0",

@@ -26,8 +26,8 @@ class SkipNodeTest {
   // Checks the correctness of a lookup table owned by the node with the given identity parameters.
   static void tableCorrectnessCheck(Identifier identifier, MembershipVector mv, LookupTable table) {
     for (int i = 0; i < table.getNumLevels(); i++) {
-      SkipNodeIdentity left = table.getLeft(i);
-      SkipNodeIdentity right = table.getRight(i);
+      Identity left = table.getLeft(i);
+      Identity right = table.getRight(i);
 
       if (!left.equals(LookupTable.EMPTY_NODE)) {
         Assertions.assertTrue(left.getIdentifier().isLessThan(identifier));
@@ -46,8 +46,8 @@ class SkipNodeTest {
   static void tableConsistencyCheck(Map<Identifier, LookupTable> tableMap, SkipNode node) {
     LookupTable table = node.getLookupTable();
     for (int i = 0; i < table.getNumLevels(); i++) {
-      SkipNodeIdentity left = table.getLeft(i);
-      SkipNodeIdentity right = table.getRight(i);
+      Identity left = table.getLeft(i);
+      Identity right = table.getRight(i);
 
       if (!left.equals(LookupTable.EMPTY_NODE)) {
         LookupTable neighborMap = tableMap.get(left.getIdentifier());
@@ -177,11 +177,11 @@ class SkipNodeTest {
     }
 
     // Create a map of identifiers to their corresponding lookup tables.
-    Map<SkipNodeIdentity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(SkipNode::getIdentity,
-        SkipNode::getLookupTable));
+    Map<Identity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(SkipNode::getIdentity,
+                                                                                      SkipNode::getLookupTable));
     // Create a map of identifiers to their corresponding lookup tables.
     Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity).collect(Collectors.toMap(
-        SkipNodeIdentity::getIdentifier,
+        Identity::getIdentifier,
         idMap::get));
 
     // Check the correctness & consistency of the tables.
@@ -198,11 +198,11 @@ class SkipNodeTest {
   void sequentialInsertion() {
     g.insertAllRandomized();
     // Creates a map of identities to their corresponding lookup tables.
-    Map<SkipNodeIdentity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(SkipNode::getIdentity,
-        SkipNode::getLookupTable));
+    Map<Identity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(SkipNode::getIdentity,
+                                                                                      SkipNode::getLookupTable));
     // Creates a map of identifiers to their corresponding lookup tables.
     Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity).collect(Collectors.toMap(
-        SkipNodeIdentity::getIdentifier,
+        Identity::getIdentifier,
         idMap::get));
     // Check the correctness of the tables.
     for (SkipNode n : g.getNodes()) {
@@ -224,7 +224,7 @@ class SkipNodeTest {
       SkipNode initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
         SkipNode target = g.getNodes().get(j);
-        SkipNodeIdentity result = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
+        Identity result = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
         Assertions.assertEquals(target.getIdentity(), result);
       }
     }
@@ -246,7 +246,7 @@ class SkipNodeTest {
       for (int j = 0; j < NODES; j++) {
         final SkipNode target = g.getNodes().get(j);
         searchThreads[NODES * i + j] = new Thread(() -> {
-          SkipNodeIdentity res = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
+          Identity res = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
           if (!target.getIdentity().getIdentifier().equals(res.getIdentifier())) {
             System.err.println("Search failed from " + initiator.getIdentity()
                 .getMemVec() + " expected: " + target.getIdentity().getIdentifier() + " got: " + res.getIdentifier());

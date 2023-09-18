@@ -1,7 +1,7 @@
 package lookup;
 
 import model.skipgraph.SkipGraph;
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 
 /**
  * Lookup Table interface.
@@ -14,8 +14,8 @@ public interface LookupTable {
     LEFT, RIGHT
   }
 
-  SkipNodeIdentity EMPTY_NODE = new SkipNodeIdentity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);
-  SkipNodeIdentity INVALID_NODE = new SkipNodeIdentity(SkipGraph.getInvalidIdentifier(), SkipGraph.getEmptyMembershipVector(), "INVALID", -1);
+  Identity EMPTY_NODE = new Identity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);
+  Identity INVALID_NODE = new Identity(SkipGraph.getInvalidIdentifier(), SkipGraph.getEmptyMembershipVector(), "INVALID", -1);
 
   /**
    * Updates the left neighbor on the given level to be the node.
@@ -24,7 +24,7 @@ public interface LookupTable {
    * @param level The level on which to insert the node
    * @return Replaced node
    */
-  SkipNodeIdentity updateLeft(SkipNodeIdentity node, int level);
+  Identity updateLeft(Identity node, int level);
 
   /**
    * Updates the right neighbor on the given level to be the node.
@@ -33,7 +33,7 @@ public interface LookupTable {
    * @param level The level on which to insert the node
    * @return Replaced node
    */
-  SkipNodeIdentity updateRight(SkipNodeIdentity node, int level);
+  Identity updateRight(Identity node, int level);
 
   /**
    * Returns the best right neighbor on the given level.
@@ -41,7 +41,7 @@ public interface LookupTable {
    * @param level The level to get the node from
    * @return The right neighbor on the given level
    */
-  SkipNodeIdentity getRight(int level);
+  Identity getRight(int level);
 
   /**
    * Returns the best left neighbor on the given level.
@@ -49,7 +49,7 @@ public interface LookupTable {
    * @param level The level to get the node from
    * @return The left neighbor on the given level
    */
-  SkipNodeIdentity getLeft(int level);
+  Identity getLeft(int level);
 
 
   /**
@@ -59,7 +59,7 @@ public interface LookupTable {
    * @param level    the level of the neighbor.
    * @return true iff the neighbor is a left neighbor at the given level.
    */
-  boolean isLeftNeighbor(SkipNodeIdentity neighbor, int level);
+  boolean isLeftNeighbor(Identity neighbor, int level);
 
   /**
    * Returns whether the given right neighbor exists in this lookup table at the given level.
@@ -68,7 +68,7 @@ public interface LookupTable {
    * @param level    the level of the neighbor.
    * @return true iff the neighbor is a right neighbor at the given level.
    */
-  boolean isRightNeighbor(SkipNodeIdentity neighbor, int level);
+  boolean isRightNeighbor(Identity neighbor, int level);
 
   /**
    * Get the number of levels in the lookup table.

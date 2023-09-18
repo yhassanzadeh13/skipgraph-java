@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -9,14 +9,14 @@ import underlay.packets.RequestType;
  */
 public class AcquireLockRequest extends Request {
 
-  public final SkipNodeIdentity requester;
+  public final Identity requester;
 
   /**
    * Constructor for AcquireLockRequest.
    *
    * @param requester Skipnode that is requesting the lock.
    */
-  public AcquireLockRequest(SkipNodeIdentity requester) {
+  public AcquireLockRequest(Identity requester) {
     super(RequestType.AcquireLock);
     this.requester = requester;
   }

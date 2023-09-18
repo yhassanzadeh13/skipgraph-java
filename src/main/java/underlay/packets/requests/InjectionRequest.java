@@ -2,7 +2,7 @@ package underlay.packets.requests;
 
 import java.util.List;
 
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -11,9 +11,9 @@ import underlay.packets.RequestType;
  */
 public class InjectionRequest extends Request {
 
-  public final List<SkipNodeIdentity> snIds;
+  public final List<Identity> snIds;
 
-  public InjectionRequest(List<SkipNodeIdentity> snIds) {
+  public InjectionRequest(List<Identity> snIds) {
     super(RequestType.Injection);
     this.snIds = snIds;
   }

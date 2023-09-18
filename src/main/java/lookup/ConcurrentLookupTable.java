@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import log.Log4jLogger;
 import org.apache.logging.log4j.LogManager;
-import skipnode.SkipNodeIdentity;
+import skipnode.Identity;
 
 /**
  * ConcurrentLookupTable is a lookup table that supports concurrent calls.
@@ -16,7 +16,7 @@ public class ConcurrentLookupTable implements LookupTable {
 
   // TODO: logger should be passed as a constructor parameter.
   private static final Log4jLogger logger = new Log4jLogger(LogManager.getLogger(ConcurrentLookupTable.class));
-  private final SkipNodeIdentity owner;
+  private final Identity owner;
   private final int numLevels;
   private final ReadWriteLock lock;
   /**
@@ -24,14 +24,14 @@ public class ConcurrentLookupTable implements LookupTable {
    * get the index of a neighbor is 2*level for a node on the left side and 2*level+1 for a node on
    * the right side. This is reflected in the getIndex method.
    */
-  private final ArrayList<SkipNodeIdentity> nodes;
+  private final ArrayList<Identity> nodes;
 
   /**
    * Constructor for ConcurrentLookupTable.
    *
    * @param numLevels Integer representing number of levels.
    */
-  public ConcurrentLookupTable(int numLevels, SkipNodeIdentity owner) {
+  public ConcurrentLookupTable(int numLevels, Identity owner) {
     this.owner = owner;
     this.numLevels = numLevels;
     lock = new ReentrantReadWriteLock(true);
@@ -42,7 +42,7 @@ public class ConcurrentLookupTable implements LookupTable {
   }
 
   @Override
-  public SkipNodeIdentity updateLeft(SkipNodeIdentity node, int level) {
+  public Identity updateLeft(Identity node, int level) {
     lock.writeLock().lock();
 
     int idx = getIndex(Direction.LEFT, level);
@@ -50,7 +50,7 @@ public class ConcurrentLookupTable implements LookupTable {
       lock.writeLock().unlock();
       return LookupTable.EMPTY_NODE;
     }
-    SkipNodeIdentity prev = nodes.set(idx, node);
+    Identity prev = nodes.set(idx, node);
 
     lock.writeLock().unlock();
 
@@ -61,7 +61,7 @@ public class ConcurrentLookupTable implements LookupTable {
   }
 
   @Override
-  public SkipNodeIdentity updateRight(SkipNodeIdentity node, int level) {
+  public Identity updateRight(Identity node, int level) {
     lock.writeLock().lock();
 
     int idx = getIndex(Direction.RIGHT, level);
@@ -69,7 +69,7 @@ public class ConcurrentLookupTable implements LookupTable {
       lock.writeLock().unlock();
       return LookupTable.EMPTY_NODE;
     }
-    SkipNodeIdentity prev = nodes.set(idx, node);
+    Identity prev = nodes.set(idx, node);
 
     lock.writeLock().unlock();
 
@@ -84,29 +84,29 @@ public class ConcurrentLookupTable implements LookupTable {
   }
 
   @Override
-  public SkipNodeIdentity getRight(int level) {
+  public Identity getRight(int level) {
     lock.readLock().lock();
 
     int idx = getIndex(Direction.RIGHT, level);
-    SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
+    Identity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
 
     lock.readLock().unlock();
     return node;
   }
 
   @Override
-  public SkipNodeIdentity getLeft(int level) {
+  public Identity getLeft(int level) {
     lock.readLock().lock();
 
     int idx = getIndex(Direction.LEFT, level);
-    SkipNodeIdentity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
+    Identity node = (idx < nodes.size()) ? nodes.get(idx) : LookupTable.EMPTY_NODE;
 
     lock.readLock().unlock();
     return node;
   }
 
   @Override
-  public boolean isLeftNeighbor(SkipNodeIdentity neighbor, int level) {
+  public boolean isLeftNeighbor(Identity neighbor, int level) {
     lock.readLock().lock();
     boolean exists = getLeft(level).equals(neighbor);
     lock.readLock().unlock();
@@ -114,7 +114,7 @@ public class ConcurrentLookupTable implements LookupTable {
   }
 
   @Override
-  public boolean isRightNeighbor(SkipNodeIdentity neighbor, int level) {
+  public boolean isRightNeighbor(Identity neighbor, int level) {
     lock.readLock().lock();
     boolean exists = getRight(level).equals(neighbor);
     lock.readLock().unlock();
