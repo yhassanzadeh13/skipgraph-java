@@ -2,12 +2,12 @@ package middlelayer;
 
 import lookup.LookupTable;
 import model.identifier.Identifier;
+import model.identifier.Identity;
 import model.identifier.MembershipVector;
 import module.logger.Logger;
 import module.logger.SkipGraphLogger;
-import node.skipgraph.SearchResult;
-import model.identifier.Identity;
 import node.Node;
+import node.skipgraph.SearchResult;
 import underlay.Underlay;
 import underlay.packets.Request;
 import underlay.packets.Response;

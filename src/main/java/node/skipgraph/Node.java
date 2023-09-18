@@ -10,9 +10,9 @@ import middlelayer.MiddleLayer;
 import model.identifier.Identifier;
 import model.identifier.Identity;
 import model.identifier.MembershipVector;
+import node.skipgraph.InsertionLock.NeighborInstance;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import node.skipgraph.InsertionLock.NeighborInstance;
 
 /**
  * Skip Node class.
@@ -346,10 +346,10 @@ public class Node implements node.Node {
    *
    * @param targetIdentifier the target identifier.
    * @return The identity of the node with the given target identifier.
-   *         If it does not exist, returns the identity of the node with target identifier closest to the given identifier
-   *         from the direction the search is initiated. For example: Initiating a search for a node with identifier 50 from
-   *         a node with identifier 10 will return the identity of the SnipNode with identifier 50 is it exists. If no such node exists, the
-   *         identity of the SnipNode whose identifier is closest to 50 among the nodes whose identifier is less than 50 is returned.
+   *     If it does not exist, returns the identity of the node with target identifier closest to the given identifier
+   *     from the direction the search is initiated. For example: Initiating a search for a node with identifier 50 from
+   *     a node with identifier 10 will return the identity of the SnipNode with identifier 50 is it exists. If no such node exists, the
+   *     identity of the SnipNode whose identifier is closest to 50 among the nodes whose identifier is less than 50 is returned.
    */
   @Override
   public Identity searchByIdentifier(Identifier targetIdentifier) {

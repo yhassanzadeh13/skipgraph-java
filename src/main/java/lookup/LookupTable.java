@@ -1,19 +1,12 @@
 package lookup;
 
-import model.skipgraph.SkipGraph;
 import model.identifier.Identity;
+import model.skipgraph.SkipGraph;
 
 /**
  * Lookup Table interface.
  */
 public interface LookupTable {
-  /**
-   * Direction of the neighbor; Left or Right.
-   */
-  enum Direction {
-    LEFT, RIGHT
-  }
-
   Identity EMPTY_NODE = new Identity(SkipGraph.getEmptyIdentifier(), SkipGraph.getEmptyMembershipVector(), "EMPTY", -1);
   Identity INVALID_NODE = new Identity(SkipGraph.getInvalidIdentifier(), SkipGraph.getEmptyMembershipVector(), "INVALID", -1);
 
@@ -51,7 +44,6 @@ public interface LookupTable {
    */
   Identity getLeft(int level);
 
-
   /**
    * Returns whether the given left neighbor exists in this lookup table at the given level.
    *
@@ -76,4 +68,11 @@ public interface LookupTable {
    * @return The number of levels in the lookup table
    */
   int getNumLevels();
+
+  /**
+   * Direction of the neighbor; Left or Right.
+   */
+  enum Direction {
+    LEFT, RIGHT
+  }
 }
