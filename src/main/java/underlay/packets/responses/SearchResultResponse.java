@@ -1,6 +1,6 @@
 package underlay.packets.responses;
 
-import skipnode.SearchResult;
+import node.skipgraph.SearchResult;
 import underlay.packets.Response;
 
 /**

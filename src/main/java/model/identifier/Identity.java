@@ -1,12 +1,9 @@
-package skipnode;
+package model.identifier;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 import static lookup.LookupTable.EMPTY_NODE;
-
-import model.identifier.Identifier;
-import model.identifier.MembershipVector;
 
 /**
  * Identity of a node in the skip graph; it contains the membership vector, the identifier, the address and the port of the node.

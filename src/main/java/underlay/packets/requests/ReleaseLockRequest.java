@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.Identity;
+import model.identifier.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 

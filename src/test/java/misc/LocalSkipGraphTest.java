@@ -5,8 +5,8 @@ import model.identifier.Identifier;
 import model.identifier.MembershipVector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import skipnode.SkipNode;
-import skipnode.Identity;
+import node.skipgraph.Node;
+import model.identifier.Identity;
 import unittest.LocalSkipGraph;
 
 class LocalSkipGraphTest {
@@ -35,7 +35,7 @@ class LocalSkipGraphTest {
   @Test
   void fourNodes() {
     LocalSkipGraph g = new LocalSkipGraph(4, true);
-    for (SkipNode n : g.getNodes()) {
+    for (Node n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
   }
@@ -43,7 +43,7 @@ class LocalSkipGraphTest {
   @Test
   void eightNodes() {
     LocalSkipGraph g = new LocalSkipGraph(8,  true);
-    for (SkipNode n : g.getNodes()) {
+    for (Node n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
   }
@@ -51,7 +51,7 @@ class LocalSkipGraphTest {
   @Test
   void sixteenNodes() {
     LocalSkipGraph g = new LocalSkipGraph(16, true);
-    for (SkipNode n : g.getNodes()) {
+    for (Node n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
     }
   }

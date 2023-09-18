@@ -4,8 +4,7 @@ import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
 import org.junit.jupiter.api.*;
-import skipnode.SkipNode;
-import skipnode.SkipNodeInterface;
+import node.skipgraph.Node;
 import underlay.packets.requests.*;
 import unittest.IdentifierFixture;
 import unittest.MembershipVectorFixture;
@@ -27,8 +26,8 @@ public class UnderlayTest {
    * @param underlay underlay to be built.
    */
   protected static void buildLayers(Underlay underlay) {
-    SkipNodeInterface overlay = new SkipNode(LookupTable.EMPTY_NODE,
-        new ConcurrentLookupTable(2, LookupTable.EMPTY_NODE));
+    Node overlay = new Node(LookupTable.EMPTY_NODE,
+                            new ConcurrentLookupTable(2, LookupTable.EMPTY_NODE));
     MiddleLayer middleLayer = new MiddleLayer(underlay, overlay);
     underlay.setMiddleLayer(middleLayer);
     overlay.setMiddleLayer(middleLayer);

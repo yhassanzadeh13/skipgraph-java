@@ -1,4 +1,4 @@
-package skipnode;
+package node;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -8,7 +8,10 @@ import java.util.stream.Collectors;
 
 import lookup.LookupTable;
 import model.identifier.Identifier;
+import model.identifier.Identity;
 import model.identifier.MembershipVector;
+import node.skipgraph.SearchResult;
+import node.skipgraph.Node;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +21,7 @@ import unittest.LocalSkipGraph;
 /**
  * Contains the skip-node tests.
  */
-class SkipNodeTest {
+class NodeTest {
   // total number of Skip Graph nodes involved in the test.
   static final int NODES = 20;
   private LocalSkipGraph g;
@@ -43,7 +46,7 @@ class SkipNodeTest {
 
   // Checks the consistency of a lookup table. In other words, we assert that if x is a neighbor of y at level l,
   // then y is a neighbor of x at level l (in opposite directions).
-  static void tableConsistencyCheck(Map<Identifier, LookupTable> tableMap, SkipNode node) {
+  static void tableConsistencyCheck(Map<Identifier, LookupTable> tableMap, Node node) {
     LookupTable table = node.getLookupTable();
     for (int i = 0; i < table.getNumLevels(); i++) {
       Identity left = table.getLeft(i);
@@ -81,8 +84,8 @@ class SkipNodeTest {
     Thread[] insertionThreads = new Thread[NODES - 1];
     for (int i = 1; i <= insertionThreads.length; i++) {
       // choose the previous node as the introducer.
-      final SkipNode introducer = g.getNodes().get(i - 1);
-      final SkipNode node = g.getNodes().get(i);
+      final Node introducer = g.getNodes().get(i - 1);
+      final Node node = g.getNodes().get(i);
       insertionThreads[i - 1] = new Thread(() -> {
         node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
         insertionDone.countDown();
@@ -103,7 +106,7 @@ class SkipNodeTest {
 
     // check the correctness and consistency of the lookup tables.
     Map<Identifier, LookupTable> tableMap = g.identifierLookupTableMap();
-    for (SkipNode n : g.getNodes()) {
+    for (Node n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
@@ -113,9 +116,9 @@ class SkipNodeTest {
     AtomicInteger searchFailed = new AtomicInteger(0);
     Thread[] searchThreads = new Thread[NODES * NODES];
     for (int i = 0; i < NODES; i++) {
-      final SkipNode initiator = g.getNodes().get(i);
+      final Node initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
-        final SkipNode target = g.getNodes().get(j);
+        final Node target = g.getNodes().get(j);
         searchThreads[i + NODES * j] = new Thread(() -> {
           SearchResult res = initiator.searchByMembershipVector(target.getIdentity().getMemVec());
           if (!target.getIdentity().getMemVec().equals(res.result.getMemVec())) {
@@ -156,8 +159,8 @@ class SkipNodeTest {
     for (int i = 1; i <= threads.length; i++) {
       // Choose an already inserted introducer.
       final int introducerIndex = (int) (Math.random() * i);
-      final SkipNode introducer = g.getNodes().get(introducerIndex);
-      final SkipNode node = g.getNodes().get(i);
+      final Node introducer = g.getNodes().get(introducerIndex);
+      final Node node = g.getNodes().get(i);
       threads[i - 1] = new Thread(() -> {
         node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
         insertionDone.countDown();
@@ -177,15 +180,15 @@ class SkipNodeTest {
     }
 
     // Create a map of identifiers to their corresponding lookup tables.
-    Map<Identity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(SkipNode::getIdentity,
-                                                                                      SkipNode::getLookupTable));
+    Map<Identity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(Node::getIdentity,
+                                                                                      Node::getLookupTable));
     // Create a map of identifiers to their corresponding lookup tables.
-    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity).collect(Collectors.toMap(
+    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(Node::getIdentity).collect(Collectors.toMap(
         Identity::getIdentifier,
         idMap::get));
 
     // Check the correctness & consistency of the tables.
-    for (SkipNode n : g.getNodes()) {
+    for (Node n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
@@ -198,14 +201,14 @@ class SkipNodeTest {
   void sequentialInsertion() {
     g.insertAllRandomized();
     // Creates a map of identities to their corresponding lookup tables.
-    Map<Identity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(SkipNode::getIdentity,
-                                                                                      SkipNode::getLookupTable));
+    Map<Identity, LookupTable> idMap = g.getNodes().stream().collect(Collectors.toMap(Node::getIdentity,
+                                                                                      Node::getLookupTable));
     // Creates a map of identifiers to their corresponding lookup tables.
-    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(SkipNode::getIdentity).collect(Collectors.toMap(
+    Map<Identifier, LookupTable> tableMap = g.getNodes().stream().map(Node::getIdentity).collect(Collectors.toMap(
         Identity::getIdentifier,
         idMap::get));
     // Check the correctness of the tables.
-    for (SkipNode n : g.getNodes()) {
+    for (Node n : g.getNodes()) {
       tableCorrectnessCheck(n.getIdentity().getIdentifier(), n.getIdentity().getMemVec(), n.getLookupTable());
       tableConsistencyCheck(tableMap, n);
     }
@@ -221,9 +224,9 @@ class SkipNodeTest {
     g.insertAllRandomized();
 
     for (int i = 0; i < NODES; i++) {
-      SkipNode initiator = g.getNodes().get(i);
+      Node initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
-        SkipNode target = g.getNodes().get(j);
+        Node target = g.getNodes().get(j);
         Identity result = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
         Assertions.assertEquals(target.getIdentity(), result);
       }
@@ -242,9 +245,9 @@ class SkipNodeTest {
     AtomicInteger searchFailed = new AtomicInteger(0);
     Thread[] searchThreads = new Thread[NODES * NODES];
     for (int i = 0; i < NODES; i++) {
-      final SkipNode initiator = g.getNodes().get(i);
+      final Node initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
-        final SkipNode target = g.getNodes().get(j);
+        final Node target = g.getNodes().get(j);
         searchThreads[NODES * i + j] = new Thread(() -> {
           Identity res = initiator.searchByIdentifier(target.getIdentity().getIdentifier());
           if (!target.getIdentity().getIdentifier().equals(res.getIdentifier())) {
@@ -280,9 +283,9 @@ class SkipNodeTest {
   void sequentialSearchByMembershipVector() {
     g.insertAllRandomized();
     for (int i = 0; i < NODES; i++) {
-      SkipNode initiator = g.getNodes().get(i);
+      Node initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
-        SkipNode target = g.getNodes().get(j);
+        Node target = g.getNodes().get(j);
         SearchResult result = initiator.searchByMembershipVector(target.getIdentity().getMemVec());
         if (!result.result.equals(target.getIdentity())) {
           initiator.searchByMembershipVector(target.getIdentity().getMemVec());
@@ -299,9 +302,9 @@ class SkipNodeTest {
     AtomicInteger searchFailed = new AtomicInteger(0);
     Thread[] searchThreads = new Thread[NODES * NODES];
     for (int i = 0; i < NODES; i++) {
-      final SkipNode initiator = g.getNodes().get(i);
+      final Node initiator = g.getNodes().get(i);
       for (int j = 0; j < NODES; j++) {
-        final SkipNode target = g.getNodes().get(j);
+        final Node target = g.getNodes().get(j);
         searchThreads[NODES * i + j] = new Thread(() -> {
           SearchResult res = initiator.searchByMembershipVector(target.getIdentity().getMemVec());
           // TODO: shorten this chain of calls with target.isIdentityEqual(res.result)

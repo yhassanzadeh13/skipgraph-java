@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.Identity;
+import model.identifier.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -16,7 +16,7 @@ public class UpdateLeftNodeRequest extends Request {
    * Constructor for UpdateLeftNodeRequest.
    *
    * @param level Integer representing the level.
-   * @param snId  Skipnode identity.
+   * @param snId  node identity.
    */
   public UpdateLeftNodeRequest(int level, Identity snId) {
     super(RequestType.UpdateLeftNode);

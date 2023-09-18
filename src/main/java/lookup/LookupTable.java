@@ -1,7 +1,7 @@
 package lookup;
 
 import model.skipgraph.SkipGraph;
-import skipnode.Identity;
+import model.identifier.Identity;
 
 /**
  * Lookup Table interface.

@@ -15,8 +15,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import underlay.Underlay;
-import skipnode.SkipNode;
-import skipnode.Identity;
+import node.skipgraph.Node;
+import model.identifier.Identity;
 import unittest.IdentifierFixture;
 import unittest.MembershipVectorFixture;
 import unittest.MockUnderlay;
@@ -28,26 +28,26 @@ import unittest.NetworkHub;
  */
 public class MvpTest {
   // TODO: this test fails if number of nodes increased, we should fix it.
-  private static final int NODES = 5;
-  private static final int MembershipVectorSize = MembershipVector.computeSize(NODES);
-  private ArrayList<SkipNode> skipNodes;
+  private static final int NODES_COUNT = 5;
+  private static final int MembershipVectorSize = MembershipVector.computeSize(NODES_COUNT);
+  private ArrayList<Node> nodes;
 
   /**
    * Creates the skip graph (generates skip nodes), initializes the underlays and middle layers. Inserts the first node.
    */
   private void createSkipGraph() {
-    List<Underlay> underlays = new ArrayList<>(NODES);
+    List<Underlay> underlays = new ArrayList<>(NODES_COUNT);
     NetworkHub networkHub = new NetworkHub();
-    for (int i = 0; i < NODES; i++) {
+    for (int i = 0; i < NODES_COUNT; i++) {
       Underlay underlay = new MockUnderlay(networkHub);
       underlay.initialize(0);
       underlays.add(underlay);
     }
 
     // identities
-    List<Identity> identities = new ArrayList<>(NODES);
+    List<Identity> identities = new ArrayList<>(NODES_COUNT);
 
-    for (int i = 0; i < NODES; i++) {
+    for (int i = 0; i < NODES_COUNT; i++) {
       Identity skid = new Identity(IdentifierFixture.newIdentifier(),
                                    MembershipVectorFixture.newMembershipVector(),
                                    underlays.get(i).getAddress(),
@@ -57,43 +57,43 @@ public class MvpTest {
     }
 
     // Constructs the lookup tables.
-    List<LookupTable> lookupTables = new ArrayList<>(NODES);
-    for (int i = 0; i < NODES; i++) lookupTables.add(new ConcurrentLookupTable(MembershipVectorSize, identities.get(i)));
+    List<LookupTable> lookupTables = new ArrayList<>(NODES_COUNT);
+    for (int i = 0; i < NODES_COUNT; i++) lookupTables.add(new ConcurrentLookupTable(MembershipVectorSize, identities.get(i)));
 
     // Finally, constructs the nodes.
-    skipNodes = new ArrayList<>(NODES);
-    for (int i = 0; i < NODES; i++) {
-      SkipNode skipNode = new SkipNode(identities.get(i), lookupTables.get(i));
-      skipNodes.add(skipNode);
+    nodes = new ArrayList<>(NODES_COUNT);
+    for (int i = 0; i < NODES_COUNT; i++) {
+      Node node = new Node(identities.get(i), lookupTables.get(i));
+      nodes.add(node);
     }
 
 
     // Create the middlelayers and wires in the underlays to the nodes
-    for (int i = 0; i < NODES; i++) {
-      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), skipNodes.get(i));
+    for (int i = 0; i < NODES_COUNT; i++) {
+      MiddleLayer middleLayer = new MiddleLayer(underlays.get(i), nodes.get(i));
       // Assign the middle layer to the underlay & overlay.
       underlays.get(i).setMiddleLayer(middleLayer);
-      skipNodes.get(i).setMiddleLayer(middleLayer);
+      nodes.get(i).setMiddleLayer(middleLayer);
     }
 
     // first node inserts itself
-    skipNodes.get(0).insert(null, -1);
+    nodes.get(0).insert(null, -1);
   }
 
   /**
    * Inserts all the skip graph nodes (besides the first one), concurrently
    */
   private void doInsertions() {
-    Thread[] threads = new Thread[NODES - 1];
+    Thread[] threads = new Thread[NODES_COUNT - 1];
     CountDownLatch insertionDone = new CountDownLatch(threads.length);
 
     // Makes node 0 the introducer of all nodes.
-    skipNodes.get(0).insert(null, -1);
-    final SkipNode introducer = skipNodes.get(0);
+    nodes.get(0).insert(null, -1);
+    final Node introducer = nodes.get(0);
 
     // Construct the threads.
     for (int i = 0; i < threads.length; i++) {
-      final SkipNode node = skipNodes.get(i+1);
+      final Node node = nodes.get(i+1);
       // picks random introducer for a node
       threads[i] = new Thread(() -> {
         node.insert(introducer.getIdentity().getAddress(), introducer.getIdentity().getPort());
@@ -121,16 +121,16 @@ public class MvpTest {
    */
   private void doSearches() {
     AtomicInteger assertionErrorCount = new AtomicInteger();
-    Thread[] searchThreads = new Thread[NODES * NODES];
+    Thread[] searchThreads = new Thread[NODES_COUNT * NODES_COUNT];
     CountDownLatch searchDone = new CountDownLatch(searchThreads.length);
 
-    for (int i = 0; i < NODES; i++) {
+    for (int i = 0; i < NODES_COUNT; i++) {
       // Choose the searcher.
-      final SkipNode searcher = skipNodes.get(i);
-      for (int j = 0; j < NODES; j++) {
+      final Node searcher = nodes.get(i);
+      for (int j = 0; j < NODES_COUNT; j++) {
         // Choose the target.
-        final SkipNode target = skipNodes.get(j);
-        searchThreads[i + NODES * j] = new Thread(() -> {
+        final Node target = nodes.get(j);
+        searchThreads[i + NODES_COUNT * j] = new Thread(() -> {
           Identity res = searcher.searchByIdentifier(target.getIdentity().getIdentifier());
           try {
             Assertions.assertEquals(
@@ -178,8 +178,8 @@ public class MvpTest {
    */
   @AfterEach
   public void TearDown(){
-    for(SkipNode skipNode: skipNodes){
-      Assertions.assertTrue(skipNode.terminate());
+    for(Node node: nodes){
+      Assertions.assertTrue(node.terminate());
     }
   }
 }

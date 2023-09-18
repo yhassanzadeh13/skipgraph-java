@@ -6,7 +6,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import log.Log4jLogger;
 import org.apache.logging.log4j.LogManager;
-import skipnode.Identity;
+import model.identifier.Identity;
 
 /**
  * ConcurrentLookupTable is a lookup table that supports concurrent calls.

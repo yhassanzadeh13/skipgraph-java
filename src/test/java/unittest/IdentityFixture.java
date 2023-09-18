@@ -1,6 +1,6 @@
 package unittest;
 
-import skipnode.Identity;
+import model.identifier.Identity;
 
 public class IdentityFixture {
   public static Identity newIdentity() {

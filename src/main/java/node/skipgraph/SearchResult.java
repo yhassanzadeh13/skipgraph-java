@@ -1,6 +1,8 @@
-package skipnode;
+package node.skipgraph;
 
 import java.io.Serializable;
+
+import model.identifier.Identity;
 
 /**
  * Represents the result of a search containing the piggybacked information.

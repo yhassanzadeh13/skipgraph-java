@@ -3,7 +3,7 @@ package lookup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import skipnode.Identity;
+import model.identifier.Identity;
 import unittest.IdentityFixture;
 
 import java.util.ArrayList;

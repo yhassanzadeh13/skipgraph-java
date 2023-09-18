@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.Identity;
+import model.identifier.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -14,7 +14,7 @@ public class AcquireLockRequest extends Request {
   /**
    * Constructor for AcquireLockRequest.
    *
-   * @param requester Skipnode that is requesting the lock.
+   * @param requester node that is requesting the lock.
    */
   public AcquireLockRequest(Identity requester) {
     super(RequestType.AcquireLock);

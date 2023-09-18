@@ -13,9 +13,6 @@ public class Request implements Serializable {
   public String senderAddress;
   public int senderPort;
 
-  // ID of the receiver, a null denotes the request is to the master node.
-  public Identifier receiverId = null;
-
   // Denotes whether the middle layer should keep trying to deliver the request to a locked overlay
   // at the client. If this is set to false, the overlay needs to check whether the response is a
   // `locked` response and act accordingly.

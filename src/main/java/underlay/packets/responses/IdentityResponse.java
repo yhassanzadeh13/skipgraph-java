@@ -1,6 +1,6 @@
 package underlay.packets.responses;
 
-import skipnode.Identity;
+import model.identifier.Identity;
 import underlay.packets.Response;
 
 /**

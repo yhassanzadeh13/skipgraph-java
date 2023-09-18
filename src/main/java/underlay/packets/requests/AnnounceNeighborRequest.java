@@ -1,6 +1,6 @@
 package underlay.packets.requests;
 
-import skipnode.Identity;
+import model.identifier.Identity;
 import underlay.packets.Request;
 import underlay.packets.RequestType;
 
@@ -15,7 +15,7 @@ public class AnnounceNeighborRequest extends Request {
   /**
    * Constructor for AnnounceNeighborRequest.
    *
-   * @param newNeighbor Skipnode that is the new neighbour.
+   * @param newNeighbor identity of the new neighbour.
    * @param minLevel    Integer representing the minimum level.
    */
   public AnnounceNeighborRequest(Identity newNeighbor, int minLevel) {

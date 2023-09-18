@@ -1,13 +1,15 @@
-package skipnode;
+package node;
 
 import middlelayer.MiddleLayer;
 import model.identifier.Identifier;
+import model.identifier.Identity;
 import model.identifier.MembershipVector;
+import node.skipgraph.SearchResult;
 
 /**
  * Skip Node interface.
  */
-public interface SkipNodeInterface {
+public interface Node {
 
   /**
    * Set the middle layer which would handle communication with remote nodes.
@@ -15,21 +17,13 @@ public interface SkipNodeInterface {
   void setMiddleLayer(MiddleLayer middleLayer);
 
   /**
-   * Add the SkipNode to the SkipGraph through an introducer.
+   * Add the node to the Skip Graph distributed overlay through an introducer.
    *
    * @param introducerAddress the address of the introducer.
    * @param introducerPort    the port of the introducer.
    */
   // TODO: this method should receive an identity for introducer. Also, we need to have a self-insert method.
   void insert(String introducerAddress, int introducerPort);
-
-  /**
-   * Adds a data node to the list of overlays of the middle layer Inserts the node into the Skip
-   * Graph.
-   *
-   * @param node skip node instance
-   */
-  void insertDataNode(SkipNodeInterface node);
 
   /**
    * Returns whether the node is available to be used as a router. If the node is still being
@@ -68,9 +62,9 @@ public interface SkipNodeInterface {
    *
    * @param targetIdentifier The target identifier to search for
    * @return The identity of the node with the given identifier. If it does not exist, returns
-   *     the identity of the SkipNode with identifier closest to the given identifier from the
-   *     direction the search is initiated. For example: Initiating a search for a SkipNode with
-   *     identifier 50 from a SnipNode with identifier 10 will return the identity of the SnipNode
+   *     the identity of the node with identifier closest to the given identifier from the
+   *     direction the search is initiated. For example: Initiating a search for a node with
+   *     identifier 50 from a node with identifier 10 will return the identity of the node
    *     with identifier 50 is it exists. If no such SnipNode exists, the identity of the
    *     SnipNode whose identifier is closest to 50 among the nodes whose identifier is less than 50 is
    *     returned.
@@ -81,9 +75,9 @@ public interface SkipNodeInterface {
    * Search for the given membership vector.
    *
    * @param membershipVector The membership vector to search for
-   * @return The identity of the SkipNode with the given membership vector. If it does not exist
-   *     returns the identity of the SkipNode which shares the longest prefix among the
-   *     nodes in the SkipGraph. Also contains the piggybacked information.
+   * @return The identity of the node with the given membership vector. If it does not exist
+   *     returns the identity of the node which shares the longest prefix among the
+   *     nodes in the Skip Graph. Also contains the piggybacked information.
    */
   SearchResult searchByMembershipVector(MembershipVector membershipVector);
 
@@ -97,7 +91,7 @@ public interface SkipNodeInterface {
   SearchResult searchByMembershipVector(MembershipVector target, int level);
 
   /**
-   * Updates the SkipNode on the left on the given level to the given identity.
+   * Updates the node on the left on the given level to the given identity.
    *
    * @param snId  The new identity to be placed in the given level
    * @param level The level to place the given identity.
@@ -106,7 +100,7 @@ public interface SkipNodeInterface {
   Identity updateLeftNode(Identity snId, int level);
 
   /**
-   * Updates the SkipNode on the right on the given level to the given identity.
+   * Updates the node on the right on the given level to the given identity.
    *
    * @param snId  The new identity to be placed in the given level
    * @param level The level to place the given identity.

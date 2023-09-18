@@ -1,8 +1,9 @@
-package skipnode;
+package node.skipgraph;
 
 import java.util.concurrent.Semaphore;
 
 import log.Log4jLogger;
+import model.identifier.Identity;
 import org.apache.logging.log4j.LogManager;
 
 /**
