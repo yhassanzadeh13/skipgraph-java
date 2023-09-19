@@ -22,7 +22,7 @@ import underlay.packets.requests.SearchByIdentifierRequest;
 import underlay.packets.requests.SearchByMembershipVectorRecursiveRequest;
 import underlay.packets.requests.SearchByMembershipVectorRequest;
 import underlay.packets.requests.UpdateLeftNodeRequest;
-import underlay.packets.requests.UpdateRightNodeRequest;
+import underlay.packets.requests.UpdateLookupTableNeighborRequest;
 import underlay.packets.responses.AckResponse;
 import underlay.packets.responses.BooleanResponse;
 import underlay.packets.responses.IdentityResponse;
@@ -135,19 +135,17 @@ public class MiddleLayer {
         return new BooleanResponse(overlay.tryAcquire(((AcquireLockRequest) request).requester));
       case ReleaseLock:
         return new BooleanResponse(overlay.unlock(((ReleaseLockRequest) request).owner));
-      case UpdateLeftNode:
+      case UpdateLookupTableNeighbor:
         // Can only be invoked when unlocked or by the lock owner.
         if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
           return new Response(true);
         }
-        identity = overlay.updateLeftNode(((UpdateLeftNodeRequest) request).snId, ((UpdateLeftNodeRequest) request).level);
-        return new IdentityResponse(identity);
-      case UpdateRightNode:
-        // Can only be invoked when unlocked or by the lock owner.
-        if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
-          return new Response(true);
+        UpdateLookupTableNeighborRequest updateLookupTableNeighborRequest = (UpdateLookupTableNeighborRequest) request;
+        if (updateLookupTableNeighborRequest.direction.isLeft()) {
+          identity = overlay.updateLeftNode(updateLookupTableNeighborRequest.identity, updateLookupTableNeighborRequest.level);
+        } else {
+          identity = overlay.updateRightNode(updateLookupTableNeighborRequest.identity, updateLookupTableNeighborRequest.level);
         }
-        identity = overlay.updateRightNode(((UpdateRightNodeRequest) request).snId, ((UpdateRightNodeRequest) request).level);
         return new IdentityResponse(identity);
       case GetRightNode:
         // Can only be invoked when unlocked or by the lock owner.

@@ -3,9 +3,16 @@ package underlay;
 import lookup.ConcurrentLookupTable;
 import lookup.LookupTable;
 import middlelayer.MiddleLayer;
-import org.junit.jupiter.api.*;
+import model.skipgraph.Direction;
 import node.skipgraph.Node;
-import underlay.packets.requests.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import underlay.packets.requests.SearchByIdentifierRequest;
+import underlay.packets.requests.SearchByMembershipVectorRequest;
+import underlay.packets.requests.UpdateLeftNodeRequest;
+import underlay.packets.requests.UpdateLookupTableNeighborRequest;
 import unittest.IdentifierFixture;
 import unittest.MembershipVectorFixture;
 
@@ -62,7 +69,9 @@ public class UnderlayTest {
         localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByIdentifierRequest(IdentifierFixture.newIdentifier())));
     // Check left/right update requests.
     Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));
-    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateRightNodeRequest(0, LookupTable.EMPTY_NODE)));
+    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress,
+                                                       remotePort,
+                                                       new UpdateLookupTableNeighborRequest(0, Direction.RIGHT, LookupTable.EMPTY_NODE)));
   }
 
   // Terminates the underlays.
