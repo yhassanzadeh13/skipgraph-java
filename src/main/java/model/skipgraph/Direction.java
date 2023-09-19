@@ -1,10 +1,12 @@
 package model.skipgraph;
 
+import java.io.Serializable;
+
 /**
  * Represents the semantic of direction in Skip Graph. It can be the direction of search, or the neighbor of a node, etc.
  * A Direction can be either LEFT or RIGHT.
  */
-public class Direction {
+public class Direction implements Serializable {
   /**
    * The value of the direction; either "Left" or "Right".
    */

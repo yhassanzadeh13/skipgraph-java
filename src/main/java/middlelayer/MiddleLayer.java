@@ -21,7 +21,6 @@ import underlay.packets.requests.ReleaseLockRequest;
 import underlay.packets.requests.SearchByIdentifierRequest;
 import underlay.packets.requests.SearchByMembershipVectorRecursiveRequest;
 import underlay.packets.requests.SearchByMembershipVectorRequest;
-import underlay.packets.requests.UpdateLeftNodeRequest;
 import underlay.packets.requests.UpdateLookupTableNeighborRequest;
 import underlay.packets.responses.AckResponse;
 import underlay.packets.responses.BooleanResponse;
@@ -136,6 +135,7 @@ public class MiddleLayer {
       case ReleaseLock:
         return new BooleanResponse(overlay.unlock(((ReleaseLockRequest) request).owner));
       case UpdateLookupTableNeighbor:
+        // TODO: this entire logic must be encapsulated as handle update lookup table neighbor in Overlay (not middlelayer).
         // Can only be invoked when unlocked or by the lock owner.
         if (overlay.isLocked() && !overlay.isLockedBy(request.senderAddress, request.senderPort)) {
           return new Response(true);

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import underlay.packets.requests.SearchByIdentifierRequest;
 import underlay.packets.requests.SearchByMembershipVectorRequest;
-import underlay.packets.requests.UpdateLeftNodeRequest;
 import underlay.packets.requests.UpdateLookupTableNeighborRequest;
 import unittest.IdentifierFixture;
 import unittest.MembershipVectorFixture;
@@ -68,7 +67,9 @@ public class UnderlayTest {
     Assertions.assertNotNull(
         localUnderlay.sendMessage(remoteAddress, remotePort, new SearchByIdentifierRequest(IdentifierFixture.newIdentifier())));
     // Check left/right update requests.
-    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress, remotePort, new UpdateLeftNodeRequest(0, LookupTable.EMPTY_NODE)));
+    Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress,
+                                                       remotePort,
+                                                       new UpdateLookupTableNeighborRequest(0, Direction.LEFT, LookupTable.EMPTY_NODE)));
     Assertions.assertNotNull(localUnderlay.sendMessage(remoteAddress,
                                                        remotePort,
                                                        new UpdateLookupTableNeighborRequest(0, Direction.RIGHT, LookupTable.EMPTY_NODE)));
